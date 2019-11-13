@@ -11,9 +11,11 @@ a.ovi_rate.f <- function(dt) {
 	st <- c(15.30,16.52,20.05,21.79,25.64,27.64,31.33,31.65,32.55,33.41)
 	model <- lm(ovir ~ poly(st,4)) #Forth polynomial
 	pred_ovi_rate <- predict(model,newdata=data.frame(st=dt),interval='confidence', level=0.95)
+	pred_ovi_rate<-ifelse(pred_ovi_rate<0,0,pred_ovi_rate)
 	return(pred_ovi_rate[,1])
 
 }
 
-# ov <- a.ovi_rate.f(temp1)
-# plot(temp1,a.batch.n)
+# ovr <- a.ovi_rate.f(temp1)
+# plot(ovir~st)
+# lines(ovr~dt,col="red")
