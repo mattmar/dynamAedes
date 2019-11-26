@@ -4,7 +4,7 @@
 #.a=adult, i.=immature, e.=egg
 #.p=probability, .r=rate, .n=number, .v=vector, .m=matrix, .a=array, .f=function
 
-zanzinv <- function(temp.matrix=ww,cell.dist.matrix=asd,road.dist.matrix=pld,startd=1,endd=10,n.clusters=1,cluster.type="SOCK",iter=1,intro.adults=100,intro.larvae=0,intro.eggs=0) {
+zanzinv <- function(temp.matrix=ww,cell.dist.matrix=asd,road.dist.matrix=pld,startd=1,endd=10,n.clusters=1,cluster.type="SOCK",iter=1,intro.adults=0,intro.immatures=0,intro.eggs=0) {
 
 	### Preamble: define variable for the model ###
 	## Export variables in the global environment
@@ -26,10 +26,11 @@ zanzinv <- function(temp.matrix=ww,cell.dist.matrix=asd,road.dist.matrix=pld,sta
 	## Time
 	days <- ncol(temp.matrix) #n of day to simulate
 	## Vector of propagules to initiate the life cycle
-	e.intro.n <- rep(0,space); e.intro.n[sample(as.integer(colnames(road.dist.matrix)),1)] <- intro.eggs #n of introduced eggs
-	i.intro.n <- rep(0,space); i.intro.n[sample(as.integer(colnames(road.dist.matrix)),1)] <- intro.larvae #n of introduced immatures
-	a.intro.n <- rep(0,space); a.intro.n[sample(as.integer(colnames(road.dist.matrix)),1)] <- intro.adults #n of introduced adults
+	if(intro.eggs!=0) {e.intro.n <- rep(0,space); e.intro.n[sample(as.integer(colnames(road.dist.matrix)),1)] <- intro.eggs} else e.intro.n <- rep(0,space)
+	if(intro.immatures!=0) {i.intro.n <- rep(0,space); i.intro.n[sample(as.integer(colnames(road.dist.matrix)),1)] <- intro.immatures} else i.intro.n <- rep(0,space)
+	if(intro.adults!=0) {a.intro.n <- rep(0,space); a.intro.n[sample(as.integer(colnames(road.dist.matrix)),1)] <- intro.adults} else a.intro.n <- rep(0,space)
 	stopit <- FALSE
+	
 	### Parallelized iterations of the life cycle
 	rs <<- foreach(iteration=1:iter) %dopar% {
 		### Life cycle ###
@@ -114,7 +115,9 @@ zanzinv <- function(temp.matrix=ww,cell.dist.matrix=asd,road.dist.matrix=pld,sta
 					i.temp.v <- sapply(1:space, function(x){rbinom(1,i.temp.v[x],i.surv.p[x])})
 
 					## Adult compartment ##
-					# A has five sub-compartments representing: adults in 1,2 of oviposition[2:3]; 2d+ old adults host-seeking and non ovipositing[4]; 2d+ old adults which digested the blood meal but not yet laying[1]; 1d old adults, non-laying and non-dispersing[5].
+					# A has five sub-compartments representing: adults in 1,2 of oviposition[2:3]; 2d+ old adults host-seeking and non ovipositing[4]; 2d+ old adults which digested the blood meal but not yet laying[1]; 1d old adults, non-laying and non-dispersing [5].
+					# Introduce if day is 1
+					p.life.a[3,,4] <- if( length(counter)==1 ) a.intro.n else p.life.a[3,,4]
 					# Remove males adult from newly emerged adults
 					p.life.a[3,,5] <- sapply(1:space,function(x) rbinom(1,i.emer.n[x],0.5))
 					# Add to females ready to oviposit the number of females which pass from host-seeking to ovipositing
@@ -122,9 +125,7 @@ zanzinv <- function(temp.matrix=ww,cell.dist.matrix=asd,road.dist.matrix=pld,sta
 					p.life.a[3,,1] <- p.life.a[3,,1] + n.ovir.a
 					# Remove females which stop host-seeking from the host-seeking compartment
 					p.life.a[3,,4] <- p.life.a[3,,4] - n.ovir.a
-					# Introduce if day is 1
-					p.life.a[3,,5] <- if( length(counter)==1 ) a.intro.n else p.life.a[3,,5]
-					# Find number of eggs laid by ovipositing females
+						# Find number of eggs laid by ovipositing females
 					a.egg.n <- sapply(1:space, function(x) sum(rpois(sum(p.life.a[3,x,2:3])[which(sum(p.life.a[3,x,2:3])>0)], a.batc.n[x])))
 					# Find number of adult females surviving
 					p.life.a[3,,1:4] <- t(sapply(1:space, function(x) {sapply(p.life.a[3,x,1:4],rbinom,n=1,p=a.surv.p[x])}))
@@ -191,11 +192,10 @@ zanzinv <- function(temp.matrix=ww,cell.dist.matrix=asd,road.dist.matrix=pld,sta
 					# Make a new host-seeking compartment and slide ovipositing female status for new day
 					p.life.a[3,,4] <- p.life.a[3,,3] + p.life.a[3,,4] + p.life.a[3,,5]
 					p.life.a[3,,2:3] <- p.life.a[3,,1:2]
-					p.life.a[3,,1] <- 0
-					#outl[[length(counter)]] <- p.life.a
 					message("\nday ",length(counter)," has ended. Population is ",sum(p.life.a)," individuals \n")
 					# Return the life table of the day 
 					stopit <- sum(p.life.a)==0
+					p.life.a[3,,1] <- 0
 					return(list(p.life.a))
 				}else{message("Extinct")} #end of stopif condition
 			} #end of the day
