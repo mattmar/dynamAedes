@@ -4,7 +4,7 @@
 #.a=adult, i.=immature, e.=egg
 #.p=probability, .r=rate, .n=number, .v=vector, .m=matrix, .a=array, .f=function
 
-zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,startd=1,endd=10,n.clusters=1,cluster.type="SOCK",iter=1,intro.cell=NULL,intro.adults=0,intro.immatures=0,intro.eggs=0) {
+zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,startd=1,endd=10,n.clusters=1,cluster.type="SOCK",iter=1,intro.cell=NULL,intro.adults=0,intro.immatures=0,intro.eggs=0,sparse.output=FALSE) {
 
 	### Preamble: define variable for the model ###
 	## Export variables in the global environment
@@ -13,7 +13,7 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 	resample <- function(x, ...) x[sample.int(length(x), ...)]
 	sapply(c("libraries","resample"), function(x) {assign(x,get(x),envir= .GlobalEnv)})
 	## Load packages
-	suppressPackageStartupMessages(ipak(c("foreach","doSNOW","Rmpi","actuar","fields")))
+	suppressPackageStartupMessages(ipak(c("foreach","doSNOW","Rmpi","actuar","fields","slam")))
 	## Type of cluster
 	if(cluster.type=="SOCK" || cluster.type=="FORK") {
 		cl <- makeCluster(n.clusters,type=cluster.type, outfile="",useXDR=FALSE,methods=FALSE,output="")
@@ -22,7 +22,7 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 	}
  	## Start the parallelized loop over iter
 	doSNOW::registerDoSNOW(cl)
-	parallel::clusterCall(cl=cl, function() ipak(c("foreach")))
+	parallel::clusterCall(cl=cl, function() ipak(c("foreach","slam")))
  	## Space
 	space <- nrow(temps.matrix)
 	## Time
@@ -34,11 +34,11 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 	stopit <- FALSE
 	
 	### Parallelized iterations of the life cycle
-	rs <<- foreach(iteration=1:iter) %dopar% {
+	rs <- foreach(iteration=1:iter) %dopar% {
 		### Life cycle ###
 		if( exists("counter") ) rm(counter)
 			foreach(day = startd:endd, .combine=c) %do% {
-				print("start of the day")
+				#print("start of the day")
 				if(!stopit) {
 					if( !exists("counter") ) {
 						counter <- 0; i.surv.m <- matrix(0,ncol=5,nrow=2); i.temp.v <- 0; e.temp.v <- 0; a.egg.n <- 0; p.life.a <- array(0,c(3,nrow(temps.matrix),5)); outl <- list()
@@ -142,10 +142,10 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 						# Find how many host-seeking females move and at what distance (0:600 m)
 						f.adis.v <- sapply(f.ocel.v, function(x) rmultinom(1,p.life.a[3,x,4],f.adis.p))
 						#print(p.life.a[3,,1:5][unique(which(p.life.a[3,,1:5]>0,arr.ind=T)[,1]),unique(which(p.life.a[3,,1:5]>0,arr.ind=T)[,2])])
-						print("just before active-dispersal")
+						#print("just before active-dispersal")
 						# Find a landing cell for each distance at which a set of adult females disperse 
 						for (i in 1:length(f.ocel.v)) {
-							print(c("In short-dispersal",length(f.ocel.v)))
+							#print(c("In short-dispersal",length(f.ocel.v)))
 							# Cell of origin from cell index
 							e <- f.ocel.v[i]
 							# Build a distance matrix between cell of origin and all other cells in the system
@@ -160,10 +160,10 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 							a.land.v <- sapply(a.plan.l, function(x) {if(length(x)>0) resample(x,1,replace=FALSE) else -999})
 							#print(a.land.v)
 							toret <- as.integer(which(a.land.v>=0))
-							print("just before adding active-adults to cells")
+							#print("just before adding active-adults to cells")
 							#print(length(f.adis.v[which(f.adis.v[,i]<max(cell.dist.matrix)),i][toret])>0)
 							if( length(f.adis.v[which(f.adis.v[,i]<max(cell.dist.matrix)),i][toret])>0 ) {
-								print(c("toreret is ", e, toret, a.land.v[toret]))
+								#print(c("toreret is ", e, toret, a.land.v[toret]))
 								# Remove dispersing individuals from cell of origin
 								p.life.a[3,e,4] <- p.life.a[3,e,4] - sum(f.adis.v[which(f.adis.v[,i]<max(cell.dist.matrix)),i][toret])
 								#print("then")
@@ -175,7 +175,7 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 						}
 						#print("out from short dispersal") 
 					}else print("No short-dispersal")
-					print("just before passive-dispersal")
+					#print("just before passive-dispersal")
 
 					## Long-distance passive dispersal
 					# It happens only if any cell with at least one adult is in proximity of roads; therefore it is key that colnames(road.dist.matrix) and the order of cells correspond to p.life.a
@@ -183,7 +183,7 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 						# Extract cells whose contain long-distance dispersing adults
 						f.opac.n <- unique(which(p.life.a[3,,]>0,arr.ind=T)[,1])[which(unique(which(p.life.a[3,,]>0,arr.ind=T)[,1])%in%colnames(road.dist.matrix))]
 						# Select only 0.0001 adults in those cells, meaning that, on average, 1 adult on 10000 is moved by a car
-						f.pdis.n <- lapply(f.opac.n, function(x) sapply(p.life.a[3,x,], function(y) rbinom(1,y,0.001)))
+						f.pdis.n <- lapply(f.opac.n, function(x) sapply(p.life.a[3,x,], function(y) rbinom(1,y,0.0001)))
 						# Disperse adults at ld distance along roads, each row*1000 is a distance category
 						f.mdis.n <- lapply(f.pdis.n, function(x) sapply(x, function(y) rmultinom(1,y,f.pdis.p)))
 						# Select drawn distances
@@ -214,13 +214,13 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					# Return the life table of the day 
 					stopit <- sum(p.life.a)==0
 					gc()
-					return(list(p.life.a))
-				}else{message("Extinct")} #end of stopif condition
+					if(sparse.output) return(list(as.simple_sparse_array(p.life.a))) else return(list(p.life.a))
+				}else{message("Extinct");return(list(NA))} #end of stopif condition
 			} #end of the day
 			#print("out of day")
 		} #end of iteration
-		print("out of iteration")
+		#print("out of iteration")
 		gc()
-		return(rs)
 		stopCluster(cl)
+		return(rs)
 	} #end fo function

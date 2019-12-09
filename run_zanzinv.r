@@ -1,6 +1,6 @@
 ## Load time series of daily average temperature and distance matrices
 setwd("~/GitHub/euaeae")
-w <- readRDS('data/temperature2016_venezia.RDS')
+w <- readRDS('data/temperature15_18_venezia.RDS')
 ww <- w[,-c(1)] #remove index
 cc <- ww[,c(1:2)] #coordinates
 ww <- ww[,-c(1:2)] #remove lat long
@@ -12,13 +12,13 @@ gc()
 
 # Run simulations
 source("zanzinv.r")
-zanzout <- zanzinv(temps.matrix=ww, cells.coords=cc, road.dist.matrix=pld,startd=140,endd=366,n.clusters=5, cluster.type="SOCK",iter=5,intro.cell=28486,intro.adults=100)
+zanzout <- zanzinv(temps.matrix=ww, cells.coords=cc, road.dist.matrix=pld,startd=150,endd=1461,n.clusters=8, cluster.type="SOCK",iter=100,intro.cell=28486,intro.eggs=100,sparse.output=TRUE)
 
 #temps.matrix=ww; cells.coords=cc; road.dist.matrix=pld;startd=210; endd=240; n.clusters=2; cluster.type="SOCK" ; iter=2; intro.cell=NA; intro.adults=100
 
 ### Plot results ###
 #trend in time, just one iteration
-outlp<-mclapply(zanzout[[1]], function(x) apply(x, MARGIN=c(1, 2), sum),mc.cores=4)
+outlp<-mclapply(zanzout[[1]], function(x) apply(x, MARGIN=c(1, 2), sum),mc.cores=1)
 outlt<-melt(t(sapply(outlp,rowSums)))
 outlt$day<-as.integer(row.names(outlt))
 ggplot(outlt, aes(x=Var1,y=value,col=as.factor(Var2))) + geom_line()
