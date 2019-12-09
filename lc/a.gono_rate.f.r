@@ -2,7 +2,7 @@
 ## Data taken from https://academic.oup.com/jme/article/46/1/33/902827, Table 5.
 
 # Message to be printed
-cat(paste("Gonotrophic cycle T-dependent rate\n"))
+#cat(paste("Gonotrophic cycle T-dependent rate\n"))
 
 # Function
 a.gono_rate.f <- function(dt) {

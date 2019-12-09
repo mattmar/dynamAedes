@@ -2,7 +2,7 @@
 ## Data taken from https://academic.oup.com/jme/article/46/1/33/902827, Table 4.
 
 # Message to be printed
-cat(paste("Immature survival rate\n"))
+#cat(paste("Immature survival rate\n"))
 
 #Function
 i.surv_rate.f <- function(dt) {

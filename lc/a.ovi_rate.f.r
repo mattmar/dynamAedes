@@ -2,7 +2,7 @@
 ## Data taken from https://academic.oup.com/jme/article/46/1/33/902827, Table 5.
 
 # Message to be printed
-cat(paste("Oviposition rate per female per day\n"))
+#cat(paste("Oviposition rate per female per day\n"))
 
 # Function
 a.ovi_rate.f <- function(dt) {

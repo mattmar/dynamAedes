@@ -1,11 +1,10 @@
 ## Load time series of daily average temperature and distance matrices
 setwd("~/GitHub/euaeae")
-w <- read.csv('data/t_data250m_res100m_clipped.csv')
+w <- readRDS('data/temperature2016_venezia.RDS')
 ww <- w[,-c(1)] #remove index
-asd <- apply(as.matrix(dist(ww[,c("x","y")], "maximum", diag=TRUE, upper=TRUE)),2,function(x) round(x/100,1)*100) #Trasform to meters
+cc <- ww[,c(1:2)] #coordinates
 ww <- ww[,-c(1:2)] #remove lat long
-#pld <- readRDS('data/ld_matrix.RDS')
-pld <- read.csv('data/t_dist_250m_res100m.txt')
+pld <- read.csv('data/dist_matrix_venezia.txt')
 row.names(pld) <- which(w[,1]%in%pld[,1])
 colnames(pld) <- row.names(pld)
 pld <- apply(pld,2,function(x) round(x/10000,1)*10000) #make round 100's 
@@ -13,11 +12,13 @@ gc()
 
 # Run simulations
 source("zanzinv.r")
-bla <- zanzinv(temp.matrix=ww, cell.dist.matrix=asd, road.dist.matrix=pld,startd=150,endd=360,n.clusters=2,cluster.type="SOCK",iter=2,intro.adults=100)
+zanzout <- zanzinv(temps.matrix=ww, cells.coords=cc, road.dist.matrix=pld,startd=140,endd=366,n.clusters=5, cluster.type="SOCK",iter=5,intro.cell=28486,intro.adults=100)
+
+#temps.matrix=ww; cells.coords=cc; road.dist.matrix=pld;startd=210; endd=240; n.clusters=2; cluster.type="SOCK" ; iter=2; intro.cell=NA; intro.adults=100
 
 ### Plot results ###
 #trend in time, just one iteration
-outlp<-mclapply(bla[[1]], function(x) apply(x, MARGIN=c(1, 2), sum),mc.cores=4)
+outlp<-mclapply(zanzout[[1]], function(x) apply(x, MARGIN=c(1, 2), sum),mc.cores=4)
 outlt<-melt(t(sapply(outlp,rowSums)))
 outlt$day<-as.integer(row.names(outlt))
 ggplot(outlt, aes(x=Var1,y=value,col=as.factor(Var2))) + geom_line()
@@ -27,8 +28,8 @@ library(rgdal)
 wadults<-cbind(w[2:3],sapply(outlp, function(x) x[3,]))
 wlarvae<-cbind(w[2:3],sapply(outlp, function(x) x[2,]))
 weggs<-cbind(w[2:3],sapply(outlp, function(x) x[1,]))
-roads<-readOGR('/home/matteo/own_data/PoD/topics/aegypti_eu/spatial_data/genova/genova_road3035.shp')
-area<-readOGR('/home/matteo/own_data/PoD/topics/aegypti_eu/spatial_data/genova/genova3035.shp')
+roads<-readOGR('/home/matteo/own_data/PoD/topics/aegypti_eu/spatial_data/venezia/venezia_roads.sqlite')
+area<-readOGR('/home/matteo/own_data/PoD/topics/aegypti_eu/spatial_data/venezia/venezia_urban.sqlite')
 
 for (i in 1:(ncol(wadults)-2)) {
 	png(paste('/home/matteo/own_data/PoD/topics/aegypti_eu/figures/figure_',sprintf("%03d", i),".png",sep=""),width = 480*3, height = 480*2)

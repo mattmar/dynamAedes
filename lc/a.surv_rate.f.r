@@ -2,7 +2,7 @@
 ## Data taken from https://academic.oup.com/jme/article/46/1/33/902827, Table 4.
 
 # Message to be printed
-cat(paste("Adult female survival rate\n"))
+#cat(paste("Adult female survival rate\n"))
 
 #Function
 a.surv_rate.f <- function(dt) {

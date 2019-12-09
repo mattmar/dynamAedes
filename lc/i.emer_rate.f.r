@@ -2,7 +2,7 @@
 ## Data taken from https://academic.oup.com/jme/article/46/1/33/902827, Table 10.
 
 # Message to be printed
-cat(paste("Immature emergence rate\n"))
+#cat(paste("Immature emergence rate\n"))
 
 #Function
 i.emer_rate.f <- function(dt) {
