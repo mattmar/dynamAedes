@@ -12,16 +12,22 @@ gc()
 
 # Run simulations
 source("zanzinv.r")
-zanzout <- zanzinv(temps.matrix=ww, cells.coords=cc, road.dist.matrix=pld,startd=150,endd=1461,n.clusters=8, cluster.type="SOCK",iter=100,intro.cell=28486,intro.eggs=100,sparse.output=TRUE)
+zanzout <- zanzinv(temps.matrix=ww, cells.coords=cc, road.dist.matrix=pld,startd=150,endd=1461,n.clusters=5, cluster.type="SOCK",iter=5,intro.cell=28486,intro.eggs=100,sparse.output=FALSE)
 
 #temps.matrix=ww; cells.coords=cc; road.dist.matrix=pld;startd=210; endd=240; n.clusters=2; cluster.type="SOCK" ; iter=2; intro.cell=NA; intro.adults=100
 
 ### Plot results ###
 #trend in time, just one iteration
-outlp<-mclapply(zanzout[[1]], function(x) apply(x, MARGIN=c(1, 2), sum),mc.cores=1)
-outlt<-melt(t(sapply(outlp,rowSums)))
+outlp<-mclapply(zanzout[[5]], function(x) {if(!is.na(x[[1]])) apply(x, MARGIN=c(1, 2), sum) else NULL},mc.cores=4)
+outlp<-outlp[!sapply(outlp, function(x) is.null(x[[1]]))]
+outlt<-melt(t(sapply(outlp, function(x) rowSums(x))))
 outlt$day<-as.integer(row.names(outlt))
 ggplot(outlt, aes(x=Var1,y=value,col=as.factor(Var2))) + geom_line()
+
+
+outlp2<-lapply(outlp, function(x) x[!is.null(x)])
+
+
 
 #trend in space, just one iteration
 library(rgdal)

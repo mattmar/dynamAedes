@@ -215,7 +215,7 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					stopit <- sum(p.life.a)==0
 					gc()
 					if(sparse.output) return(list(as.simple_sparse_array(p.life.a))) else return(list(p.life.a))
-				}else{message("Extinct");return(list(NA))} #end of stopif condition
+				}else{message("Extinct")} #end of stopif condition
 			} #end of the day
 			#print("out of day")
 		} #end of iteration
