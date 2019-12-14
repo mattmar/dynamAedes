@@ -1,10 +1,10 @@
 ## Load time series of daily average temperature and distance matrices
 setwd("~/GitHub/euaeae")
-w <- readRDS('data/temperature15_18_venezia.RDS')
+w <- readRDS('data/venezia_temps11-18.RDS')
 ww <- w[,-c(1)] #remove index
 cc <- ww[,c(1:2)] #coordinates
 ww <- ww[,-c(1:2)] #remove lat long
-pld <- read.csv('data/dist_matrix_venezia.txt')
+pld <- read.csv('data/venezia_distmatrix.txt')
 row.names(pld) <- which(w[,1]%in%pld[,1])
 colnames(pld) <- row.names(pld)
 pld <- apply(pld,2,function(x) round(x/10000,1)*10000) #make round 100's 
@@ -12,7 +12,7 @@ gc()
 
 # Run simulations
 source("zanzinv.r")
-zanzout <- zanzinv(temps.matrix=ww, cells.coords=cc, road.dist.matrix=pld,startd=150,endd=1461,n.clusters=5, cluster.type="SOCK",iter=5,intro.cell=28486,intro.eggs=100,sparse.output=FALSE)
+zanzout <- zanzinv(temps.matrix=ww, cells.coords=cc, road.dist.matrix=pld,startd=150,endd=515,n.clusters=47, cluster.type="SOCK",iter=100,intro.cell=28486,intro.eggs=100,sparse.output=FALSE)
 
 #temps.matrix=ww; cells.coords=cc; road.dist.matrix=pld;startd=210; endd=240; n.clusters=2; cluster.type="SOCK" ; iter=2; intro.cell=NA; intro.adults=100
 
@@ -23,11 +23,6 @@ outlp<-outlp[!sapply(outlp, function(x) is.null(x[[1]]))]
 outlt<-melt(t(sapply(outlp, function(x) rowSums(x))))
 outlt$day<-as.integer(row.names(outlt))
 ggplot(outlt, aes(x=Var1,y=value,col=as.factor(Var2))) + geom_line()
-
-
-outlp2<-lapply(outlp, function(x) x[!is.null(x)])
-
-
 
 #trend in space, just one iteration
 library(rgdal)
@@ -53,3 +48,30 @@ for (i in 1:(ncol(wadults)-2)) {
 	#Sys.sleep(0.1)
 	dev.off()
 }	
+
+#Derive number of time an iteration is still active at the end of next spring
+library(parallel)
+days<-sapply(zanzout,length)[1]
+outlp<-mclapply(zanzout[1:40], function (x) {lapply(x, function(y) {if(!is.na(y[[1]])) apply(y, MARGIN=c(1, 2), sum) else NULL})},mc.cores=20)
+
+#check number of individuals in each stage
+lapply(outlp, function(x) if(!is.null(x[days])) rowSums(x[days][[1]]))
+
+#derive 95% CI in each day
+returnci<-function(st=1,cores=8){
+	out<-apply(do.call(rbind.data.frame,mclapply(outlp, function(x) {
+		lapply(1:days, function(y) {
+			if(y<=length(x)) sum(x[[y]][st,],na.rm=T) else NA})},mc.cores=cores)),2,quantile,probs=c(0.025,0.50,0.975),na.rm=T) ;
+	colnames(out)<-NULL
+	outo<-rbind.data.frame(out,
+		stage=rep(st,nrow(out)),
+		day=as.factor(1:ncol(out)))
+	return(t(outo))
+}
+
+citoplot<-rbind.data.frame(returnci(1),returnci(2),returnci(3))
+citoplot$stage<-as.factor(citoplot$stage)
+
+g1<-ggplot(citoplot, aes(y=`50%`,x=day,group=stage,col=stage)) + 
+geom_ribbon(aes(ymin=`2.5%`,ymax=`97.5%`,fill=stage),alpha=0.2) +
+geom_line()

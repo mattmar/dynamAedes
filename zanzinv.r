@@ -6,14 +6,14 @@
 
 zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,startd=1,endd=10,n.clusters=1,cluster.type="SOCK",iter=1,intro.cell=NULL,intro.adults=0,intro.immatures=0,intro.eggs=0,sparse.output=FALSE) {
 
-	### Preamble: define variable for the model ###
+	### Preamble: define variables for the model ###
 	## Export variables in the global environment
 	source("./other/libraries.r")
 	## Define globally a "safer version of "sample" function
 	resample <- function(x, ...) x[sample.int(length(x), ...)]
 	sapply(c("libraries","resample"), function(x) {assign(x,get(x),envir= .GlobalEnv)})
 	## Load packages
-	suppressPackageStartupMessages(ipak(c("foreach","doSNOW","Rmpi","actuar","fields","slam")))
+	suppressPackageStartupMessages(libraries(c("foreach","doSNOW","Rmpi","actuar","fields","slam")))
 	## Type of cluster
 	if(cluster.type=="SOCK" || cluster.type=="FORK") {
 		cl <- makeCluster(n.clusters,type=cluster.type, outfile="",useXDR=FALSE,methods=FALSE,output="")
@@ -22,7 +22,8 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 	}
  	## Start the parallelized loop over iter
 	doSNOW::registerDoSNOW(cl)
-	parallel::clusterCall(cl=cl, function() ipak(c("foreach","slam")))
+	parallel::clusterExport(cl=cl, varlist=c("libraries", "resample"))
+	parallel::clusterCall(cl=cl, function() libraries(c("foreach","slam")))
  	## Space
 	space <- nrow(temps.matrix)
 	## Time
