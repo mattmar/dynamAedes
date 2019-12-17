@@ -12,7 +12,7 @@ gc()
 
 # Run simulations
 source("zanzinv.r")
-zanzout <- zanzinv(temps.matrix=ww, cells.coords=cc, road.dist.matrix=pld,startd=150,endd=515,n.clusters=47, cluster.type="SOCK",iter=100,intro.cell=28486,intro.eggs=100,sparse.output=FALSE)
+zanzout <- zanzinv(temps.matrix=ww, cells.coords=cc, road.dist.matrix=pld,startd=120,endd=515,n.clusters=40, cluster.type="SOCK",iter=1000,intro.cell=28486,intro.eggs=100,sparse.output=FALSE,compressed.output=TRUE)
 
 #temps.matrix=ww; cells.coords=cc; road.dist.matrix=pld;startd=210; endd=240; n.clusters=2; cluster.type="SOCK" ; iter=2; intro.cell=NA; intro.adults=100
 
@@ -51,17 +51,17 @@ for (i in 1:(ncol(wadults)-2)) {
 
 #Derive number of time an iteration is still active at the end of next spring
 library(parallel)
-days<-sapply(zanzout,length)[1]
-outlp<-mclapply(zanzout[1:40], function (x) {lapply(x, function(y) {if(!is.na(y[[1]])) apply(y, MARGIN=c(1, 2), sum) else NULL})},mc.cores=20)
+days<-max(sapply(zanzout,length))
+#outlp<-mclapply(zanzout, function (x) {lapply(x, function(y) {if(!is.na(y[[1]])) apply(y, MARGIN=c(1, 2), sum) else NULL})},mc.cores=20)
 
 #check number of individuals in each stage
 lapply(outlp, function(x) if(!is.null(x[days])) rowSums(x[days][[1]]))
 
 #derive 95% CI in each day
-returnci<-function(st=1,cores=8){
-	out<-apply(do.call(rbind.data.frame,mclapply(outlp, function(x) {
+returnci<-function(outl=NA,st=1,cores=8,days=0){
+	out<-apply(do.call(rbind.data.frame,mclapply(outl, function(x) {
 		lapply(1:days, function(y) {
-			if(y<=length(x)) sum(x[[y]][st,],na.rm=T) else NA})},mc.cores=cores)),2,quantile,probs=c(0.025,0.50,0.975),na.rm=T) ;
+			if(y<=length(x)) {sum(x[[y]][st,],na.rm=T)} else {NA}})},mc.cores=cores)),2,quantile,probs=c(0.025,0.50,0.975),na.rm=T);
 	colnames(out)<-NULL
 	outo<-rbind.data.frame(out,
 		stage=rep(st,nrow(out)),
@@ -69,9 +69,12 @@ returnci<-function(st=1,cores=8){
 	return(t(outo))
 }
 
-citoplot<-rbind.data.frame(returnci(1),returnci(2),returnci(3))
+citoplot<-rbind.data.frame(returnci(zanzout,1,days=days),returnci(zanzout,2,days=days),returnci(zanzout,3,days=days))
+
 citoplot$stage<-as.factor(citoplot$stage)
 
 g1<-ggplot(citoplot, aes(y=`50%`,x=day,group=stage,col=stage)) + 
 geom_ribbon(aes(ymin=`2.5%`,ymax=`97.5%`,fill=stage),alpha=0.2) +
 geom_line()
+
+ggsave("~/ci.png",g1,dpi=400,scale=1.5,width=25,height=15,unit="cm")

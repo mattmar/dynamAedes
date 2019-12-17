@@ -4,16 +4,16 @@
 #.a=adult, i.=immature, e.=egg
 #.p=probability, .r=rate, .n=number, .v=vector, .m=matrix, .a=array, .f=function
 
-zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,startd=1,endd=10,n.clusters=1,cluster.type="SOCK",iter=1,intro.cell=NULL,intro.adults=0,intro.immatures=0,intro.eggs=0,sparse.output=FALSE) {
+zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,startd=1,endd=10,n.clusters=1,cluster.type="SOCK",iter=1,intro.cell=NULL,intro.adults=0,intro.immatures=0,intro.eggs=0,sparse.output=FALSE,compressed.output=FALSE) {
 
 	### Preamble: define variables for the model ###
 	## Export variables in the global environment
 	source("./other/libraries.r")
 	## Define globally a "safer version of "sample" function
 	resample <- function(x, ...) x[sample.int(length(x), ...)]
-	sapply(c("libraries","resample"), function(x) {assign(x,get(x),envir= .GlobalEnv)})
+	sapply(c("libraries","resample","cluster.type"), function(x) {assign(x,get(x),envir= .GlobalEnv)})
 	## Load packages
-	suppressPackageStartupMessages(libraries(c("foreach","doSNOW","Rmpi","actuar","fields","slam")))
+	suppressPackageStartupMessages(libraries(c("foreach","doSNOW","Rmpi","actuar","fields","slam","Matrix")))
 	## Type of cluster
 	if(cluster.type=="SOCK" || cluster.type=="FORK") {
 		cl <- makeCluster(n.clusters,type=cluster.type, outfile="",useXDR=FALSE,methods=FALSE,output="")
@@ -32,10 +32,10 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 	if(intro.eggs!=0) {e.intro.n <- rep(0,space); if(!is.na(intro.cell)) e.intro.n[intro.cell] <- intro.eggs else  e.intro.n[sample(as.integer(colnames(road.dist.matrix)),1)] <- intro.eggs} else e.intro.n <- rep(0,space)
 	if(intro.immatures!=0) {i.intro.n <- rep(0,space); if(!is.na(intro.cell)) i.intro.n[intro.cell] <- intro.immatures else i.intro.n[sample(as.integer(colnames(road.dist.matrix)),1)] <- intro.immatures} else i.intro.n <- rep(0,space)
 	if(intro.adults!=0) {a.intro.n <- rep(0,space); if(!is.na(intro.cell)) a.intro.n[intro.cell] <- intro.adults else a.intro.n[sample(as.integer(colnames(road.dist.matrix)),1)] <- intro.adults} else a.intro.n <- rep(0,space)
-	stopit <- FALSE
 	
 	### Parallelized iterations of the life cycle
 	rs <- foreach(iteration=1:iter) %dopar% {
+		stopit<-FALSE
 		### Life cycle ###
 		if( exists("counter") ) rm(counter)
 			foreach(day = startd:endd, .combine=c) %do% {
@@ -212,16 +212,22 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					p.life.a[3,,2:3] <- p.life.a[3,,1:2]
 					p.life.a[3,,1] <- 0
 					message("\nday ",length(counter)," has ended. Population is ",(sum(p.life.a)-sum(i.emer.n))," individuals \n")
-					# Return the life table of the day 
+					# Condition for exinction
 					stopit <- sum(p.life.a)==0
 					gc()
-					if(sparse.output) return(list(as.simple_sparse_array(p.life.a))) else return(list(p.life.a))
+					# Condition for 2D output
+					if(compressed.output) p.life.aout <- apply(p.life.a, MARGIN=c(1, 2), sum)
+					if(sparse.output) return(list(as.simple_sparse_array(p.life.a))) else return(list(p.life.aout))
 				}else{message("Extinct")} #end of stopif condition
-			} #end of the day
+			} #end of days
 			#print("out of day")
-		} #end of iteration
-		#print("out of iteration")
-		gc()
+		} #end of iterations
+		print("out of iteration")
+			if(cluster.type == "MPI") {
+			message("MPI")
+			saveRDS(rs,"~/output_zanzinv.RDS")
+			mpi.quit() #Close mpi clusters
+		}
 		stopCluster(cl)
 		return(rs)
 	} #end fo function

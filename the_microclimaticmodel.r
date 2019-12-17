@@ -49,16 +49,16 @@ T_df[,1:2] <- coordinates(spTransform(SpatialPoints(coords = T_df[,c(1,2)], proj
 saveRDS(T_df, '~/algeciras_data250mcoast_noprcp_2017.RDS')
 
 
-data<-as.data.frame(matrix(c(395,157,13,27,163,0,2,0,147,0,4,0,14,35,55,170,10,32,23,185,10,28,2,36,9,20,4,32,7,0,10,0,6,0,4,0,0,15,0,53,0,11,0,23,0,8,0,33,0,6,0,14),ncol=4,nrow=13,byrow=T))
-names(data) <-c("Ae.ae_posres","Ae.al_posres","Ae.ae_pospub","Ae.al_pospub")
-data$habitat <-c("Domestic containers", "Ornamental
-Containers", "Flower pot plate/tray","Drains", "Discarded
-receptacles","Plants","CanvasPlasticSheet","Puddle/ Ground depression","Roof top/RoofGutters","Gully trap","Inspection chamber","Bins","Puddle/Ground depression")
+# data<-as.data.frame(matrix(c(395,157,13,27,163,0,2,0,147,0,4,0,14,35,55,170,10,32,23,185,10,28,2,36,9,20,4,32,7,0,10,0,6,0,4,0,0,15,0,53,0,11,0,23,0,8,0,33,0,6,0,14),ncol=4,nrow=13,byrow=T))
+# names(data) <-c("Ae.ae_posres","Ae.al_posres","Ae.ae_pospub","Ae.al_pospub")
+# data$habitat <-c("Domestic containers", "Ornamental
+# Containers", "Flower pot plate/tray","Drains", "Discarded
+# receptacles","Plants","CanvasPlasticSheet","Puddle/ Ground depression","Roof top/RoofGutters","Gully trap","Inspection chamber","Bins","Puddle/Ground depression")
 
-datam<-melt(data,id.vars="habitat")
-datam$species<-sapply(strsplit(as.character(datam$variable),"_",fixed=FALSE), function(x) x[1])
-datam$loc<-sapply(strsplit(as.character(datam$variable),"_",fixed=FALSE), function(x) x[2])
+# datam<-melt(data,id.vars="habitat")
+# datam$species<-sapply(strsplit(as.character(datam$variable),"_",fixed=FALSE), function(x) x[1])
+# datam$loc<-sapply(strsplit(as.character(datam$variable),"_",fixed=FALSE), function(x) x[2])
 
-ggplot(data=datam, aes(x=habitat, y=value,fill=habitat,group=species)) + 
-  geom_bar(stat="identity") +
-  facet_wrap(~loc+species)
+# ggplot(data=datam, aes(x=habitat, y=value,fill=habitat,group=species)) + 
+#   geom_bar(stat="identity") +
+#   facet_wrap(~loc+species)
