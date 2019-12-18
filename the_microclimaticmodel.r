@@ -8,11 +8,11 @@ setwd('/home/matteo/own_data/PoD/topics/aegypti_eu/spatial_data/')
 # alg250<-get_dem(alg,resolution=250,zmin=0)
 # rplot(venezia)
 alg250<-raster("algeciras/alg_dtm_clipped.tif")
-#ven250<-raster("venezia/venezia_dtm.tif")
+ven250<-raster("venezia/venezia_dtm.tif")
 
 #Dates
 sdate<-as.Date("2019-01-01")
-edate<-as.Date("2019-12-31")
+edate<-as.Date("2019-10-31")
 
 #Add precipitation
 # prcp <- wda[[1]][wda[[1]]$yearmoda>=sdate&wda[[1]]$yearmoda<edate,c("yearmoda","prcp")]
@@ -20,7 +20,7 @@ edate<-as.Date("2019-12-31")
 # prcp <- merge(dd,prcp,by="yearmoda",all.x=T)
 # prcp <- ifelse(is.na(prcp$prcp),0,prcp$prcp)
 
-algtemps <- microclima::runauto(alg250, dstart=format(sdate,"%d/%m/%Y"), dfinish=format(edate,"%d/%m/%Y"), hgt = 2, l = NA, x = NA, r.is.dem=TRUE, habitat = 14, plot.progress = FALSE, save.memory=TRUE, coastal=TRUE, use.raster=TRUE, zmin=0, summarydata = FALSE)
+ventemps <- microclima::runauto(ven250, dstart=format(sdate,"%d/%m/%Y"), dfinish=format(edate,"%d/%m/%Y"), hgt = 2, l = NA, x = NA, r.is.dem=TRUE, habitat = 14, plot.progress = FALSE, save.memory=TRUE, coastal=FALSE, use.raster=TRUE, zmin=0, summarydata = FALSE)
 
 #get daily mean
 day<-seq(1, dim(algtemps$temps)[3], 24)
