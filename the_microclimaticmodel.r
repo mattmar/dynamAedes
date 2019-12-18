@@ -5,7 +5,7 @@ require(NicheMapR)
 
 setwd('/home/matteo/own_data/PoD/topics/aegypti_eu/spatial_data/')
 # venezia<-raster('venezia_region3035.tiff' )
-#alg250<-get_dem(alg,resolution=250,zmin=0)
+# alg250<-get_dem(alg,resolution=250,zmin=0)
 # rplot(venezia)
 alg250<-raster("algeciras/alg_dtm_clipped.tif")
 #ven250<-raster("venezia/venezia_dtm.tif")

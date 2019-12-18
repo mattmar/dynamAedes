@@ -4,7 +4,7 @@
 #.a=adult, i.=immature, e.=egg
 #.p=probability, .r=rate, .n=number, .v=vector, .m=matrix, .a=array, .f=function
 
-zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,startd=1,endd=10,n.clusters=1,cluster.type="SOCK",iter=1,intro.cell=NULL,intro.adults=0,intro.immatures=0,intro.eggs=0,sparse.output=FALSE,compressed.output=FALSE) {
+zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,startd=1,endd=10,n.clusters=1,cluster.type="SOCK",iter=1,intro.cells=NULL,intro.adults=0,intro.immatures=0,intro.eggs=0,sparse.output=FALSE,compressed.output=FALSE) {
 
 	### Preamble: define variables for the model ###
 	## Export variables in the global environment
@@ -28,14 +28,18 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 	space <- nrow(temps.matrix)
 	## Time
 	days <- ncol(temps.matrix) #n of day to simulate
-	## Vector of propagules to initiate the life cycle
-	if(intro.eggs!=0) {e.intro.n <- rep(0,space); if(!is.na(intro.cell)) e.intro.n[intro.cell] <- intro.eggs else  e.intro.n[sample(as.integer(colnames(road.dist.matrix)),1)] <- intro.eggs} else e.intro.n <- rep(0,space)
-	if(intro.immatures!=0) {i.intro.n <- rep(0,space); if(!is.na(intro.cell)) i.intro.n[intro.cell] <- intro.immatures else i.intro.n[sample(as.integer(colnames(road.dist.matrix)),1)] <- intro.immatures} else i.intro.n <- rep(0,space)
-	if(intro.adults!=0) {a.intro.n <- rep(0,space); if(!is.na(intro.cell)) a.intro.n[intro.cell] <- intro.adults else a.intro.n[sample(as.integer(colnames(road.dist.matrix)),1)] <- intro.adults} else a.intro.n <- rep(0,space)
-	
+
 	### Parallelized iterations of the life cycle
 	rs <- foreach(iteration=1:iter) %dopar% {
 		stopit<-FALSE
+		## Vector of propagules to initiate the life cycle
+		##If intro.cells is a vector of cells than sample one value for ech iteration
+		if(length(intro.cells)>1) {intro.cell <- sample(intro.cells,1)}
+		
+		if(intro.eggs!=0) {e.intro.n <- rep(0,space); if(!is.na(intro.cell)) e.intro.n[intro.cell] <- intro.eggs else  e.intro.n[sample(as.integer(colnames(road.dist.matrix)),1)] <- intro.eggs} else e.intro.n <- rep(0,space)
+		if(intro.immatures!=0) {i.intro.n <- rep(0,space); if(!is.na(intro.cell)) i.intro.n[intro.cell] <- intro.immatures else i.intro.n[sample(as.integer(colnames(road.dist.matrix)),1)] <- intro.immatures} else i.intro.n <- rep(0,space)
+		if(intro.adults!=0) {a.intro.n <- rep(0,space); if(!is.na(intro.cell)) a.intro.n[intro.cell] <- intro.adults else a.intro.n[sample(as.integer(colnames(road.dist.matrix)),1)] <- intro.adults} else a.intro.n <- rep(0,space)
+
 		### Life cycle ###
 		if( exists("counter") ) rm(counter)
 			foreach(day = startd:endd, .combine=c) %do% {
