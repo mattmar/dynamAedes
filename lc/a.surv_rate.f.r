@@ -7,17 +7,16 @@
 #Function
 a.surv_rate.f <- function(dt) {
 
-	survd <- c(13.18,10.91,27.71,30.62,23.72,26.90,32.87,36.91,22.77,29.26,22.53,20.07)
-	st <- c(10.54,10.76,15.30,16.52,20.05,21.79,25.64,27.64,31.33,31.65,32.55,33.41)
+	survd <- c(0,13.18,10.91,27.71,30.62,23.72,26.90,32.87,36.91,22.77,29.26,22.53,20.07)
+	st <- c(-20,10.54,10.76,15.30,16.52,20.05,21.79,25.64,27.64,31.33,31.65,32.55,33.41)
 	model <- lm(survd ~ poly(st,4)) #Forth polynomial
 	pred_a_duration <- predict(model,newdata=data.frame(st=dt),interval='confidence', level=0.95)
 	pred_a_rate <- 1/pred_a_duration[,1]
-	pred_a_rate <- ifelse(pred_a_rate<0,100,pred_a_rate)
+	pred_a_rate <- ifelse(pred_a_rate<0,1000,pred_a_rate)
 	return( pred_a_rate ) 
 
 }
 
-# su <- a.surv_rate.f(temp1)
-# plot(exp(-(1/survd))~st)
-# plot(exp(-su)~dt,col="red")
-# plot(pred_a_duration[,1]~dt)
+#su <- a.surv_rate.f(-20:40)
+#plot(-20:40,exp(-su),col="red",type="l")
+#plot(survd~st)

@@ -66,6 +66,7 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					## Transform rate in daily probabiltiy to survive.
 					a.surv.p <- exp(-a.surv.r)
 					## Add difference between lab and field survival (from Brady et al. 2014)
+					a.surv.p <- ifelse(a.surv.p>0.95, a.surv.p-0.06, a.surv.p)
 					a.surv.p <- ifelse(a.surv.p<0,0,a.surv.p)
 					## Immature survival
 					source("./lc/i.surv_rate.f.r")
@@ -79,7 +80,7 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					i.emer.r <- i.emer_rate.f(temps.matrix[,day]/1000)
 					## Transform rate in daily probabiltiy to survive.
 					i.emer.p <- exp(-i.emer.r)
-					## Probability of short active dispersal (from Marcantonio et al 2019)
+					## Probability of short active dispersal (from Marcantonio et al. 2019)
 					f.adis.p <- dlnorm(seq(0,600,10),meanlog=4.95,sdlog=0.66)
 					## Probability of long passive dispersal (from Pasaoglu et al. 2012)
 					f.pdis.p <- rgamma(seq(1,max(road.dist.matrix,na.rm=T),1000),shape=16/(10000/16), scale=10000/16)
@@ -133,7 +134,7 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					p.life.a[3,,1] <- p.life.a[3,,1] + n.ovir.a
 					# Remove females which stop host-seeking from the host-seeking compartment
 					p.life.a[3,,4] <- p.life.a[3,,4] - n.ovir.a
-						# Find number of eggs laid by ovipositing females
+					# Find number of eggs laid by ovipositing females
 					a.egg.n <- sapply(1:space, function(x) sum(rpois(sum(p.life.a[3,x,2:3])[which(sum(p.life.a[3,x,2:3])>0)], a.batc.n[x])))
 					# Find number of adult females surviving
 					p.life.a[3,,1:4] <- t(sapply(1:space, function(x) {sapply(p.life.a[3,x,1:4],rbinom,n=1,p=a.surv.p[x])}))
@@ -215,7 +216,7 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					p.life.a[3,,4] <- p.life.a[3,,3] + p.life.a[3,,4] + p.life.a[3,,5]
 					p.life.a[3,,2:3] <- p.life.a[3,,1:2]
 					p.life.a[3,,1] <- 0
-					message("\nday ",length(counter)," has ended. Population is ",(sum(p.life.a)-sum(i.emer.n))," individuals \n")
+					message("\nday ",length(counter),".",iteration," has ended. Population is ",(sum(p.life.a)-sum(i.emer.n))," individuals \n")
 					# Condition for exinction
 					stopit <- sum(p.life.a)==0
 					gc()

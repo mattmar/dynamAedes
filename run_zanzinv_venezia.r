@@ -15,7 +15,7 @@ introvector<-c(27475,27476,27645,27646,27647,27648,27820,27821,27822,27823,27824
 
 # Run simulations
 source("zanzinv.r")
-zanzout <- zanzinv(temps.matrix=ww, cells.coords=cc, road.dist.matrix=pld,startd=135,endd=600,n.clusters=48, cluster.type="SOCK",iter=48,intro.cells=introvector,intro.eggs=500,sparse.output=FALSE,compressed.output=TRUE)
+zanzout <- zanzinv(temps.matrix=ww, cells.coords=cc, road.dist.matrix=pld,startd=195,endd=400,n.clusters=8, cluster.type="SOCK",iter=8,intro.cells=introvector,intro.eggs=100,sparse.output=FALSE,compressed.output=TRUE)
 
 #temps.matrix=ww; cells.coords=cc; road.dist.matrix=pld;startd=210; endd=240; n.clusters=2; cluster.type="SOCK" ; iter=2; intro.cell=NA; intro.adults=100
 
