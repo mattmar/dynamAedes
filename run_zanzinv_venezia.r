@@ -1,6 +1,6 @@
 ## Load time series of daily average temperature and distance matrices
 setwd("~/GitHub/euaeae")
-w <- readRDS('data/venezia_temps11-18.RDS')[,c(1:3,((365*5)+3):((365*2)+3))] #select years 1=2011;
+w <- readRDS('data/venezia_temps11-18.RDS')[,c(1:3,2193:2925)] #select years 1=2011;
 ww <- w[,-c(1)] #remove index
 cc <- ww[,c(1:2)] #coordinates
 ww <- ww[,-c(1:2)] #remove lat long
@@ -15,7 +15,7 @@ introvector<-c(27475,27476,27645,27646,27647,27648,27820,27821,27822,27823,27824
 
 # Run simulations
 source("zanzinv.r")
-zanzout <- zanzinv(temps.matrix=ww, cells.coords=cc, road.dist.matrix=pld,startd=195,endd=400,n.clusters=8, cluster.type="SOCK",iter=8,intro.cells=introvector,intro.eggs=100,sparse.output=FALSE,compressed.output=TRUE)
+zanzout <- zanzinv(temps.matrix=ww, cells.coords=cc, road.dist.matrix=pld,startd=196,endd=733,n.clusters=47, cluster.type="SOCK",iter=100,intro.cells=introvector,intro.eggs=250,sparse.output=FALSE,compressed.output=TRUE)
 
 #temps.matrix=ww; cells.coords=cc; road.dist.matrix=pld;startd=210; endd=240; n.clusters=2; cluster.type="SOCK" ; iter=2; intro.cell=NA; intro.adults=100
 
@@ -75,17 +75,19 @@ returnci<-function(outl=NA,st=1,cores=1,days=0){
 citoplot<-rbind.data.frame(returnci(zanzout,1,days=days),returnci(zanzout,2,days=days),returnci(zanzout,3,days=days))
 
 citoplot$stage<-as.factor(citoplot$stage)
-citoplot$date<-as.Date(citoplot$day,origin="2016-05-15")
+citoplot$date<-as.Date(citoplot$day,origin="2017-07-15")
 
-w <- readRDS('~/GitHub/euaeae/data/venezia_temps11-18.RDS')[,c(((365*5)+3):((365*8)+3))][,166:(165+days)]
+w <- readRDS('~/GitHub/euaeae/data/venezia_temps11-18_corr.RDS')[,c(1:3,2193:2925)][,196:(195+days)]
 
 citoplot$tempm<-rep(as.numeric(w[26102,]),3)
 
 g1<-ggplot(citoplot, aes(y=`50%`,x=date,group=stage,col=stage)) + 
 geom_ribbon(aes(ymin=`2.5%`,ymax=`97.5%`,fill=stage),alpha=0.2) +
 geom_line(linetype=1,size=1.5) + labs(y="Populazion size") +
-geom_line(aes(y=tempm*10),col="black") + labs(y="Populazion size") +
-ggtitle("Introduction of 100 eggs in Venice harbour"); g1
+geom_line(aes(y=tempm/10),col="black") + labs(y="Populazion size") +
+ggtitle("Introduction of 100 eggs in Venezia harbour") +
+scale_y_continuous(sec.axis = ~ ./100) +
+xlim(as.Date("2018-01-01"),as.Date("2019-04-30")); g1
 
 ggsave("~/venezia_500.png",g1,dpi=400,scale=1.5,width=25,height=15,unit="cm")
 

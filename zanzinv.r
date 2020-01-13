@@ -19,23 +19,23 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 		cl <- makeCluster(n.clusters,type=cluster.type, outfile="",useXDR=FALSE,methods=FALSE,output="")
 	} else if(cluster.type=="MPI") {
 		cl <- snow::makeMPIcluster(n.clusters,outfile="",useXDR=FALSE,methods=FALSE,output="")
-	}
+	} else(message("Default cluster.type is SOCK"))
  	## Start the parallelized loop over iter
 	doSNOW::registerDoSNOW(cl)
-	parallel::clusterExport(cl=cl, varlist=c("libraries", "resample"))
-	parallel::clusterCall(cl=cl, function() libraries(c("foreach","slam")))
- 	## Space
+	parallel::clusterExport(cl=cl, varlist=c("libraries", "resample")) # This loads functions in each child R process
+	parallel::clusterCall(cl=cl, function() libraries(c("foreach","slam"))) # This loads packages in each child R process
+  	## Load space dimensionality in which simulations occour
 	space <- nrow(temps.matrix)
-	## Time
-	days <- ncol(temps.matrix) #n of day to simulate
+	## Load time dimensionality in which simulations occour
+	days <- ncol(temps.matrix) #n of day to simulate, which is equal to the number of column of the temperature matrix
 
 	### Parallelized iterations of the life cycle
 	rs <- foreach(iteration=1:iter) %dopar% {
 		stopit<-FALSE
 		## Vector of propagules to initiate the life cycle
-		##If intro.cells is a vector of cells than sample one value for ech iteration
+		## If intro.cells is a vector of cells than sample one value for ech iteration
 		if(length(intro.cells)>1) {intro.cell <- sample(intro.cells,1)}
-		
+		## if intro.cell is not NA than use intro.cell, otherwise sample at random a cell along roads (column of road.dist.matrix)
 		if(intro.eggs!=0) {e.intro.n <- rep(0,space); if(!is.na(intro.cell)) e.intro.n[intro.cell] <- intro.eggs else  e.intro.n[sample(as.integer(colnames(road.dist.matrix)),1)] <- intro.eggs} else e.intro.n <- rep(0,space)
 		if(intro.immatures!=0) {i.intro.n <- rep(0,space); if(!is.na(intro.cell)) i.intro.n[intro.cell] <- intro.immatures else i.intro.n[sample(as.integer(colnames(road.dist.matrix)),1)] <- intro.immatures} else i.intro.n <- rep(0,space)
 		if(intro.adults!=0) {a.intro.n <- rep(0,space); if(!is.na(intro.cell)) a.intro.n[intro.cell] <- intro.adults else a.intro.n[sample(as.integer(colnames(road.dist.matrix)),1)] <- intro.adults} else a.intro.n <- rep(0,space)
@@ -46,79 +46,72 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 				#print("start of the day")
 				if(!stopit) {
 					if( !exists("counter") ) {
+						#counter is to be sure that propagules are introduce only at day 1
 						counter <- 0; i.surv.m <- matrix(0,ncol=5,nrow=2); i.temp.v <- 0; e.temp.v <- 0; a.egg.n <- 0; p.life.a <- array(0,c(3,nrow(temps.matrix),5)); outl <- list()
 					}else counter <- append(counter,day)
-					### Header: load temperature dependent functions ###
+					### Header: load functions for life cycle paramenters. /1000 because temperature is an integer T*1000 ###
 					## Gonotrophic cycle
 					source("./lc/a.gono_rate.f.r")
-					## Derive daily rate for gonotrophic cycle,i.e. blood meal to oviposition. 
-					a.gono.r <- a.gono_rate.f(temps.matrix[,day]/1000)
-					## Transform rate in daily probabiltiy to terminate the gonotrophic cycle.
-					a.gono.p <- 1-exp(-(a.gono.r))
+					## Derive daily rate for gonotrophic cycle, i.e. blood meal to oviposition, then transform rate in daily probabiltiy to terminate the gonotrophic cycle.
+					a.gono.p <- 1-exp(-(a.gono_rate.f(temps.matrix[,day]/1000)))
 					## Oviposition rate
 					source("./lc/a.ovi_rate.f.r")
-					## Derive oviposition rate, i.e., number of eggs laid per female per day 
+					## Derive oviposition rate, i.e., number of eggs laid per female per day.
 					a.batc.n <- a.ovi_rate.f(temps.matrix[,day]/1000)
 					## Adult survival
 					source("./lc/a.surv_rate.f.r")
-					## Derive daily adult female survival rate
-					a.surv.r <- a.surv_rate.f(temps.matrix[,day]/1000)
-					## Transform rate in daily probabiltiy to survive.
-					a.surv.p <- exp(-a.surv.r)
-					## Add difference between lab and field survival (from Brady et al. 2014)
-					a.surv.p <- ifelse(a.surv.p>0.95, a.surv.p-0.06, a.surv.p)
+					## Derive daily adult female survival rate and transform rate in daily probabiltiy to survive.
+					a.surv.p <- exp(-a.surv_rate.f(temps.matrix[,day]/1000))
+					## Add difference between lab and field survival only if survival is very high (from Brady et al. 2014)
+					a.surv.p <- ifelse(a.surv.p>0.975, a.surv.p-0.06, a.surv.p)
 					a.surv.p <- ifelse(a.surv.p<0,0,a.surv.p)
 					## Immature survival
 					source("./lc/i.surv_rate.f.r")
-					## Derive daily immature survival rate
-					i.surv.r <- i.surv_rate.f(temps.matrix[,day]/1000)
-					## Transform rate in daily probabiltiy to survive.
-					i.surv.p <- exp(-i.surv.r)
+					## Derive daily immature survival rate, then transform rate in daily probabiltiy to survive.
+					i.surv.p <- exp(-i.surv_rate.f(temps.matrix[,day]/1000))
 					## Immature emergence
 					source("./lc/i.emer_rate.f.r")
-					## Derive daily immature emergence rate
-					i.emer.r <- i.emer_rate.f(temps.matrix[,day]/1000)
-					## Transform rate in daily probabiltiy to survive.
-					i.emer.p <- exp(-i.emer.r)
-					## Probability of short active dispersal (from Marcantonio et al. 2019)
+					## Derive daily immature emergence rate then transform rate in daily probabiltiy to survive.
+					i.emer.p <- exp(-i.emer_rate.f(temps.matrix[,day]/1000))
+					## Probability of short active dispersal (from Marcantonio et al. 2019); density with mean log(4.95) and sd log(0.66) from 0 to 600 every 10th value.
 					f.adis.p <- dlnorm(seq(0,600,10),meanlog=4.95,sdlog=0.66)
 					## Probability of long passive dispersal (from Pasaoglu et al. 2012)
 					f.pdis.p <- rgamma(seq(1,max(road.dist.matrix,na.rm=T),1000),shape=16/(10000/16), scale=10000/16)
-					## Probability of egg survival
+					## Probability of egg survival; 0.99 as can be assumed that egg hatching is independent from temperature
 					e.surv.p <- 0.99
-					## Probability of hatching (from Soares-Pinheiro et al. 2015)
+					## Probability of hatching (data from Soares-Pinheiro et al. 2015)
 					e.hatc.p <- exp(-rgamma(length(temps.matrix[,day]/1000),shape=(7.6/7.4)^2,rate=(7.6/7.4^2)))
 
-					## Egg compartment ##
+					## Events in the egg compartment ##
 					# E has four sub-compartment: 1:3 for eggs 1-3 days old that can only die or survive, 4 can die/survive/hatch
 					# Binomial draw to find numbers of eggs that die or survive
-					p.life.a[1,,2:4] <- t(sapply(1:space, function(x) {sapply(p.life.a[1,x,1:3],rbinom,n=1,p=e.surv.p)}))
-					# Introduce if day is 1
+					p.life.a[1,,2:4] <- apply(t(p.life.a[1,,1:3]),MARGIN=1,function(x) rbinom(size=x,n=space,p=e.surv.p))
+					# Introduce if day is 1; introduction is in sub-compartment 4 as can be assumed eggs in an advanced stage of development are most likely to be introduced
 					p.life.a[1,,4] <- if(length(counter)==1) e.intro.n else p.life.a[1,,4]
 					# Add eggs laid by females the day before
 					p.life.a[1,,1] <- a.egg.n
 					# Add eggs that not hatched yesterday to egg that today are ready to hatch
 					p.life.a[1,,4] <- p.life.a[1,,4] + e.temp.v
-					# Random binomial draw to find numbers of eggs 4d+ old that don't hatch or hatch
-					e.hatc.n <- sapply(1:space, function(x){rbinom(1,p.life.a[1,x,4],e.hatc.p[x])})
+					# Random binomial draw to find numbers of eggs 4d+ old that hatch
+					e.hatc.n <- rbinom(length(1:space), p.life.a[1,,4], e.hatc.p)
 					# Remove hatched eggs from eggs 4d+ old
 					e.temp.v <- p.life.a[1,,4] - e.hatc.n
 					# Apply mortality to non hatched 4d+ old eggs
-					e.temp.v <- sapply(1:space, function(x){rbinom(1,e.temp.v[x],e.surv.p)})
+					e.temp.v <- rbinom(length(1:space), e.temp.v, e.surv.p)
 
-					## Immature compartment ##
-					# I has five sub-compartments representing days from hatching; an immature can survive/die for the first four days after hatching but from the fifth day on, it can survive/die/emerge. 
+					## Events in the immature compartment ##
+					# I has five sub-compartments representing days from hatching; an immature can survive/die for the first four days after hatching but from the fifth day on, it can survive/die/emerge.
 					# Binomial draw to find numbers of immature that die or survive passing to the next compartment
-					p.life.a[2,,2:5] <- t(sapply(1:space, function(x) {sapply(p.life.a[2,x,1:4],rbinom,n=1,p=i.surv.p[x])}))
+					p.life.a[2,,2:5] <- apply(t(p.life.a[2,,1:4]), MARGIN = 1, FUN= function(x) rbinom(size=x, n= space, p= i.surv.p))
 					# Introduce if day is 1
 					p.life.a[2,,5] <- if( length(counter)==1 ) i.intro.n else p.life.a[2,,5]
-					# Add immatures hatched the day before
+					# Add immatures hatched from eggs the same day
 					p.life.a[2,,1] <- e.hatc.n
 					# Add immatures that did not emerge yesterday to immature that today are ready to emerge
 					p.life.a[2,,5] <- p.life.a[2,,5] + i.temp.v
-					# Random binomial draw to find numbers of immature 5d+ old that not emerge or emerge
-					i.emer.n <- sapply(1:space, function(x){rbinom(1,p.life.a[2,x,5], c(i.emer.p[x]))})
-					# Remove emerged immatures from imamtures 5d+ old
+					# Random binomial draw to find numbers of immature 5d+ old that emerge
+					i.emer.n <- rbinom(length(1:space), p.life.a[2, ,5], i.emer.p)
+					# Remove emerged immatures from immatures 5d+ old
 					i.temp.v <- p.life.a[2,,5] - i.emer.n
 					# Apply mortality to non emerged 5d+ old immatures
 					i.temp.v <- sapply(1:space, function(x){rbinom(1,i.temp.v[x],i.surv.p[x])})
@@ -128,16 +121,16 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					# Introduce ovipositing females if day is 1
 					p.life.a[3,,1] <- if( length(counter)==1 ) a.intro.n else p.life.a[3,,1]
 					# Remove males adult from newly emerged adults
-					p.life.a[3,,5] <- sapply(1:space,function(x) rbinom(1,i.emer.n[x],0.5))
+					p.life.a[3,,5] <- rbinom(space,i.emer.n, 0.5)
 					# Add to females ready to oviposit the number of females which pass from host-seeking to ovipositing
-					n.ovir.a <- sapply(1:space, function(x) rbinom(1, p.life.a[3,x,4], a.gono.p[x]))
+					n.ovir.a <- rbinom(space, p.life.a[3,,4], a.gono.p)
 					p.life.a[3,,1] <- p.life.a[3,,1] + n.ovir.a
 					# Remove females which stop host-seeking from the host-seeking compartment
 					p.life.a[3,,4] <- p.life.a[3,,4] - n.ovir.a
 					# Find number of eggs laid by ovipositing females
-					a.egg.n <- sapply(1:space, function(x) sum(rpois(sum(p.life.a[3,x,2:3])[which(sum(p.life.a[3,x,2:3])>0)], a.batc.n[x])))
+					a.egg.n <- sapply(1:space, function(x) sum(rpois(sum(p.life.a[3,x,2:3]), a.batc.n[x])))
 					# Find number of adult females surviving
-					p.life.a[3,,1:4] <- t(sapply(1:space, function(x) {sapply(p.life.a[3,x,1:4],rbinom,n=1,p=a.surv.p[x])}))
+					p.life.a[3,,1:4] <- apply(t(p.life.a[3,,1:4]),MARGIN=1,FUN=function(x) rbinom(size=x,n=space,p=a.surv.p))
 					#print(c(sum(a.intro.n), sum(p.life.a[3,,1]), a.surv.p[28622],day))
 
 					## Short-distance active dispersal
