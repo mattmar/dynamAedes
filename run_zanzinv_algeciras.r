@@ -15,14 +15,15 @@ gc()
 introvector<-c(15664,15665,15666,15667,15685,15686,15687,15688,15704,15705,15706,15707,15708,15723,15724,15725,15726,15727,15741,15742,15743,15744,15745,15757,15758,15759,15760,15761,15762,15774,15775,15776,15777,15778,15779,15780,15792,15793,15794,15795,15796,15797,15798,15810,15811,15812,15813,15814,15815,15816,15832,15833,15834,15835,15836,15837,15838,15854,15855,15856,15857,15858,15859,15860,15875,15876,15877,15878,15879,15880,15881,15894,15895,15896,15897,15898,15899,15900,15912,15913,15914,15915,15916,15917,15929,15930,15933,15934)
 
 # Run simulations, start 15th of July 2017; end 31 October 2019
-str=235
+str=195
 endr=1037
 source("zanzinv.r")
-zanzout <- zanzinv(temps.matrix=ww, cells.coords=cc, road.dist.matrix=pld,startd=str,endd=endr,n.clusters=47, cluster.type="SOCK",iter=100,intro.cells=introvector,intro.eggs=250,sparse.output=FALSE,compressed.output=TRUE)
+zanzout <- zanzinv(temps.matrix=ww, cells.coords=cc, road.dist.matrix=pld,startd=str,endd=endr,n.clusters=47, cluster.type="SOCK",iter=100,intro.cells=introvector,intro.eggs=100,sparse.output=FALSE,compressed.output=TRUE)
 
-str=225
-endr=445
-zanzout <- zanzinv(temps.matrix=ww, cells.coords=cc, road.dist.matrix=pld,startd=str,endd=endr,n.clusters=7, cluster.type="SOCK",iter=7,intro.cells=introvector,intro.eggs=100,sparse.output=FALSE,compressed.output=TRUE)
+str=195
+endr=1037
+source("zanzinv.r")
+zanzout <- zanzinv(temps.matrix=ww, cells.coords=cc, road.dist.matrix=pld,startd=str,endd=endr,n.clusters=40, cluster.type="SOCK",iter=40,intro.cells=introvector,intro.eggs=100,sparse.output=FALSE,compressed.output=TRUE)
 
 #temps.matrix=ww; cells.coords=cc; road.dist.matrix=pld;startd=210; endd=240; n.clusters=2; cluster.type="SOCK" ; iter=2; intro.cell=NA; intro.adults=100
 
@@ -71,9 +72,10 @@ geom_line(linetype=1,size=1.5) + labs(y="Populazion size") +
 geom_line(aes(y=tempm/10),col="black") + labs(y="Populazion size") +
 ggtitle("Introduction of 100 eggs in Algeciras harbour") +
 scale_y_continuous(sec.axis = ~ ./100) +
-xlim(range(seq(as.Date("2017-01-01")+str, by = "day", length.out = 100))); g1
+#ylim(0,20000) +
+xlim(range(seq(as.Date("2017-01-01")+str, by = "day", length.out = endr-str))); g1
 
-ggsave("~/algeciras_500.png",g1,dpi=400,scale=1.5,width=25,height=15,unit="cm")
+ggsave("~/algeciras_test.png",g1,dpi=400,scale=1.5,width=25,height=15,unit="cm")
 
 ###Spatial spread
 w <- readRDS('data/algeciras_temps11-19_corr.RDS')[,c(1:3,2193:3229)] #select years 1=2011;

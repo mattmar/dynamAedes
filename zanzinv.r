@@ -63,7 +63,7 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					## Derive daily adult female survival rate and transform rate in daily probabiltiy to survive.
 					a.surv.p <- exp(-a.surv_rate.f(temps.matrix[,day]/1000))
 					## Add difference between lab and field survival only if survival is very high (from Brady et al. 2014)
-					a.surv.p <- ifelse(a.surv.p>0.975, a.surv.p-0.06, a.surv.p)
+					a.surv.p <- ifelse(a.surv.p>0.96, a.surv.p-0.06, a.surv.p)
 					a.surv.p <- ifelse(a.surv.p<0,0,a.surv.p)
 					## Immature survival
 					source("./lc/i.surv_rate.f.r")
@@ -116,8 +116,8 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					# Apply mortality to non emerged 5d+ old immatures
 					i.temp.v <- sapply(1:space, function(x){rbinom(1,i.temp.v[x],i.surv.p[x])})
 
-					## Adult compartment ##
-					# A has five sub-compartments representing: adults in 1,2 of oviposition[2:3]; 2d+ old adults host-seeking and non ovipositing[4]; 2d+ old adults which digested the blood meal but not yet laying[1]; 1d old adults, non-laying and non-dispersing [5].
+					## Events in the adult compartment ##
+					# A has five sub-compartments representing: adults in day 1 and 2 of oviposition [2:3]; 2d+ old adults host-seeking and non ovipositing [4]; 2d+ old adults which digested the blood meal but which are not yet laying 	[1]; 1d old adults, non-laying and non-dispersing [5].
 					# Introduce ovipositing females if day is 1
 					p.life.a[3,,1] <- if( length(counter)==1 ) a.intro.n else p.life.a[3,,1]
 					# Remove males adult from newly emerged adults
