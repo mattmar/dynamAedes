@@ -4,14 +4,16 @@
 #.a=adult, i.=immature, e.=egg
 #.p=probability, .r=rate, .n=number, .v=vector, .m=matrix, .a=array, .f=function
 
-zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,startd=1,endd=10,n.clusters=1,cluster.type="SOCK",iter=1,intro.cells=NULL,intro.adults=0,intro.immatures=0,intro.eggs=0,sparse.output=FALSE,compressed.output=FALSE) {
+zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,startd=1,endd=10,n.clusters=1,cluster.type="SOCK",iter=1,intro.cells=NULL,intro.adults=0,intro.immatures=0,intro.eggs=0,sparse.output=FALSE,compressed.output=FALSE,suffix="italy_test",country="italy") {
 
 	### Preamble: define variables for the model ###
 	## Export variables in the global environment
 	source("./other/libraries.r")
 	## Define globally a "safer version of "sample" function
 	resample <- function(x, ...) x[sample.int(length(x), ...)]
-	sapply(c("libraries","resample","cluster.type"), function(x) {assign(x,get(x),envir= .GlobalEnv)})
+	## Define globally the average distance of a trip by car
+	if(country=="it") car.avg.trip <- 18.43 else if(country=="nl") car.avg.trip <- 23.14 else if(country=="es") car.avg.trip <- 28.14 else (car.avg.trip=23.24)
+	sapply(c("libraries","resample","cluster.type","car.avg.trip","suffix"), function(x) {assign(x,get(x),envir= .GlobalEnv)})
 	## Load packages
 	suppressPackageStartupMessages(libraries(c("foreach","doSNOW","Rmpi","actuar","fields","slam","Matrix")))
 	## Type of cluster
@@ -22,7 +24,7 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 	} else(message("Default cluster.type is SOCK"))
  	## Start the parallelized loop over iter
 	doSNOW::registerDoSNOW(cl)
-	parallel::clusterExport(cl=cl, varlist=c("libraries", "resample")) # This loads functions in each child R process
+	parallel::clusterExport(cl=cl, varlist=c("libraries","resample","car.avg.trip","suffix")) # This loads functions in each child R process
 	parallel::clusterCall(cl=cl, function() libraries(c("foreach","slam"))) # This loads packages in each child R process
   	## Load space dimensionality in which simulations occour
 	space <- nrow(temps.matrix)
@@ -44,7 +46,7 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 		if( exists("counter") ) rm(counter)
 			foreach(day = startd:endd, .combine=c) %do% {
 				#print("start of the day")
-				if(!stopit) {
+				if( !stopit ) {
 					if( !exists("counter") ) {
 						#counter is to be sure that propagules are introduce only at day 1
 						counter <- 0; i.surv.m <- matrix(0,ncol=5,nrow=2); i.temp.v <- 0; e.temp.v <- 0; a.egg.n <- 0; p.life.a <- array(0,c(3,nrow(temps.matrix),5)); outl <- list()
@@ -76,7 +78,7 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					## Probability of short active dispersal (from Marcantonio et al. 2019); density with mean log(4.95) and sd log(0.66) from 0 to 600 every 10th value.
 					f.adis.p <- dlnorm(seq(0,600,10),meanlog=4.95,sdlog=0.66)
 					## Probability of long passive dispersal (from Pasaoglu et al. 2012)
-					f.pdis.p <- rgamma(seq(1,max(road.dist.matrix,na.rm=T),1000),shape=16/(10000/16), scale=10000/16)
+					f.pdis.p <- rgamma(seq(1,max(road.dist.matrix,na.rm=T),1000),shape=car.avg.trip/(10000/car.avg.trip), scale=10000/car.avg.trip)
 					## Probability of egg survival; 0.99 as can be assumed that egg hatching is independent from temperature
 					e.surv.p <- 0.99
 					## Probability of hatching (data from Soares-Pinheiro et al. 2015)
@@ -181,7 +183,7 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					if( any(which(p.life.a[3,,]>0)%in%colnames(road.dist.matrix)) ) {
 						# Extract cells whose contain long-distance dispersing adults
 						f.opac.n <- unique(which(p.life.a[3,,]>0,arr.ind=T)[,1])[which(unique(which(p.life.a[3,,]>0,arr.ind=T)[,1])%in%colnames(road.dist.matrix))]
-						# Select only 0.0001 adults in those cells, meaning that, on average, 1 adult on 10000 is moved by a car
+						# Select only 0.0001 adults in those cells, meaning that, on average, 1 adult over 10000 is moved by a car
 						f.pdis.n <- lapply(f.opac.n, function(x) sapply(p.life.a[3,x,], function(y) rbinom(1,y,0.0001)))
 						# Disperse adults at ld distance along roads, each row*1000 is a distance category
 						f.mdis.n <- lapply(f.pdis.n, function(x) sapply(x, function(y) rmultinom(1,y,f.pdis.p)))
@@ -223,7 +225,7 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 		print("out of iteration")
 			if(cluster.type == "MPI") {
 			message("MPI")
-			saveRDS(rs,"~/output_zanzinv.RDS")
+			saveRDS(rs, paste("~/output_zanzinv",suffix,".RDS", sep=""))
 			mpi.quit() #Close mpi clusters
 		}
 		stopCluster(cl)
