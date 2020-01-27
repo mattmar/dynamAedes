@@ -33,7 +33,8 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 
 	### Parallelized iterations of the life cycle
 	rs <- foreach(iteration=1:iter) %dopar% {
-		stopit<-FALSE
+		#Condition to satisfy to stop the life cycle: sum(pop) == 0
+		stopit <- FALSE
 		## Vector of propagules to initiate the life cycle
 		## If intro.cells is a vector of cells than sample one value for ech iteration
 		if(length(intro.cells)>1) {intro.cell <- sample(intro.cells,1)}
@@ -49,7 +50,7 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 				if( !stopit ) {
 					if( !exists("counter") ) {
 						#counter is to be sure that propagules are introduce only at day 1
-						counter <- 0; i.surv.m <- matrix(0,ncol=5,nrow=2); i.temp.v <- 0; e.temp.v <- 0; a.egg.n <- 0; p.life.a <- array(0,c(3,nrow(temps.matrix),5)); outl <- list()
+						counter <- 0; i.surv.m <- matrix(0,ncol=5,nrow=2); i.temp.v <- 0; e.temp.v <- 0; a.egg.n <- 0; p.life.a <- array(0,c(3,nrow(temps.matrix),6)); outl <- list()
 					}else counter <- append(counter,day)
 					### Header: load functions for life cycle paramenters. /1000 because temperature is an integer T*1000 ###
 					## Gonotrophic cycle
@@ -102,19 +103,19 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					e.temp.v <- rbinom(length(1:space), e.temp.v, e.surv.p)
 
 					## Events in the immature compartment ##
-					# I has five sub-compartments representing days from hatching; an immature can survive/die for the first four days after hatching but from the fifth day on, it can survive/die/emerge.
+					# I has six sub-compartments representing days from hatching; an immature can survive/die for the first five days after hatching, but from the fifth day on, it can survive/die/emerge.
 					# Binomial draw to find numbers of immature that die or survive passing to the next compartment
-					p.life.a[2,,2:5] <- apply(t(p.life.a[2,,1:4]), MARGIN = 1, FUN= function(x) rbinom(size=x, n= space, p= i.surv.p))
+					p.life.a[2,,2:6] <- apply(t(p.life.a[2,,1:5]), MARGIN = 1, FUN= function(x) rbinom(size=x, n= space, p= i.surv.p))
 					# Introduce if day is 1
-					p.life.a[2,,5] <- if( length(counter)==1 ) i.intro.n else p.life.a[2,,5]
+					p.life.a[2,,6] <- if( length(counter)==1 ) i.intro.n else p.life.a[2,,6]
 					# Add immatures hatched from eggs the same day
 					p.life.a[2,,1] <- e.hatc.n
 					# Add immatures that did not emerge yesterday to immature that today are ready to emerge
-					p.life.a[2,,5] <- p.life.a[2,,5] + i.temp.v
+					p.life.a[2,,6] <- p.life.a[2,,6] + i.temp.v
 					# Random binomial draw to find numbers of immature 5d+ old that emerge
-					i.emer.n <- rbinom(length(1:space), p.life.a[2, ,5], i.emer.p)
+					i.emer.n <- rbinom(length(1:space), p.life.a[2,,6], i.emer.p)
 					# Remove emerged immatures from immatures 5d+ old
-					i.temp.v <- p.life.a[2,,5] - i.emer.n
+					i.temp.v <- p.life.a[2,,6] - i.emer.n
 					# Apply mortality to non emerged 5d+ old immatures
 					i.temp.v <- sapply(1:space, function(x){rbinom(1,i.temp.v[x],i.surv.p[x])})
 
@@ -149,20 +150,21 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 							#print(c("In short-dispersal",length(f.ocel.v)))
 							# Cell of origin from cell index
 							e <- f.ocel.v[i]
-							# Build a distance matrix between cell of origin and all other cells in the system
+							# Build a distance matrix between cell of origin and all other cells in the system; roundint to -1 reports to the closest ten. 
 							cell.dist.matrix <- sapply(fields::rdist(cells.coords[e,],cells.coords,compact=T),function(x) round(x,-1))
 							names(cell.dist.matrix) <- 1:nrow(cells.coords)
-							# Find set of dispersing cells for each cell of origin based on the selected dispersing distance; any mosquito that disperses less than 250 meters stays in the cell of origin
+							# Find set of dispersing cells for each cell of origin based on the selected dispersing distance; any mosquito that disperses less than 250 meters stays in the cell of origin. Note: * 10-10 is to transform the cell id (1-60) to 100-600 and match the first dispersal distance to 0.
 							a.plan.l <- sapply(which(f.adis.v[,i]<max(cell.dist.matrix))*10-10, function(x) {
 								if(x<250) {x<-as.numeric()} else {x<-cell.dist.matrix[as.numeric(which(cell.dist.matrix==x))]}; return(x)})
 							# Set dispersing distances which do not exist in the distance matrix cell.dist.matrix as NULL
 							a.plan.l <- lapply(a.plan.l, function(x) if( (length(x)>0) & (is.null(names(x))|any(is.na(names(x)))) ) x=numeric() else x)
-							# Randomly choose one of the landing cells for each dispersing distance
+							# Randomly choose one of the landing cells for each dispersing distance; therefore the direction of dispersal is random (non directional dispersal or anisotrophic)
 							a.land.v <- sapply(a.plan.l, function(x) {if(length(x)>0) resample(x,1,replace=FALSE) else -999})
 							#print(a.land.v)
 							toret <- as.integer(which(a.land.v>=0))
 							#print("just before adding active-adults to cells")
 							#print(length(f.adis.v[which(f.adis.v[,i]<max(cell.dist.matrix)),i][toret])>0)
+							# If there is any dispersal distance farther than 0 for a cell of origin, then proceed
 							if( length(f.adis.v[which(f.adis.v[,i]<max(cell.dist.matrix)),i][toret])>0 ) {
 								#print(c("toreret is ", e, toret, a.land.v[toret]))
 								# Remove dispersing individuals from cell of origin
@@ -223,9 +225,9 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 			#print("out of day")
 		} #end of iterations
 		print("out of iteration")
+			saveRDS(rs, paste("~/output_zanzinv",suffix,".RDS", sep=""))
 			if(cluster.type == "MPI") {
 			message("MPI")
-			saveRDS(rs, paste("~/output_zanzinv",suffix,".RDS", sep=""))
 			mpi.quit() #Close mpi clusters
 		}
 		stopCluster(cl)
