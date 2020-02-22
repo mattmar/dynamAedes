@@ -64,26 +64,26 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					## Adult survival
 					source("./lc/a.surv_rate.f.r")
 					## Derive daily adult female survival rate and transform rate in daily probabiltiy to survive.
-					a.surv.p <- exp(-a.surv_rate.f(temps.matrix[,day]/1000))
+					a.surv.p <- 1-exp(-a.surv_rate.f(temps.matrix[,day]/1000))
 					## Add difference between lab and field survival only if survival is very high (from Brady et al. 2014)
 					a.surv.p <- ifelse(a.surv.p>0.96, a.surv.p-0.06, a.surv.p)
 					a.surv.p <- ifelse(a.surv.p<0,0,a.surv.p)
 					## Immature survival
 					source("./lc/i.surv_rate.f.r")
 					## Derive daily immature survival rate, then transform rate in daily probabiltiy to survive.
-					i.surv.p <- exp(-i.surv_rate.f(temps.matrix[,day]/1000))
+					i.surv.p <- 1-exp(-i.surv_rate.f(temps.matrix[,day]/1000))
 					## Immature emergence
 					source("./lc/i.emer_rate.f.r")
 					## Derive daily immature emergence rate then transform rate in daily probabiltiy to survive.
-					i.emer.p <- exp(-i.emer_rate.f(temps.matrix[,day]/1000))
-					## Probability of short active dispersal (from Marcantonio et al. 2019); density with mean log(4.95) and sd log(0.66) from 0 to 600 every 10th value.
+					i.emer.p <- 1-exp(-i.emer_rate.f(temps.matrix[,day]/1000))
+					## Probability density of short active dispersal (from Marcantonio et al. 2019); density with mean log(4.95) and sd log(0.66) from 0 to 600 every 10th value.
 					f.adis.p <- dlnorm(seq(0,600,10),meanlog=4.95,sdlog=0.66)
-					## Probability of long passive dispersal (from Pasaoglu et al. 2012)
-					f.pdis.p <- rgamma(seq(1,max(road.dist.matrix,na.rm=T),1000),shape=car.avg.trip/(10000/car.avg.trip), scale=10000/car.avg.trip)
-					## Probability of egg survival; 0.99 as can be assumed that egg hatching is independent from temperature
+					## Probability density of long passive dispersal (from Alemanno et al. 2012)
+					f.pdis.p <- dgamma(seq(1,max(road.dist.matrix,na.rm=T),1000),shape=car.avg.trip/(10000/car.avg.trip), scale=10000/car.avg.trip)
+					## Probability of egg survival; 0.99 as it can be assumed that egg survival is independent from temperature
 					e.surv.p <- 0.99
-					## Probability of hatching (data from Soares-Pinheiro et al. 2015)
-					e.hatc.p <- exp(-rgamma(length(temps.matrix[,day]/1000),shape=(7.6/7.4)^2,rate=(7.6/7.4^2)))
+					## Probability of egg hatching from ratio of hatching eggs (data from Soares-Pinheiro et al. 2015)
+					e.hatc.p <- 1-exp(-rgamma(length(temps.matrix[,day]),shape=(0.076/0.074)^2,rate=(0.076/0.074^2)))
 
 					## Events in the egg compartment ##
 					# E has four sub-compartment: 1:3 for eggs 1-3 days old that can only die or survive, 4 can die/survive/hatch
@@ -105,14 +105,14 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					## Events in the immature compartment ##
 					# I has six sub-compartments representing days from hatching; an immature can survive/die for the first five days after hatching, but from the fifth day on, it can survive/die/emerge.
 					# Binomial draw to find numbers of immature that die or survive passing to the next compartment
-					p.life.a[2,,2:6] <- apply(t(p.life.a[2,,1:5]), MARGIN = 1, FUN= function(x) rbinom(size=x, n= space, p= i.surv.p))
+					p.life.a[2,,2:6] <- apply(t(p.life.a[2,,1:5]), MARGIN = 1, FUN= function(x) rbinom(size=x, n=space, p=i.surv.p))
 					# Introduce if day is 1
 					p.life.a[2,,6] <- if( length(counter)==1 ) i.intro.n else p.life.a[2,,6]
 					# Add immatures hatched from eggs the same day
 					p.life.a[2,,1] <- e.hatc.n
 					# Add immatures that did not emerge yesterday to immature that today are ready to emerge
 					p.life.a[2,,6] <- p.life.a[2,,6] + i.temp.v
-					# Random binomial draw to find numbers of immature 5d+ old that emerge
+					# Find numbers of immature 5d+ old that emerge before applying mortality which is applied as newly emerged adults today
 					i.emer.n <- rbinom(length(1:space), p.life.a[2,,6], i.emer.p)
 					# Remove emerged immatures from immatures 5d+ old
 					i.temp.v <- p.life.a[2,,6] - i.emer.n
@@ -120,21 +120,20 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					i.temp.v <- sapply(1:space, function(x){rbinom(1,i.temp.v[x],i.surv.p[x])})
 
 					## Events in the adult compartment ##
-					# A has five sub-compartments representing: adults in day 1 and 2 of oviposition [2:3]; 2d+ old adults host-seeking and non ovipositing [4]; 2d+ old adults which digested the blood meal but which are not yet laying 	[1]; 1d old adults, non-laying and non-dispersing [5].
-					# Introduce ovipositing females if day is 1
+					# A has five sub-compartments representing: adults in day 1 and 2 of oviposition [2:3]; 2d+ old adults host-seeking and non ovipositing [4]; 2d+ old blod-fed adults which are not yet laying [1]; 1d old adults, non-laying and non-dispersing [5].
+					# Introduce blood-fed females if day is 1
 					p.life.a[3,,1] <- if( length(counter)==1 ) a.intro.n else p.life.a[3,,1]
 					# Remove males adult from newly emerged adults
 					p.life.a[3,,5] <- rbinom(space,i.emer.n, 0.5)
-					# Add to females ready to oviposit the number of females which pass from host-seeking to ovipositing
-					n.ovir.a <- rbinom(space, p.life.a[3,,4], a.gono.p)
-					p.life.a[3,,1] <- p.life.a[3,,1] + n.ovir.a
-					# Remove females which stop host-seeking from the host-seeking compartment
-					p.life.a[3,,4] <- p.life.a[3,,4] - n.ovir.a
-					# Find number of eggs laid by ovipositing females
+					# Add to females with matured eggs from yesteday the number of blood-fed females which today matured eggs
+					n.ovir.a <- rbinom(space, p.life.a[3,,1], a.gono.p)
+					p.life.a[3,,2] <- n.ovir.a
+					# Remove females which today matured eggs from the host-fed compartment
+					p.life.a[3,,1] <- p.life.a[3,,1] - n.ovir.a
+					# Find number of eggs laid today by ovipositing females
 					a.egg.n <- sapply(1:space, function(x) sum(rpois(sum(p.life.a[3,x,2:3]), a.batc.n[x])))
-					# Find number of adult females surviving
-					p.life.a[3,,1:4] <- apply(t(p.life.a[3,,1:4]),MARGIN=1,FUN=function(x) rbinom(size=x,n=space,p=a.surv.p))
-					#print(c(sum(a.intro.n), sum(p.life.a[3,,1]), a.surv.p[28622],day))
+					# Find number of adult females surviving today
+					p.life.a[3,,1:5] <- apply(t(p.life.a[3,,1:5]),MARGIN=1,FUN=function(x) rbinom(size=x,n=space,p=a.surv.p))
 
 					## Short-distance active dispersal
 					# It happens only if there is any host-seeking female, which are the only actively dispersing
@@ -209,10 +208,11 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 							}
 						}
 					}
-					# Make a new host-seeking compartment and slide ovipositing female status for new day
-					p.life.a[3,,4] <- p.life.a[3,,3] + p.life.a[3,,4] + p.life.a[3,,5]
-					p.life.a[3,,2:3] <- p.life.a[3,,1:2]
-					p.life.a[3,,1] <- 0
+					# Make a new host-seeking compartment and slide blodd-fed and ovipositing female status for new day
+					p.life.a[3,,1] <- p.life.a[3,,4]
+					p.life.a[3,,4] <- p.life.a[3,,3] + p.life.a[3,,5]
+					p.life.a[3,,3] <- p.life.a[3,,2]
+					p.life.a[3,,2] <- 0
 					message("\nday ",length(counter),".",iteration," has ended. Population is ",(sum(p.life.a)-sum(i.emer.n))," individuals \n")
 					# Condition for exinction
 					stopit <- sum(p.life.a)==0

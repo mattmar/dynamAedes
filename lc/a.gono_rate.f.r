@@ -1,4 +1,5 @@
 ## Daily rate of gonotrophic cycle, i.e., rate of adult females completing the cycle from bloodmeal to the first day of oviposition.
+# This process has a minimum duration of 5 days, which consiste of 24h to mature gonads, 3 days for gonadotrophic cycle.
 ## Data taken from https://academic.oup.com/jme/article/46/1/33/902827, Table 5.
 
 # Message to be printed
