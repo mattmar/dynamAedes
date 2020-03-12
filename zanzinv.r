@@ -56,7 +56,7 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					## Gonotrophic cycle
 					source("./lc/a.gono_rate.f.r")
 					## Derive daily rate for gonotrophic cycle, i.e. blood meal to oviposition, then transform rate in daily probabiltiy to terminate the gonotrophic cycle.
-					a.gono.p <- exp(-(a.gono_rate.f(temps.matrix[,day]/1000)))
+					a.gono.p <- 1-exp(-(a.gono_rate.f(temps.matrix[,day]/1000)))
 					## Oviposition rate
 					source("./lc/a.ovi_rate.f.r")
 					## Derive oviposition rate, i.e., number of eggs laid per female per day.
