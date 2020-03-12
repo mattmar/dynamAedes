@@ -4,7 +4,7 @@
 #.a=adult, i.=immature, e.=egg
 #.p=probability, .r=rate, .n=number, .v=vector, .m=matrix, .a=array, .f=function
 
-zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,startd=1,endd=10,n.clusters=1,cluster.type="SOCK",iter=1,intro.cells=NULL,intro.adults=0,intro.immatures=0,intro.eggs=0,sparse.output=FALSE,compressed.output=FALSE,suffix="italy_test",country="italy") {
+zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,startd=1,endd=10,n.clusters=1,cluster.type="SOCK",iter=1,intro.cells=NULL,intro.adults=0,intro.immatures=0,intro.eggs=0,sparse.output=FALSE,compressed.output=FALSE,suffix="italy_test",country="italy",e.surv.p=0.99,p_dis_a=0.051,e_hatch_pa=0.076) {
 
 	### Preamble: define variables for the model ###
 	## Export variables in the global environment
@@ -81,9 +81,9 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					## Probability density of long passive dispersal (from Alemanno et al. 2012)
 					f.pdis.p <- dgamma(seq(1,max(road.dist.matrix,na.rm=T),1000),shape=car.avg.trip/(10000/car.avg.trip), scale=10000/car.avg.trip)
 					## Probability of egg survival; 0.99 as it can be assumed that egg survival is independent from temperature
-					e.surv.p <- 0.99
+					#e.surv.p <- 0.99
 					## Probability of egg hatching from ratio of hatching eggs (data from Soares-Pinheiro et al. 2015)
-					e.hatc.p <- exp(-rgamma(length(temps.matrix[,day]),shape=(0.076/0.074)^2,rate=(0.076/0.074^2)))
+					e.hatc.p <- exp(-rgamma(length(temps.matrix[,day]),shape=(e_hatch_pa/0.074)^2,rate=(e_hatch_pa/0.074^2)))
 
 					## Events in the egg compartment ##
 					# E has four sub-compartment: 1:3 for eggs 1-3 days old that can only die or survive, 4 can die/survive/hatch
@@ -185,7 +185,7 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 						# Extract cells whose contain long-distance dispersing adults
 						f.opac.n <- unique(which(p.life.a[3,,]>0,arr.ind=T)[,1])[which(unique(which(p.life.a[3,,]>0,arr.ind=T)[,1])%in%colnames(road.dist.matrix))]
 						# Select only 0.0001 adults in those cells, meaning that, on average, 1 adult over 10000 is moved by a car
-						f.pdis.n <- lapply(f.opac.n, function(x) sapply(p.life.a[3,x,], function(y) rbinom(1,y,0.0001)))
+						f.pdis.n <- lapply(f.opac.n, function(x) sapply(p.life.a[3,x,], function(y) rbinom(1,y,p_dis_a)))
 						# Disperse adults at ld distance along roads, each row*1000 is a distance category
 						f.mdis.n <- lapply(f.pdis.n, function(x) sapply(x, function(y) rmultinom(1,y,f.pdis.p)))
 						# Select drawn distances
