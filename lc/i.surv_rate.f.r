@@ -8,12 +8,12 @@ i.mort_rate.f <- function(dt) {
 	st <- c(10,10,10,10,10.38,10.45,10.45,14.74,14.84,14.92,18.86,19.04,19.18,26.56,26.84,26.85,30.83,31.61,34.95,36.47,36.55,39.95,40.16,40.64)
 	model <- lm(survd ~ poly(st,5))
 	pred_i_duration <- predict(model,newdata=data.frame(st=dt),interval='confidence', level=0.95)
-	pred_i_duration[,1]<-ifelse(pred_i_duration[,1]<0,0,pred_i_duration[,1])
+	pred_i_duration[,1]<-ifelse(pred_i_duration[,1]<0,1,pred_i_duration[,1])
 	pred_i_rate <- 1/pred_i_duration[,1]
 	return( pred_i_rate ) 
 
 }
 
-# su <- i.mort_rate.f(1:45)
-# plot(1:45,(1-(exp(-su))))
+# su <- i.mort_rate.f(-20:50)
+# plot(-20:50,1-(1-(exp(-su))))
 # lines(st,1/survd)

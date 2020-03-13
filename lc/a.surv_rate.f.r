@@ -8,7 +8,7 @@ a.mort_rate.f <- function(dt) {
 	st <- c(10.54,10.76,15.30,16.52,20.05,21.79,25.64,27.64,31.33,31.65,32.55,33.41)
 	model <- lm(survd ~ poly(st,4))
 	pred_a_duration <- predict(model,newdata=data.frame(st=dt),interval='confidence', level=0.95)
-	pred_a_duration[,1]<-ifelse(pred_a_duration[,1]<0,0,pred_a_duration[,1])
+	pred_a_duration<-ifelse(pred_a_duration<1,0.1,pred_a_duration)
 	pred_a_rate <- 1/pred_a_duration[,1]
 	return( pred_a_rate ) 
 

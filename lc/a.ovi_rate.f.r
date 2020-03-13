@@ -13,6 +13,6 @@ a.ovi_rate.f <- function(dt) {
 
 }
 
-# ovr <- a.ovi_rate.f(1:50)
-# plot(1:50,ovr)
+# ovr <- a.ovi_rate.f(-20:50)
+# plot(-20:50,ovr)
 # lines(st,ovir,col="red")

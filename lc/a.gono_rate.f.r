@@ -15,6 +15,6 @@ a.gono_rate.f <- function(dt) {
 
 }
 
-# gp <- a.gono_rate.f(1:45)
-# plot(1:45,gp)
+# gp <- a.gono_rate.f(-20:50)
+# plot(-20:50,gp)
 # sapply(1:10, function(x) AICc(lm(gpd ~ poly(st,x))))
