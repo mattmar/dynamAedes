@@ -16,4 +16,3 @@ a.mort_rate.f <- function(dt) {
 
 # su <- a.mort_rate.f(-20:40)
 # plot(-20:40,1-(1-exp(-su)))
-# lines(st,survd)

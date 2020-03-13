@@ -4,7 +4,7 @@
 #.a=adult, i.=immature, e.=egg
 #.p=probability, .r=rate, .n=number, .v=vector, .m=matrix, .a=array, .f=function
 
-zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,startd=1,endd=10,n.clusters=1,cluster.type="SOCK",iter=1,intro.cells=NULL,intro.adults=0,intro.immatures=0,intro.eggs=0,sparse.output=FALSE,compressed.output=FALSE,suffix="italy_test",country="italy") {
+zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,startd=1,endd=10,n.clusters=1,cluster.type="SOCK",iter=1,intro.cells=NULL,intro.adults=0,intro.immatures=0,intro.eggs=0,sparse.output=FALSE,compressed.output=FALSE,suffix="italy_test",country="it") {
 
 	### Preamble: define variables for the model ###
 	## Export variables in the global environment
@@ -25,13 +25,14 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
  	## Start the parallelized loop over iter
 	doSNOW::registerDoSNOW(cl)
 	parallel::clusterExport(cl=cl, varlist=c("libraries","resample","car.avg.trip","suffix")) # This loads functions in each child R process
-	parallel::clusterCall(cl=cl, function() libraries(c("foreach","slam"))) # This loads packages in each child R process
+	parallel::clusterCall(cl=cl, function() libraries(c("foreach","slam","epiR"))) # This loads packages in each child R process
   	## Load space dimensionality in which simulations occour
 	space <- nrow(temps.matrix)
 	## Load time dimensionality in which simulations occour
 	days <- ncol(temps.matrix) #n of day to simulate, which is equal to the number of column of the temperature matrix
 
 	### Parallelized iterations of the life cycle
+	
 	rs <- foreach(iteration=1:iter) %dopar% {
 		#Condition to satisfy to stop the life cycle: sum(pop) == 0
 		stopit <- FALSE
@@ -60,16 +61,15 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					## Oviposition rate
 					source("./lc/a.ovi_rate.f.r")
 					## Derive oviposition rate, i.e., number of eggs laid per female per day.
-					a.batc.n <- a.ovi_rate.f(temps.matrix[,day]/1000)
+					a.batc.n <- a.ovi_rate.f(temps.matrix[,day]/1000)#rep(20,length(temps.matrix[,day]))
 					## Adult survival
-					source("./lc/a.surv_rate.f.r")
+					source("./lc/a.mort_rate.f.r")
 					## Derive daily adult female survival rate and transform rate in daily probabiltiy to survive.
 					a.surv.p <- 1-(1-exp(-a.mort_rate.f(temps.matrix[,day]/1000)))
 					## Add difference between lab and field survival only if survival is high (from Brady et al. 2014)
-					a.surv.p <- ifelse(a.surv.p>0.96, a.surv.p-0.06, a.surv.p)
-					a.surv.p <- ifelse(a.surv.p<0,0,a.surv.p)
+					#a.surv.p <- ifelse(a.surv.p>0.96, a.surv.p-0.06, a.surv.p)
 					## Immature survival
-					source("./lc/i.surv_rate.f.r")
+					source("./lc/i.mort_rate.f.r")
 					## Derive daily immature survival rate, then transform rate in daily probabiltiy to survive.
 					i.surv.p <- 1-(1-exp(-i.mort_rate.f(temps.matrix[,day]/1000)))
 					## Immature emergence
@@ -83,7 +83,8 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					## Probability of egg survival; 0.99 as it can be assumed that egg survival is independent from temperature
 					e.surv.p <- 0.99
 					## Probability of egg hatching from ratio of hatching eggs (data from Soares-Pinheiro et al. 2015)
-					e.hatc.p <- rgamma(length(temps.matrix[,day]),shape=(0.076/0.074)^2,rate=(0.076/0.074^2))
+					e.betap <- epi.betabuster(mode= 0.072, conf = .95, greaterthan = FALSE, x= 0.023)
+					e.hatc.p <- rbeta(length(temps.matrix[,day]),e.betap$shape1, e.betap$shape2)
 
 					## Events in the egg compartment ##
 					# E has four sub-compartment: 1:3 for eggs 1-3 days old that can only die or survive, 4 can die/survive/hatch
@@ -213,7 +214,8 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					p.life.a[3,,4] <- p.life.a[3,,3] + p.life.a[3,,5]
 					p.life.a[3,,3] <- p.life.a[3,,2]
 					p.life.a[3,,2] <- 0
-					message("\nday ",length(counter),".",iteration," has ended. Population is ",(sum(p.life.a)-sum(i.emer.n))," individuals \n")
+					#message("\nday ",length(counter),".",iteration," has ended. Population is ",(sum(p.life.a)-sum(i.emer.n))," individuals \n")
+					message("\nday ",length(counter),".",iteration," has ended. Population is e: ",sum(p.life.a[1,,])," i: ", sum(p.life.a[2,,])," a: " ,sum(p.life.a[3,,]), " eh: ", sum(e.hatc.n), " el: ",sum(a.egg.n), " \n")
 					# Condition for exinction
 					stopit <- sum(p.life.a)==0
 					gc()
@@ -225,7 +227,7 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 			#print("out of day")
 		} #end of iterations
 		print("out of iteration")
-			saveRDS(rs, paste("~/output_zanzinv",suffix,".RDS", sep=""))
+			saveRDS(rs, paste("~",suffix,".RDS", sep=""))
 			if(cluster.type == "MPI") {
 			message("MPI")
 			mpi.quit() #Close mpi clusters

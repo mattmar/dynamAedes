@@ -14,6 +14,6 @@ i.emer_rate.f <- function(dt) {
 
 }
 
-# em <- i.emer_rate.f(-20:50)
-# plot(-20:50,1-exp(-em))
-# lines(st,1/emerd,col="red")
+# em <- i.emer_rate.f(-15:45)
+# plot(-15:45,em)
+# lines(st,1/emerd)

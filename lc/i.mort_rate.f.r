@@ -14,6 +14,7 @@ i.mort_rate.f <- function(dt) {
 
 }
 
-# su <- i.mort_rate.f(-20:50)
-# plot(-20:50,1-(1-(exp(-su))))
+#png("~/imortp.png",res=600,width=480*20,height=480*11,pointsize=8)
+# su <- i.mort_rate.f(-10:45)
+# plot(-10:45,1-(1-(exp(-su))))
 # lines(st,1/survd)

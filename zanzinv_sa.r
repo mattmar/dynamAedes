@@ -62,14 +62,14 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					## Derive oviposition rate, i.e., number of eggs laid per female per day.
 					a.batc.n <- a.ovi_rate.f(temps.matrix[,day]/1000)
 					## Adult survival
-					source("./lc/a.surv_rate.f.r")
+					source("./lc/a.mort_rate.f.r")
 					## Derive daily adult female survival rate and transform rate in daily probabiltiy to survive.
 					a.surv.p <- 1-(1-exp(-a.mort_rate.f(temps.matrix[,day]/1000)))
 					## Add difference between lab and field survival only if survival is high (from Brady et al. 2014)
 					a.surv.p <- ifelse(a.surv.p>0.96, a.surv.p-0.06, a.surv.p)
 					a.surv.p <- ifelse(a.surv.p<0,0,a.surv.p)
 					## Immature survival
-					source("./lc/i.surv_rate.f.r")
+					source("./lc/i.mort_rate.f.r")
 					## Derive daily immature survival rate, then transform rate in daily probabiltiy to survive.
 					i.surv.p <- 1-(1-exp(-i.mort_rate.f(temps.matrix[,day]/1000)))
 					## Immature emergence
