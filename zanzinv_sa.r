@@ -64,18 +64,18 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					## Adult survival
 					source("./lc/a.surv_rate.f.r")
 					## Derive daily adult female survival rate and transform rate in daily probabiltiy to survive.
-					a.surv.p <- exp(-a.surv_rate.f(temps.matrix[,day]/1000))
+					a.surv.p <- 1-(1-exp(-a.mort_rate.f(temps.matrix[,day]/1000)))
 					## Add difference between lab and field survival only if survival is high (from Brady et al. 2014)
 					a.surv.p <- ifelse(a.surv.p>0.96, a.surv.p-0.06, a.surv.p)
 					a.surv.p <- ifelse(a.surv.p<0,0,a.surv.p)
 					## Immature survival
 					source("./lc/i.surv_rate.f.r")
 					## Derive daily immature survival rate, then transform rate in daily probabiltiy to survive.
-					i.surv.p <- exp(-i.surv_rate.f(temps.matrix[,day]/1000))
+					i.surv.p <- 1-(1-exp(-i.mort_rate.f(temps.matrix[,day]/1000)))
 					## Immature emergence
 					source("./lc/i.emer_rate.f.r")
 					## Derive daily immature emergence rate then transform rate in daily probabiltiy to survive.
-					i.emer.p <- exp(-i.emer_rate.f(temps.matrix[,day]/1000))
+					i.emer.p <- 1-exp(-i.emer_rate.f(temps.matrix[,day]/1000))
 					## Probability density of short active dispersal (from Marcantonio et al. 2019); density with mean log(4.95) and sd log(0.66) from 0 to 600 every 10th value.
 					f.adis.p <- dlnorm(seq(0,600,10),meanlog=4.95,sdlog=0.66)
 					## Probability density of long passive dispersal (from Alemanno et al. 2012)
@@ -83,7 +83,7 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					## Probability of egg survival; 0.99 as it can be assumed that egg survival is independent from temperature
 					#e.surv.p <- 0.99
 					## Probability of egg hatching from ratio of hatching eggs (data from Soares-Pinheiro et al. 2015)
-					e.hatc.p <- exp(-rgamma(length(temps.matrix[,day]),shape=(e_hatch_pa/0.074)^2,rate=(e_hatch_pa/0.074^2)))
+					e.hatc.p <- rgamma(length(temps.matrix[,day]),shape=(e_hatch_pa/0.074)^2,rate=(e_hatch_pa/0.074^2))
 
 					## Events in the egg compartment ##
 					# E has four sub-compartment: 1:3 for eggs 1-3 days old that can only die or survive, 4 can die/survive/hatch
