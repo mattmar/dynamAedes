@@ -15,7 +15,7 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 	if(country=="it") car.avg.trip <- 18.43 else if(country=="nl") car.avg.trip <- 23.14 else if(country=="es") car.avg.trip <- 28.14 else (car.avg.trip=23.24)
 	sapply(c("libraries","resample","cluster.type","car.avg.trip","suffix"), function(x) {assign(x,get(x),envir= .GlobalEnv)})
 	## Load packages
-	suppressPackageStartupMessages(libraries(c("foreach","doSNOW","Rmpi","actuar","fields","slam","Matrix")))
+	suppressPackageStartupMessages(libraries(c("foreach","doSNOW","Rmpi","actuar","fields","slam","Matrix","epiR")))
 	## Type of cluster
 	if(cluster.type=="SOCK" || cluster.type=="FORK") {
 		cl <- makeCluster(n.clusters,type=cluster.type, outfile="",useXDR=FALSE,methods=FALSE,output="")
@@ -214,7 +214,6 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					p.life.a[3,,4] <- p.life.a[3,,3] + p.life.a[3,,5]
 					p.life.a[3,,3] <- p.life.a[3,,2]
 					p.life.a[3,,2] <- 0
-					#message("\nday ",length(counter),".",iteration," has ended. Population is ",(sum(p.life.a)-sum(i.emer.n))," individuals \n")
 					message("\nday ",length(counter),".",iteration," has ended. Population is e: ",sum(p.life.a[1,,])," i: ", sum(p.life.a[2,,])," a: " ,sum(p.life.a[3,,]), " eh: ", sum(e.hatc.n), " el: ",sum(a.egg.n), " \n")
 					# Condition for exinction
 					stopit <- sum(p.life.a)==0
@@ -227,7 +226,7 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 			#print("out of day")
 		} #end of iterations
 		print("out of iteration")
-			saveRDS(rs, paste("~",suffix,".RDS", sep=""))
+			saveRDS(rs, paste("~/",suffix,".RDS", sep=""))
 			if(cluster.type == "MPI") {
 			message("MPI")
 			mpi.quit() #Close mpi clusters
