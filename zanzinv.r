@@ -83,7 +83,7 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					## Probability of egg survival; 0.99 as it can be assumed that egg survival is independent from temperature
 					e.surv.p <- 0.99
 					## Probability of egg hatching from ratio of hatching eggs (data from Soares-Pinheiro et al. 2015)
-					e.betap <- epi.betabuster(mode= 0.072, conf = .95, greaterthan = FALSE, x= 0.023)
+					e.betap <- epi.betabuster(mode=0.076, conf=0.95, greaterthan=TRUE, x=0.023)
 					e.hatc.p <- rbeta(length(temps.matrix[,day]),e.betap$shape1, e.betap$shape2)
 
 					## Events in the egg compartment ##
