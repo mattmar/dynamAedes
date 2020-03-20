@@ -4,7 +4,7 @@
 #.a=adult, i.=immature, e.=egg
 #.p=probability, .r=rate, .n=number, .v=vector, .m=matrix, .a=array, .f=function
 
-zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,startd=1,endd=10,n.clusters=1,cluster.type="SOCK",iter=1,intro.cells=NULL,intro.adults=0,intro.immatures=0,intro.eggs=0,sparse.output=FALSE,compressed.output=FALSE,suffix="italy_test",country="it",e.surv.p=0.99,p_dis_a=0.051,e_hatch_pa=0.076) {
+zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,startd=1,endd=10,n.clusters=1,cluster.type="SOCK",iter=1,intro.cells=NULL,intro.adults=0,intro.immatures=0,intro.eggs=0,sparse.output=FALSE,compressed.output=FALSE,suffix="italy_test",country="it",e.surv.p=0.99,p_dis_a=0.051,e_hatch_pa=0.076, e_hatch_pam=0.023) {
 
 	### Preamble: define variables for the model ###
 	## Export variables in the global environment
@@ -65,8 +65,6 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					source("./lc/a.mort_rate.f.r")
 					## Derive daily adult female survival rate and transform rate in daily probabiltiy to survive.
 					a.surv.p <- 1-(1-exp(-a.mort_rate.f(temps.matrix[,day]/1000)))
-					## Add difference between lab and field survival only if survival is high (from Brady et al. 2014)
-					#a.surv.p <- ifelse(a.surv.p>0.96, a.surv.p-0.06, a.surv.p)
 					## Immature survival
 					source("./lc/i.mort_rate.f.r")
 					## Derive daily immature survival rate, then transform rate in daily probabiltiy to survive.
@@ -82,7 +80,7 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					## Probability of egg survival; 0.99 as it can be assumed that egg survival is independent from temperature
 					#e.surv.p <- 0.99
 					## Probability of egg hatching from ratio of hatching eggs (data from Soares-Pinheiro et al. 2015)
-					e.betap <- epi.betabuster(mode=e_hatch_pa, conf=0.95, greaterthan=TRUE, x=0.023)
+					e.betap <- epi.betabuster(mode=e_hatch_pa, conf=0.95, greaterthan=TRUE, x=e_hatch_pam)
 					e.hatc.p <- rbeta(length(temps.matrix[,day]),e.betap$shape1, e.betap$shape2)
 
 					## Events in the egg compartment ##
