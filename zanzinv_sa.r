@@ -4,7 +4,7 @@
 #.a=adult, i.=immature, e.=egg
 #.p=probability, .r=rate, .n=number, .v=vector, .m=matrix, .a=array, .f=function
 
-zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,startd=1,endd=10,n.clusters=1,cluster.type="SOCK",iter=1,intro.cells=NULL,intro.adults=0,intro.immatures=0,intro.eggs=0,sparse.output=FALSE,compressed.output=FALSE,suffix="italy_test",country="it",e.surv.p=0.99,p_dis_a=0.051,e_hatch_pa=0.076, e_hatch_pam=0.023) {
+zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,startd=1,endd=10,n.clusters=1,cluster.type="SOCK",iter=1,intro.cells=NULL,intro.adults=0,intro.immatures=0,intro.eggs=0,sparse.output=FALSE,compressed.output=FALSE,suffix="italy_test",country="it",e.surv.p=0.99,p_dis_a=0.0051,e_hatch_pa=0.076, e_hatch_pam=0.023) {
 
 	### Preamble: define variables for the model ###
 	## Export variables in the global environment
