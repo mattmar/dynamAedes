@@ -15,7 +15,7 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 	if(country=="it") car.avg.trip <- 18.43 else if(country=="nl") car.avg.trip <- 23.14 else if(country=="es") car.avg.trip <- 28.14 else (car.avg.trip=23.24)
 	sapply(c("libraries","resample","cluster.type","car.avg.trip","suffix"), function(x) {assign(x,get(x),envir= .GlobalEnv)})
 	## Load packages
-	suppressPackageStartupMessages(libraries(c("foreach","doSNOW","Rmpi","actuar","fields","slam","Matrix","epiR")))
+	suppressPackageStartupMessages(libraries(c("foreach","doParallel","actuar","fields","slam","Matrix","epiR")))
 	## Type of cluster
 	if(cluster.type=="SOCK" || cluster.type=="FORK") {
 		cl <- makeCluster(n.clusters,type=cluster.type, outfile="",useXDR=FALSE,methods=FALSE,output="")
@@ -23,9 +23,9 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 		cl <- snow::makeMPIcluster(n.clusters,outfile="",useXDR=FALSE,methods=FALSE,output="")
 	} else(message("Default cluster.type is SOCK"))
  	## Start the parallelized loop over iter
-	doSNOW::registerDoSNOW(cl)
+	registerDoParallel(cl)
 	parallel::clusterExport(cl=cl, varlist=c("libraries","resample","car.avg.trip","suffix")) # This loads functions in each child R process
-	parallel::clusterCall(cl=cl, function() libraries(c("foreach","slam","epiR"))) # This loads packages in each child R process
+	clusterCall(cl=cl, function() libraries(c("foreach","slam","epiR"))) # This loads packages in each child R process
   	## Load space dimensionality in which simulations occour
 	space <- nrow(temps.matrix)
 	## Load time dimensionality in which simulations occour
@@ -65,6 +65,7 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					source("./lc/a.mort_rate.f.r")
 					## Derive daily adult female survival rate and transform rate in daily probabiltiy to survive.
 					a.surv.p <- 1-(1-exp(-a.mort_rate.f(temps.matrix[,day]/1000)))
+					a.surv.p <- ifelse(a.surv.p>0.95, a.surv.p-0.06, a.surv.p)
 					## Immature survival
 					source("./lc/i.mort_rate.f.r")
 					## Derive daily immature survival rate, then transform rate in daily probabiltiy to survive.
@@ -216,13 +217,13 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 					stopit <- sum(p.life.a)==0
 					gc()
 					# Condition for 2D output
-					if(compressed.output) p.life.aout <- apply(p.life.a, MARGIN=c(1, 2), sum)
-					if(sparse.output) return(list(as.simple_sparse_array(p.life.a))) else return(list(p.life.aout))
+					if(compressed.output) {p.life.aout <- apply(p.life.a, MARGIN=c(1, 2), sum)}
+					if(sparse.output) {return(list(as.simple_sparse_array(p.life.a)))} else {return(list(p.life.aout))}
+					message("Output compressed. Ready to save it.")
 				}else{message("Extinct")} #end of stopif condition
 			} #end of days
-			#print("out of day")
 		} #end of iterations
-		print("out of iteration")
+		message("out of iteration.")
 			saveRDS(rs, paste("~/",suffix,".RDS", sep=""))
 			if(cluster.type == "MPI") {
 			message("MPI")

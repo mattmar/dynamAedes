@@ -186,7 +186,7 @@ zanzinv <- function(temps.matrix=NULL,cells.coords=NULL,road.dist.matrix=NULL,st
 						# Extract cells whose contain long-distance dispersing adults
 						f.opac.n <- unique(which(p.life.a[3,,]>0,arr.ind=T)[,1])[which(unique(which(p.life.a[3,,]>0,arr.ind=T)[,1])%in%colnames(road.dist.matrix))]
 						# Select only 0.0001 adults in those cells, meaning that, on average, 1 adult over 10000 is moved by a car
-						f.pdis.n <- lapply(f.opac.n, function(x) sapply(p.life.a[3,x,], function(y) rbinom(1,y,0.0001)))
+						f.pdis.n <- lapply(f.opac.n, function(x) sapply(p.life.a[3,x,], function(y) rbinom(1,y,0.0051)))
 						# Disperse adults at ld distance along roads, each row*1000 is a distance category
 						f.mdis.n <- lapply(f.pdis.n, function(x) sapply(x, function(y) rmultinom(1,y,f.pdis.p)))
 						# Select drawn distances
