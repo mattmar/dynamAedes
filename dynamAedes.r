@@ -17,7 +17,7 @@
 ## ---------------------------------------------------##
 ## DOI: 
 ##%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%##
-DynamAedes <- function(temps.matrix=NULL,cells.coords=NULL,
+DynamAedes <- function(species="aegypti",temps.matrix=NULL,cells.coords=NULL,
 	road.dist.matrix=NULL,startd=1,endd=10,n.clusters=1,
 	cluster.type="SOCK",iter=1,intro.cells=NULL,intro.adults=0,
 	intro.immatures=0,intro.eggs=0,sparse.output=FALSE,
@@ -25,7 +25,7 @@ DynamAedes <- function(temps.matrix=NULL,cells.coords=NULL,
 	#%%%%%%%%%%%%%%%%%%%#
 	### Preamble: declare variables and prepare the parallel environment for the life cycle ###
 	## Install all required packages if not already installed
-	source("./other/libraries.r")
+	source("./of/libraries.r")
 	## Define globally a "safer version of "sample" function
 	resample <- function(x, ...) x[sample.int(length(x), ...)]
 	## Define globally the average distance of a trip by car: data taken (from DOI: 10.2790/7028)
@@ -39,12 +39,10 @@ DynamAedes <- function(temps.matrix=NULL,cells.coords=NULL,
 	## Export variables to the global environment
 	sapply(c("libraries","resample","cluster.type","car.avg.trip","suffix"), function(x) {assign(x,get(x),envir=.GlobalEnv)})
 	## Load required packages
-	suppressPackageStartupMessages(libraries(c("foreach","doSNOW","Rmpi","actuar","fields","slam","Matrix","epiR")))
+	suppressPackageStartupMessages(libraries(c("foreach","doSNOW","actuar","fields","slam","Matrix","epiR")))
 	## Define the type of cluster computing environment 
 	if(cluster.type=="SOCK" || cluster.type=="FORK") {
 		cl <- makeCluster(n.clusters,type=cluster.type, outfile="",useXDR=FALSE,methods=FALSE,output="")
-	} else if(cluster.type=="MPI") {
-		cl <- snow::makeMPIcluster(n.clusters,outfile="",useXDR=FALSE,methods=FALSE,output="")
 	} else(message("Default cluster.type is SOCK"))
  	## Register the environment and export newly defined variables and packages to the global environment 
 	doSNOW::registerDoSNOW(cl)
@@ -55,13 +53,13 @@ DynamAedes <- function(temps.matrix=NULL,cells.coords=NULL,
 	## Define time dimensionality in which simulations occour
 	days <- ncol(temps.matrix) #n of day to simulate, equal to the number of column of the temperature matrix
 	### End of preamble ###
-	#%%%%%%%%%%%%%%%%%%%#
+	#%%%%%%%%%%%%%%%%%%%%%#
 	### Iterations: start parallelised introduction "iteration" ###
 	rs <- foreach(iteration=1:iter) %dopar% {
-		## Condition to satisfy to stop the life cycle: sum(pop) == 0, in case the day before exinction happened
+		## Condition to satisfy to stop the life cycle: sum(pop) == 0, in case the day before extinction has happened
 		stopit <- FALSE
 		## Vector of propagules to initiate the life cycle
-		# If intro.cells is a vector of cells than sample one value for ech iteration
+		# If intro.cells is a vector of cells than sample a value for each iteration
 		if( length(intro.cells)>1 ) {
 			intro.cell <- sample(intro.cells,1)
 		} else {intro.cell <- NA}
@@ -102,40 +100,31 @@ DynamAedes <- function(temps.matrix=NULL,cells.coords=NULL,
 		foreach(day = startd:endd, .combine=c) %do% {
 			if( !stopit ) {
 				if( !exists("counter") ) {
-					# Define objects required to store data
+					# Define objects required to store data during a day
 					counter <- 0; i.surv.m <- matrix(0,ncol=5,nrow=2); i.temp.v <- 0; e.temp.v <- 0; a.egg.n <- 0; p.life.a <- array(0,c(3,nrow(temps.matrix),6)); outl <- list()
 				} else counter <- append(counter,day)
 
-				### Header: load functions for life cycle paramenters. (/1000 because T*1000)
+				### Header: load functions for life cycle parameters. (/1000 because T*1000)
+				source(paste("./lcf/",species,".R",sep=""))
 				## Gonotrophic cycle
-				source("./lc/a.gono_rate.f.r")
 				## Derive daily rate for gonotrophic cycle, i.e. blood meal to oviposition, then transform rate in daily probabiltiy to terminate the gonotrophic cycle.
 				a.gono.p <- 1-exp(-(a.gono_rate.f(temps.matrix[,day]/1000)))
 				## Oviposition rate
-				source("./lc/a.ovi_rate.f.r")
 				## Derive oviposition rate, i.e. number of eggs laid per female per day.
 				a.batc.n <- a.ovi_rate.f(temps.matrix[,day]/1000)
 				## Adult survival
-				source("./lc/a.mort_rate.f.r")
 				## Derive daily adult female survival rate and transform rate in daily probabiltiy to survive.
 				a.surv.p <- 1-(1-exp(-a.mort_rate.f(temps.matrix[,day]/1000)))
 				## Immature survival
-				source("./lc/i.mort_rate.f.r")
 				## Derive daily immature survival rate, then transform rate in daily probabiltiy to survive.
 				i.surv.p <- 1-(1-exp(-i.mort_rate.f(temps.matrix[,day]/1000)))
 				## Immature emergence
-				source("./lc/i.emer_rate.f.r")
-				## Derive daily immature emergence rate then transform rate in daily probabiltiy to survive.
+				## Derive daily immature emergence rate then transform rate in daily probabiltiy to emerge.
 				i.emer.p <- 1-exp(-i.emer_rate.f(temps.matrix[,day]/1000))
-				## Log-Normal probability density of short active dispersal (from DOI: 10.1002/ecs2.2977); from 0 to 600 m with resolution of 10 m.
-				f.adis.p <- dlnorm(seq(0,600,10),meanlog=4.95,sdlog=0.66)
+				## Derive daily egg survival rate then transform rate in daily probabiltiy to survive.
+				e.surv.p <- 1-exp(-e.surv.rate(temps.matrix[,day]/1000))
 				## Gamma probability density of long passive dispersal (from DOI: 10.2790/7028); from 0 to maximum distance of road segments with resolution of 1000 m.
 				f.pdis.p <- dgamma(seq(1,max(road.dist.matrix,na.rm=T),1000),shape=car.avg.trip/(10000/car.avg.trip), scale=10000/car.avg.trip)
-				## Uniform probability of egg survival; 0.99 as it can be assumed that egg survival is independent from temperature.
-				e.surv.p <- 0.99
-				## Probability of egg hatching from egg hatching ratio (from DOI: 10.1590/S0037-86822012000200007)
-				e.betap <- epi.betabuster(mode=0.076, conf=0.95, greaterthan=TRUE, x=0.023)
-				e.hatc.p <- rbeta(length(temps.matrix[,day]),e.betap$shape1, e.betap$shape2)
 				
 				### Events in the (`E`) egg compartment
 				## `E` has four sub-compartment: 1:3 for eggs 1-3 days old that can only die or survive, 4 for eggs older than 3 days that can die/survive/hatch
@@ -166,7 +155,7 @@ DynamAedes <- function(temps.matrix=NULL,cells.coords=NULL,
 				} else p.life.a[2,,6]
 				## Add immatures hatched the same day
 				p.life.a[2,,1] <- e.hatc.n
-				## Add immatures that did not emerge yesterday to immature that today are ready to emerge
+				## Add immatures that did not emerge yesterday to immatures that today are ready to emerge
 				p.life.a[2,,6] <- p.life.a[2,,6] + i.temp.v
 				## Find numbers of immature 5d+ old that emerge before applying mortality (applied as newly emerged adults today)
 				i.emer.n <- rbinom(length(1:space), p.life.a[2,,6], i.emer.p)
@@ -220,7 +209,7 @@ DynamAedes <- function(temps.matrix=NULL,cells.coords=NULL,
 						a.plan.l <- lapply(a.plan.l, function(x) if( (length(x)>0) & (is.null(names(x)) | any(is.na(names(x)))) ) {
 							x=numeric()
 						} else x)
-						# Randomly choose one a landing cell for each dispersing distance, thus the direction of dispersal is completely random within each distance class (non directional or anisotrophic dispersal). Set cells not select for landing as -999
+						# Randomly choose a landing cell for each dispersing distance, thus the direction of dispersal is completely random within each distance class (non directional or anisotrophic dispersal). Set cells not selected for landing as -999
 						a.land.v <- sapply(a.plan.l, function(x) {if( length(x)>0 ) {
 							resample(x,1,replace=FALSE)
 						} else -999})
@@ -263,9 +252,8 @@ DynamAedes <- function(temps.matrix=NULL,cells.coords=NULL,
 						}
 					} else print("No medium-dispersing females today...")
 				}
-				
-				## End of the day housekeeping
-				# Make a new host-seeking compartment and slide blood-fed and ovipositing female status to prepare the life cycle for tomorrow (t1)
+				## End-of-day housekeeping
+				# Make a new host-seeking compartment and slide blood-fed and ovipositing female status to prepare the life cycle for tomorrow (t+1)
 				p.life.a[3,,1] <- p.life.a[3,,4]
 				p.life.a[3,,4] <- p.life.a[3,,3] + p.life.a[3,,5]
 				p.life.a[3,,3] <- p.life.a[3,,2]
@@ -280,20 +268,22 @@ DynamAedes <- function(temps.matrix=NULL,cells.coords=NULL,
 				if( compressed.output ) {
 					p.life.aout <- apply(p.life.a, MARGIN=c(1, 2), sum)
 				}
-				# If TRUE a sparse array is returned (save memory but coplex to process)
+				# If TRUE a sparse array is returned (save memory but complex to process)
 				if(sparse.output) return(list(as.simple_sparse_array(p.life.a))) else return(list(p.life.aout))
-			}else{message("Extinct")} #end of stopif condition
+			}else{
+				message("Extinct")
+			} #end of stopif condition
+		}
 	}
-}
-### Complete final tasks, then return and exit:
-cat(paste("\nIterations concluded. Saving the output to: ",suffix,".RDS\n\n\n",sep=""))
-saveRDS(rs, paste(suffix,".RDS",sep=""))
-# Close MPI clusters
-if(cluster.type == "MPI") {
-	message("MPI")
-	mpi.quit() 
-}
-# Close cluster
-stopCluster(cl)
-return(rs)
+	### Complete final tasks, then return data and exit:
+	cat(paste("\nIterations concluded. Saving the output to: ",suffix,".RDS\n\n\n",sep=""))
+	saveRDS(rs, paste(suffix,".RDS",sep=""))
+	# Close MPI clusters
+	if(cluster.type == "MPI") {
+		message("MPI")
+		mpi.quit() 
+	}
+	# Close cluster
+	stopCluster(cl)
+	return(rs)
 }
