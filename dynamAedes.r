@@ -17,7 +17,7 @@
 ## ---------------------------------------------------##
 ## DOI: 
 ##%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%##
-DynamAedes <- function(species="aegypti",temps.matrix=NULL,cells.coords=NULL,
+dynamAedes <- function(species="aegypti",temps.matrix=NULL,cells.coords=NULL,
 	road.dist.matrix=NULL,startd=1,endd=10,n.clusters=1,
 	cluster.type="SOCK",iter=1,intro.cells=NULL,intro.adults=0,
 	intro.immatures=0,intro.eggs=0,sparse.output=FALSE,
@@ -48,14 +48,14 @@ DynamAedes <- function(species="aegypti",temps.matrix=NULL,cells.coords=NULL,
 	doSNOW::registerDoSNOW(cl)
 	parallel::clusterExport(cl=cl, varlist=c("libraries","resample","car.avg.trip","suffix")) # This loads functions in each child R process
 	parallel::clusterCall(cl=cl, function() libraries(c("foreach","slam","epiR"))) # This loads packages in each child R process
-  	## Define space dimensionality in which simulations occour
+  	## Define space dimensionality into which simulations occour
 	space <- nrow(temps.matrix)
-	## Define time dimensionality in which simulations occour
+	## Define time dimensionality into which simulations occour
 	days <- ncol(temps.matrix) #n of day to simulate, equal to the number of column of the temperature matrix
 	### End of preamble ###
 	#%%%%%%%%%%%%%%%%%%%%%#
 	### Iterations: start parallelised introduction "iteration" ###
-	rs <- foreach(iteration=1:iter) %dopar% {
+	rs <- foreach( iteration=1:iter ) %dopar% {
 		## Condition to satisfy to stop the life cycle: sum(pop) == 0, in case the day before extinction has happened
 		stopit <- FALSE
 		## Vector of propagules to initiate the life cycle
@@ -105,7 +105,7 @@ DynamAedes <- function(species="aegypti",temps.matrix=NULL,cells.coords=NULL,
 				} else counter <- append(counter,day)
 
 				### Header: load functions for life cycle parameters. (/1000 because T*1000)
-				source(paste("./lcf/",species,".R",sep=""))
+				source(paste("./lcf/",species,".r",sep=""))
 				## Gonotrophic cycle
 				## Derive daily rate for gonotrophic cycle, i.e. blood meal to oviposition, then transform rate in daily probabiltiy to terminate the gonotrophic cycle.
 				a.gono.p <- 1-exp(-(a.gono_rate.f(temps.matrix[,day]/1000)))
@@ -122,7 +122,9 @@ DynamAedes <- function(species="aegypti",temps.matrix=NULL,cells.coords=NULL,
 				## Derive daily immature emergence rate then transform rate in daily probabiltiy to emerge.
 				i.emer.p <- 1-exp(-i.emer_rate.f(temps.matrix[,day]/1000))
 				## Derive daily egg survival rate then transform rate in daily probabiltiy to survive.
-				e.surv.p <- 1-exp(-e.surv.rate(temps.matrix[,day]/1000))
+				e.surv.p <- 1-exp(-e.surv_rate.f(temps.matrix[,day]/1000))
+				## Derive daily egg hatching rate then transform rate in daily probabiltiy to hatch.
+				e.hatc.p <- 1-exp(-e.hatch_rate.f(temps.matrix[,day]/1000))
 				## Gamma probability density of long passive dispersal (from DOI: 10.2790/7028); from 0 to maximum distance of road segments with resolution of 1000 m.
 				f.pdis.p <- dgamma(seq(1,max(road.dist.matrix,na.rm=T),1000),shape=car.avg.trip/(10000/car.avg.trip), scale=10000/car.avg.trip)
 				
