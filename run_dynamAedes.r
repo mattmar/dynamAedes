@@ -51,16 +51,32 @@ bbox <- as(extent(r), "SpatialPolygons")
 
 ##(2) Simulate 2-year temperature data with seasonal trend -----
 ndays = 365*2 #[days]
-set.seed(123)
-sim_temp <- create_sims(n_reps = 1, n = ndays, central = 12.5, sd = 1.5,
+set.seed(123); sim_temp <- create_sims(n_reps = 1, n = ndays, central = 11.9, sd = 4,
 	exposure_type = "continuous", exposure_trend = "cos1",
-	exposure_amp = -0.8, average_outcome = 25,
-	outcome_trend = "cos1", outcome_amp = -0.9, 
-	rr = 1.0005)
+	exposure_amp = -0.9, average_outcome = 1,
+	outcome_trend = "cos1", outcome_amp = -0.5, 
+	rr = 1.005,start.date="2018-01-01")
+
+## T series similar to Barcelona ##
+# sim_temp <- create_sims(n_reps = 1, n = ndays, central = 18.2, sd = 2.5, exposure_type = "continuous", exposure_trend = "cos1", exposure_amp = -0.3, average_outcome = 25, outcome_trend = "cos1", outcome_amp = -1, rr = 1.0005,start.date="2019-01-01")
+####################################
+
 # Check temperature distribution and what would be the "average" temporal trends for all pixels
 hist(sim_temp[[1]]$x)
-plot(1:ndays,sim_temp[[1]]$x)
+plot(sim_temp[[1]]$date,sim_temp[[1]]$x)
 plot(1:ndays,sim_temp[[1]]$x*mean(sapply(autocorr_factor,max)))
+sim_temp[[1]]$month<-format(sim_temp[[1]]$date,"%m")
+aggregate(x~month,data=sim_temp[[1]],"mean")
+
+# Compare with some real data
+gentemp <- zz[zz$yearmoda>="2018-01-01",]
+plot(sim_temp[[1]]$date,sim_temp[[1]]$x)
+points(amstemp$temp~amstemp$yearmoda,col="blue")
+points(boltemp$temp~boltemp$yearmoda,col="green")
+points(gentemp$temp~gentemp$yearmoda,col="yellow")
+
+sim_temp[[1]]$x<-gentemp$temp
+
 #Merge spatial autocorrelation to simulated temperatures
 mat <- mclapply(1:ncell(r), function(x) {
 	d_t <- sim_temp[[1]]$x*autocorr_factor[[x]]
@@ -100,24 +116,28 @@ dist_matrix <- as.matrix(dist(coordinates(df_sp)))
 ### Run the model with the simulated input data
 ## Define temperature matrix
 # IMPORTANT: temperature must be multiplied by 1000
-w <- df_temp[,-c(1:3)]*1000 
+w <- as.matrix(df_temp[,-c(1:3)]*1000)
+storage.mode(w) <- "integer"
+
 ## Define matrix of coordinates for each cell in the grid
-cc <- df_temp[,c("x","y")]
+cc <- as.matrix(df_temp[,c("x","y")])
+storage.mode(cc) <- "integer"
 ## Assign colnames from rownames to the distance matrix.
 # IMPORTANT: The distance matrix has to be rounded to the thousands 
 colnames(dist_matrix) <- row.names(dist_matrix)
 dist_matrix <- apply(dist_matrix,2,function(x) round(x/1000,1)*1000) 
 hist(dist_matrix, xlab="Distance (meters)")
+storage.mode(dist_matrix) <- "integer"
 ## Define cells into which introduce propagules
-intro.vector <- as.numeric(row.names(dist_matrix)) 
+intro.vector <- type.convert(as.numeric(row.names(dist_matrix)))
 ## Define the day of introduction
-str = 151
+str = 121
 ## Define the end-day of life cycle
 endr = 365*2; 
 ## Define the number of eggs to be introduced
 ie = 100; 
 ## Define number of iterations
-it = 8
+it = 20
 ## Define the number of parallel processes (for sequential itarations set nc=1)
 nc = 8
 ## Set folder where the *.RDS output will be saved
@@ -132,12 +152,14 @@ source('dynamAedes.r')
 ### Run the model
 aeg.simout <- dynamAedes(species="aegypti", temps.matrix=w, cells.coords=cc, road.dist.matrix=dist_matrix, startd=str,endd=endr, n.clusters=nc, cluster.type="SOCK",iter=it,intro.cells=intro.vector,intro.eggs=ie, compressed.output=TRUE,country="es",suffix=paste(outfolder,"/DynamAedes_aeg_testrun_dayintro_",str,"_end",endr,"_niters",it,"_neggs",ie,sep=""))
 
-albo.simout <- dynamAedes(species="albopictus", temps.matrix=w, cells.coords=cc, road.dist.matrix=dist_matrix, startd=str,endd=endr, n.clusters=nc, cluster.type="SOCK",iter=it,intro.cells=intro.vector,intro.eggs=ie, compressed.output=TRUE,country="es",suffix=paste(outfolder,"/DynamAedes_albo_testrun_dayintro_",str,"_end",endr,"_niters",it,"_neggs",ie,sep=""))
+albo.simout <- dynamAedes(species="albopictus", temps.matrix=w, cells.coords=cc, road.dist.matrix=dist_matrix, startd=str,endd=endr, n.clusters=nc, cluster.type="SOCK",iter=it,intro.cells=intro.vector,intro.eggs=ie, compressed.output=TRUE,country="es",suffix=paste(outfolder,"/DynamAedes_albo_testrun_dayintro_",str,"_end",endr,"_niters",it,"_neggs",ie,sep=""),lat=44.3,long=8.9,intro.year=2018)
+
+#Coords: Bolzano: 46.5,11.3; Amsterdam: 51.6,4.5; Genova: 44.3,8.9.
 
 simout <- albo.simout
 days <- max(sapply(simout, function(x) length(x)))
 ## Define temperature dates, assuming the two years are 2019 and 2020
-tdates <- seq(as.Date("2020-01-01"),as.Date("2020-01-01")+endr,by="day")
+tdates <- seq(as.Date("2018-01-01"),as.Date("2020-01-01")+endr,by="day")
 
 #%%%%%%%%%%%%%%%%%%%##
 ### Derive probability of a successfull introduction at the end of the simulated period
@@ -157,7 +179,7 @@ cat("\n### p of successfull introduction is:",pofe," ###\n")
 dabu95ci <- function(outl=NA,st=1,cores=1,days=0){
 	out <- apply(do.call(rbind.data.frame,mclapply(outl, function(x) {
 		lapply(1:days, function(y) {
-			if(y<=length(x)) {sum(x[[y]][st,],na.rm=T)} else {NA}})},mc.cores=cores)),2,quantile,probs=c(0.025,0.50,0.975),na.rm=T);
+			if(y<=length(x)) {sum(x[[y]][st,],na.rm=T)} else {NA}})},mc.cores=cores)),2,quantile,probs=c(0.25,0.50,0.75),na.rm=T);
 	colnames(out)<-NULL
 	outo <- rbind.data.frame(out,
 		stage=rep(st,nrow(out)),
@@ -167,26 +189,28 @@ dabu95ci <- function(outl=NA,st=1,cores=1,days=0){
 # Apply function and format dataset for ggplot
 dabu_df <- rbind.data.frame(
 	rbind.data.frame(
-		dabu95ci(albo.simout,1,days=max(sapply(albo.simout, function(x) length(x)))),dabu95ci(albo.simout,2,days=max(sapply(albo.simout, function(x) length(x)))),dabu95ci(albo.simout,3,days=max(sapply(albo.simout, function(x) length(x))))),
+		dabu95ci(albo.simout,1,days=max(sapply(albo.simout, function(x) length(x)))),dabu95ci(albo.simout,2,days=max(sapply(albo.simout, function(x) length(x)))),dabu95ci(albo.simout,3,days=max(sapply(albo.simout, function(x) length(x)))),dabu95ci(albo.simout,4,days=max(sapply(albo.simout, function(x) length(x))))),
 	rbind.data.frame(
-		dabu95ci(aeg.simout,1,days=max(sapply(aeg.simout, function(x) length(x)))),dabu95ci(aeg.simout,2,days=max(sapply(aeg.simout, function(x) length(x)))),dabu95ci(aeg.simout,3,days=max(sapply(aeg.simout, function(x) length(x)))))
+		dabu95ci(aeg.simout,1,days=max(sapply(aeg.simout, function(x) length(x)))),dabu95ci(aeg.simout,2,days=max(sapply(aeg.simout, function(x) length(x)))),dabu95ci(aeg.simout,3,days=max(sapply(aeg.simout, function(x) length(x)))), dabu95ci(aeg.simout,4,days=max(sapply(aeg.simout, function(x) length(x)))))
 	)
 
 dabu_df$stage <- as.factor(dabu_df$stage)
-levels(dabu_df$stage) <- c("Immature","Egg","Adult")
-dabu_df$date <- as.Date(origin=as.Date("2020-01-01"),dabu_df$day+str)
+levels(dabu_df$stage) <- c("Egg","Immature","Adult","Diapause egg")
+
+dabu_df$date <- as.Date(origin=as.Date("2018-01-01"),dabu_df$day+str)
 dabu_df$sp <- c(
-	rep("albo",max(sapply(albo.simout, function(x) length(x)))*3),
-	rep("aeg",max(sapply(aeg.simout, function(x) length(x)))*3)
+	rep("albopictus",max(sapply(albo.simout, function(x) length(x)))*4),
+	rep("aegypti",max(sapply(aeg.simout, function(x) length(x)))*4)
 	)
 
 # Plot simple abundance time trend
-ggplot(dabu_df, aes(y=`50%`+1,x=date,group=stage,col=stage)) + 
-geom_ribbon(aes(ymin=`2.5%`+1,ymax=`97.5%`+1,fill=stage),col="white",alpha=0.1,outline.type="full") +
-geom_smooth(linetype=1,size=1.5,se=FALSE) + labs(y="log10(Abundance)") +
-scale_y_continuous(trans="log10") +
+ggplot(dabu_df, aes(y=`50%`,x=date,group=stage,col=stage)) + 
+geom_ribbon(aes(ymin=`25%`,ymax=`75%`,fill=stage),col="white",alpha=0.1,outline.type="full") +
+geom_line() +
 xlab("Date") +
-facet_wrap(~sp) +
+facet_wrap(sp~stage,scale="free_y",ncol=4) +
 theme(legend.pos="top") +
-ggtitle("Smoothed 95% CI abundance per stage") +
-scale_x_date(date_breaks = "2 months", date_labels = "%b-%y")
+ggtitle("Genova - Interquartile abundance per stage") +
+scale_x_date(date_breaks = "3 months", date_labels = "%b-%y")
+
+ggsave("~/dynamaedes_test_genova.png",dpi=400)
