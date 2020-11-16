@@ -36,7 +36,7 @@ dynamAedes <- function(species="aegypti", temps.matrix=NULL,
 		car.avg.trip <- 23.14
 	} else if( country=="es" ) {
 		car.avg.trip <- 28.14
-	} else ( car.avg.trip=23.24 )
+	} else ( car.avg.trip = 23.24 )
 	## Derive daylength for laying of diapausing eggs in albopictus
 	if(species=="albopictus"){
 		jd <- JD(seq(as.POSIXct(paste(intro.year,"/01/01",sep="")),as.POSIXct(as.Date(paste(intro.year,"/01/01",sep=""))+endd),by='day'))
@@ -45,7 +45,7 @@ dynamAedes <- function(species="aegypti", temps.matrix=NULL,
 	## Export variables to the global environment
 	sapply(c("libraries","resample","cluster.type","car.avg.trip","suffix","species"), function(x) {assign(x,get(x),envir=.GlobalEnv)})
 	## Load required packages
-	suppressPackageStartupMessages(libraries(c("foreach","doSNOW","actuar","fields","slam","Matrix","epiR","insol")))
+	suppressPackageStartupMessages(libraries(c("foreach","doSNOW","actuar","fields","slam","Matrix","epiR","insol","aomisc")))
 	## Define the type of cluster computing environment 
 	if(cluster.type=="SOCK" || cluster.type=="FORK") {
 		cl <- makeCluster(n.clusters,type=cluster.type, outfile="",useXDR=FALSE,methods=FALSE,output="")
@@ -53,7 +53,7 @@ dynamAedes <- function(species="aegypti", temps.matrix=NULL,
 	## Register the environment and export newly defined variables and packages to the global environment 
 	doSNOW::registerDoSNOW(cl)
 	parallel::clusterExport(cl=cl, varlist=c("libraries","resample","car.avg.trip","suffix","species")) # This loads functions in each child R process
-	parallel::clusterCall(cl=cl, function() libraries(c("foreach","slam","epiR"))) # This loads packages in each child R process
+	parallel::clusterCall(cl=cl, function() libraries(c("foreach","slam","epiR","aomisc"))) # This loads packages in each child R process
 	## Define space dimensionality into which simulations occour
 	space <- nrow(temps.matrix)
 	### End of preamble ###
@@ -109,7 +109,7 @@ dynamAedes <- function(species="aegypti", temps.matrix=NULL,
 				} else counter <- append(counter,day)
 
                 ### Header: load functions for life cycle parameters. (/1000 because T*1000)
-				source(paste("./lcf/",species,".r",sep=""))
+				source(paste("./lcf/",species,"_beta.r",sep=""))
                 ## Gonotrophic cycle
                 ## Derive daily rate for gonotrophic cycle, i.e. blood meal to oviposition, then transform rate in daily probabiltiy to terminate the gonotrophic cycle.
 				a.gono.p <- a.gono_rate.f(temps.matrix[,day]/1000)
@@ -156,13 +156,13 @@ dynamAedes <- function(species="aegypti", temps.matrix=NULL,
 				e.temp.v <- p.life.a[1,,4] - e.hatc.n
 				d.temp.v <- p.life.a[4,,4] - d.hatc.n
                 # Apply mortality to non hatched 4d+ old eggs
-				e.temp.v <- rbinom(length(1:space), e.temp.v, e.surv.p)
-				d.temp.v <- rbinom(length(1:space), d.temp.v, d.surv.p)
+				#e.temp.v <- rbinom(length(1:space), e.temp.v, 1)
+				#d.temp.v <- rbinom(length(1:space), d.temp.v, 1)
                 ### Events in the (`I`) immature compartment
                 ## `I` has 6 sub-compartments representing days from hatching; an immature can survive/die for the first 5 days after hatching, from the 5th day on, it can survive/die and `emerge`.
                 ## Derive mortality rate due to density and add to mortality rate due to temperature sum and derive probability of survival in each cell.
 				imm.v <- rowSums(p.life.a[2,,2:6])
-				i.ddmort_rate.v <- exp(predict(i.ddmort_rate.m,list(i.dens.v=imm.v, i.surd.v=rep(1,length(imm.v)))))
+				i.ddmort_rate.v <- exp(predict(i.ddmort_rate.m,list(i.dens.v=imm.v)))
 				i.surv.p <- 1-(1-exp(-(i.mort_rate.v + i.ddmort_rate.v)))
                 ## Binomial draw to find numbers of immature that die or survive-and-move to the next compartment
 				p.life.a[2,,2:6] <- apply(t(p.life.a[2,,1:5]), MARGIN=1, FUN=function(x) rbinom(size=x, n=space, p=i.surv.p))
@@ -179,8 +179,8 @@ dynamAedes <- function(species="aegypti", temps.matrix=NULL,
                 ## Remove emerged immatures from immatures 5d+ old
 				i.temp.v <- p.life.a[2,,6] - i.emer.n
                 ## Apply mortality to non emerged 5d+ old immatures
-				i.temp.v <- sapply(1:space, function(x){rbinom(1,i.temp.v[x],i.surv.p[x])})
-
+				#i.temp.v <- sapply(1:space, function(x){rbinom(1,i.temp.v[x],i.surv.p[x])})
+				i.temp.v <- sapply(1:space, function(x){rbinom(1,i.temp.v[x],0.95)})	
                 ### Events in the (`A`) adult compartment
                 ## `A` has 5 sub-compartments representing: adults in day 1 and 2 of oviposition [2:3]; 2d+ old adults host-seeking and non ovipositing [4]; 2d+ old blod-fed adults which are not yet laying [1]; 1d old adults, non-laying and non-dispersing [5].
                 ## Introduce blood-fed females if day is 1

@@ -22,7 +22,7 @@ library(eesim)
 
 ### Prepare input data
 ##(1) Create lattice arena with some spatial autocorrelation
-# 10 km squared arena with 250 m resolution (1600 total cells)
+# 2 km squared arena with 250 m resolution (1600 total cells)
 gridDim <- 2000
 res <- 250
 xy <- expand.grid(x=seq(1,gridDim,res), y=seq(1,gridDim,res))
@@ -69,13 +69,12 @@ sim_temp[[1]]$month<-format(sim_temp[[1]]$date,"%m")
 aggregate(x~month,data=sim_temp[[1]],"mean")
 
 # Compare with some real data
-gentemp <- zz[zz$yearmoda>="2018-01-01",]
-plot(sim_temp[[1]]$date,sim_temp[[1]]$x)
-points(amstemp$temp~amstemp$yearmoda,col="blue")
-points(boltemp$temp~boltemp$yearmoda,col="green")
-points(gentemp$temp~gentemp$yearmoda,col="yellow")
+temp <-  readRDS("/home/matteo/own_data/PoD/topics/aedes_genmod/data/t_genova.RDS")
+temp <- temp[temp$yearmoda>="2018-01-01"&temp$yearmoda<="2019-12-31",]
+plot(temp$yearmoda,temp$temp, col="red")
+abline(v=as.Date("2018-01-01")+121)
 
-sim_temp[[1]]$x<-gentemp$temp
+sim_temp[[1]]$x<-temp$temp
 
 #Merge spatial autocorrelation to simulated temperatures
 mat <- mclapply(1:ncell(r), function(x) {
@@ -131,15 +130,15 @@ storage.mode(dist_matrix) <- "integer"
 ## Define cells into which introduce propagules
 intro.vector <- type.convert(as.numeric(row.names(dist_matrix)))
 ## Define the day of introduction
-str = 121
+str = 165
 ## Define the end-day of life cycle
 endr = 365*2; 
 ## Define the number of eggs to be introduced
-ie = 100; 
+ie = 500; 
 ## Define number of iterations
-it = 20
+it = 8
 ## Define the number of parallel processes (for sequential itarations set nc=1)
-nc = 8
+nc = 7
 ## Set folder where the *.RDS output will be saved
 outfolder <- ('./output')
 if(!dir.exists(outfolder)){dir.create(outfolder)}
@@ -150,25 +149,27 @@ setwd('/home/matteo/own_data/PoD/topics/aedes_genmod/')
 source('dynamAedes.r')
 
 ### Run the model
-aeg.simout <- dynamAedes(species="aegypti", temps.matrix=w, cells.coords=cc, road.dist.matrix=dist_matrix, startd=str,endd=endr, n.clusters=nc, cluster.type="SOCK",iter=it,intro.cells=intro.vector,intro.eggs=ie, compressed.output=TRUE,country="es",suffix=paste(outfolder,"/DynamAedes_aeg_testrun_dayintro_",str,"_end",endr,"_niters",it,"_neggs",ie,sep=""))
+aeg.s <- dynamAedes(species="aegypti", temps.matrix=w, cells.coords=cc, road.dist.matrix=dist_matrix, startd=str,endd=endr, n.clusters=nc, cluster.type="SOCK",iter=it,intro.cells=intro.vector,intro.eggs=ie, compressed.output=TRUE,country="es",suffix=paste(outfolder,"/dynamAedes_aeg_testrun_dayintro_",str,"_end",endr,"_niters",it,"_neggs",ie,sep=""))
 
-albo.simout <- dynamAedes(species="albopictus", temps.matrix=w, cells.coords=cc, road.dist.matrix=dist_matrix, startd=str,endd=endr, n.clusters=nc, cluster.type="SOCK",iter=it,intro.cells=intro.vector,intro.eggs=ie, compressed.output=TRUE,country="es",suffix=paste(outfolder,"/DynamAedes_albo_testrun_dayintro_",str,"_end",endr,"_niters",it,"_neggs",ie,sep=""),lat=44.3,long=8.9,intro.year=2018)
+albo.s <- dynamAedes(species="albopictus", temps.matrix=w, cells.coords=cc, road.dist.matrix=dist_matrix, startd=str,endd=endr, n.clusters=nc, cluster.type="SOCK",iter=it,intro.cells=intro.vector,intro.eggs=ie, compressed.output=TRUE,country="es",suffix=paste(outfolder,"/dynamAedes_albo_testrun_dayintro_",str,"_end",endr,"_niters",it,"_neggs",ie,sep=""),lat=44.3,long=11.3,intro.year=2018)
 
-#Coords: Bolzano: 46.5,11.3; Amsterdam: 51.6,4.5; Genova: 44.3,8.9.
+kore.s <- dynamAedes(species="koreicus", temps.matrix=w, cells.coords=cc, road.dist.matrix=dist_matrix, startd=str,endd=endr, n.clusters=nc, cluster.type="SOCK",iter=it,intro.cells=intro.vector,intro.eggs=ie, compressed.output=TRUE,country="es",suffix=paste(outfolder,"/dynamAedes_kore_testrun_dayintro_",str,"_end",endr,"_niters",it,"_neggs",ie,sep=""))
 
-simout <- albo.simout
-days <- max(sapply(simout, function(x) length(x)))
+#Coords: Bolzano: 46.5,11.3; Amsterdam: 51.6,4.5; Genova: 44.3,8.9; Barcelona: 41,3. Rio: -22.9,-43.4
+
+s <- albo.s
+days <- max(sapply(s, function(x) length(x)))
 ## Define temperature dates, assuming the two years are 2019 and 2020
-tdates <- seq(as.Date("2018-01-01"),as.Date("2020-01-01")+endr,by="day")
+tdates <- seq(as.Date("2018-01-01"),as.Date("2018-01-01")+endr,by="day")
 
 #%%%%%%%%%%%%%%%%%%%##
 ### Derive probability of a successfull introduction at the end of the simulated period
-pofe <- sum(unlist(mclapply(simout, function(x) {
+pofe <- sum(unlist(mclapply(s, function(x) {
 	days <- length(x)
 	pe <- length(which(sum(x[days][[1]])>0)) 
 	gc()
 	return(pe)
-},mc.cores=8))) / length(simout)
+},mc.cores=8))) / length(s)
 
 ### Print the probability
 cat("\n### p of successfull introduction is:",pofe," ###\n")
@@ -189,9 +190,11 @@ dabu95ci <- function(outl=NA,st=1,cores=1,days=0){
 # Apply function and format dataset for ggplot
 dabu_df <- rbind.data.frame(
 	rbind.data.frame(
-		dabu95ci(albo.simout,1,days=max(sapply(albo.simout, function(x) length(x)))),dabu95ci(albo.simout,2,days=max(sapply(albo.simout, function(x) length(x)))),dabu95ci(albo.simout,3,days=max(sapply(albo.simout, function(x) length(x)))),dabu95ci(albo.simout,4,days=max(sapply(albo.simout, function(x) length(x))))),
+		dabu95ci(albo.s,1,days=max(sapply(albo.s, function(x) length(x)))),dabu95ci(albo.s,2,days=max(sapply(albo.s, function(x) length(x)))),dabu95ci(albo.s,3,days=max(sapply(albo.s, function(x) length(x)))),dabu95ci(albo.s,4,days=max(sapply(albo.s, function(x) length(x))))),
 	rbind.data.frame(
-		dabu95ci(aeg.simout,1,days=max(sapply(aeg.simout, function(x) length(x)))),dabu95ci(aeg.simout,2,days=max(sapply(aeg.simout, function(x) length(x)))),dabu95ci(aeg.simout,3,days=max(sapply(aeg.simout, function(x) length(x)))), dabu95ci(aeg.simout,4,days=max(sapply(aeg.simout, function(x) length(x)))))
+		dabu95ci(aeg.s,1,days=max(sapply(aeg.s, function(x) length(x)))),dabu95ci(aeg.s,2,days=max(sapply(aeg.s, function(x) length(x)))),dabu95ci(aeg.s,3,days=max(sapply(aeg.s, function(x) length(x)))), dabu95ci(aeg.s,4,days=max(sapply(aeg.s, function(x) length(x))))),
+	rbind.data.frame(
+		dabu95ci(kore.s,1,days=max(sapply(kore.s, function(x) length(x)))),dabu95ci(kore.s,2,days=max(sapply(kore.s, function(x) length(x)))),dabu95ci(kore.s,3,days=max(sapply(kore.s, function(x) length(x)))), dabu95ci(kore.s,4,days=max(sapply(kore.s, function(x) length(x)))))
 	)
 
 dabu_df$stage <- as.factor(dabu_df$stage)
@@ -199,8 +202,9 @@ levels(dabu_df$stage) <- c("Egg","Immature","Adult","Diapause egg")
 
 dabu_df$date <- as.Date(origin=as.Date("2018-01-01"),dabu_df$day+str)
 dabu_df$sp <- c(
-	rep("albopictus",max(sapply(albo.simout, function(x) length(x)))*4),
-	rep("aegypti",max(sapply(aeg.simout, function(x) length(x)))*4)
+	rep("albopictus",max(sapply(albo.s, function(x) length(x)))*4),
+	rep("aegypti",max(sapply(aeg.s, function(x) length(x)))*4),
+	rep("koreicus",max(sapply(kore.s, function(x) length(x)))*4)
 	)
 
 # Plot simple abundance time trend
@@ -213,4 +217,4 @@ theme(legend.pos="top") +
 ggtitle("Genova - Interquartile abundance per stage") +
 scale_x_date(date_breaks = "3 months", date_labels = "%b-%y")
 
-ggsave("~/dynamaedes_test_genova.png",dpi=400)
+#ggsave("~/dynamaedes_test_genova.png",dpi=400)
