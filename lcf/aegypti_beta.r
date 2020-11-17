@@ -75,19 +75,15 @@ i.ddmort_rate.m <- lm(log(i.dmort_rate.v) ~ i.dens.v)
 
 ## Egg hatching rate
 ## This rate decides embryonated eggs which hatch or stay from Soares-Pinheiro et al. 2016.
-e.betap <- epi.betabuster(mode=0.076, conf=0.95, greaterthan=TRUE, x=0.023)
 e.hatch_rate.f <- function(temp.new){
-	tmp.p <- rbeta(length(temp.new),e.betap$shape1, e.betap$shape2)
-	tmp.p[temp.new<10|temp.new>40] <- 0
-	return( tmp.p )
+  hatc_d <- c(0,  0.025*2,1,0.98, 0.73, 0.30, 0.037, 0.016)/2 
+  temp_d <- c(7, 12,   19,  24.5, 26.5, 29.5, 32.5,    34.5)
+  model <- drm(hatc_d ~ temp_d, fct = DRC.beta())
+  e.hatch.pred <- predict(model,data.frame(temp.v=temp.new))
+  return( e.hatch.pred )
 }
-#plot(-15:50,e.hatch_rate.f(-15:50),col="red",type="l")
-
-# png("~/e_hatch_rate.png",heigh=480*3,width=480*3,res=300)
 # plot(-15:50,e.hatch_rate.f(-15:50),col="red",type="l",ylim=c(0,1))
-# lines(-15:50,e.hatch_rate.f(-15:50),col="blue",ylim=c(0,1))
-# legend(x=-10,y=1,c("aegypti","albopictus"),cex=.8,col=c("red","blue"),pch=c(1,2))
-# dev.off()
+# points(hatc_d~temp_d,col="blue")
 
 ## Egg hatching rate: from Thomas et al. 2012 (Fig. 2) and Eisen et al. 2014 (Fig.1)
 e.surv_rate.f <- function(temp.new) {
@@ -97,15 +93,8 @@ e.surv_rate.f <- function(temp.new) {
 	e.surv.pred <- predict(model,data.frame(temp.v=temp.new))
 	return( e.surv.pred )
 }
-#plot(-15:50,e.surv_rate.f(-15:50),col="red",type="l",ylim=c(0,1))
-# points(surv.v~temp.v,col="blue")
-
-# png("~/e_surv_rate.png",heigh=480*3,width=480*3,res=300)
 # plot(-15:50,e.surv_rate.f(-15:50),col="red",type="l",ylim=c(0,1))
-# lines(-15:50,e.surv_rate.f(-15:50),col="blue",ylim=c(0,1))
-# lines(-15:50,d.surv_rate.f(-15:50),col="green",ylim=c(0,1))
-# legend(x=-15,y=1,c("aegypti","albopictus","albopictus dia"),cex=.8,col=c("red","blue","green"),pch=c(1,2,3))
-# dev.off()
+# points(surv.v~temp.v,col="blue")
 
 ## Log-Normal probability density of short active dispersal (from DOI: 10.1002/ecs2.2977); from 0 to 600 m with resolution of 10 m.
 f.adis.p <- dlnorm(seq(0,600,10), meanlog=4.95, sdlog=0.66)

@@ -73,14 +73,14 @@ i.ddmort_rate.m <- lm(log(i.dmort_rate.v) ~ i.dens.v)
 
 #eggs hatching rate
 e.hatch_rate.f <- function(temp.new){
-  hatc_d <- 1/c(100,2.45,1.35,1.07,1.08,1.04,100)/2
-  temp_d <- c(5,8,13,23,28,33,45)
+  hatc_d <- 1/c(100,2.45,1.35,1.07,1.08,2.04,100)/2
+  temp_d <- c(0,8,13,23,28,33,35)
   model <- drm(hatc_d ~ temp_d, fct = DRC.beta())
   e.hatch.pred <- predict(model,data.frame(temp.v=temp.new))
   return( e.hatch.pred ) 
 }
 #plot(-10:50,e.hatch_rate.f(-10:50),col="red",type="l")
-# points(hatc_d~temp_d,col="blue")
+#points(hatc_d~temp_d,col="blue")
 
 #eggs survival rate.
 e.surv_rate.f <- function(dt){

@@ -82,8 +82,8 @@ i.ddmort_rate.m <- lm(log(i.dmort_rate.v) ~ i.dens.v)
 ## Egg hatching rate: from Tab. 1 in Delatte et al. (2009), column Egg-L1
 ## This rate decides embryonated eggs which hatch or stay
 e.hatch_rate.f <- function(temp.new){
-  hatc_d <- 1/c(100,11,7.4,2.9,4.5,6.7,7.1,100) 
-  temp_d <- c(0,10,15,20,25,30,35,45)
+  hatc_d <- 1/c(100,11,7.4,2.9,4.5,6.7,7.1,500) 
+  temp_d <- c(0,10,15,20,25,30,35,35)
   model <- drm(hatc_d ~ temp_d, fct = DRC.beta())
   e.hatch.pred <- predict(model,data.frame(temp.v=temp.new))
   return( e.hatch.pred )
