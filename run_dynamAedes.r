@@ -19,6 +19,7 @@ library(spatstat)
 library(maptools)
 library(rgeos)
 library(eesim)
+library(parallel)
 
 ### Prepare input data
 ##(1) Create lattice arena with some spatial autocorrelation
@@ -69,7 +70,7 @@ sim_temp[[1]]$month<-format(sim_temp[[1]]$date,"%m")
 aggregate(x~month,data=sim_temp[[1]],"mean")
 
 # Compare with some real data
-temp <-  readRDS("/home/matteo/own_data/PoD/topics/aedes_genmod/data/t_genova.RDS")
+temp <-  readRDS("/home/matteo/own_data/PoD/topics/aedes_genmod/data/t_fresno.RDS")
 temp <- temp[temp$yearmoda>="2018-01-01"&temp$yearmoda<="2019-12-31",]
 plot(temp$yearmoda,temp$temp, col="red")
 abline(v=as.Date("2018-01-01")+121)
@@ -130,7 +131,7 @@ storage.mode(dist_matrix) <- "integer"
 ## Define cells into which introduce propagules
 intro.vector <- type.convert(as.numeric(row.names(dist_matrix)))
 ## Define the day of introduction
-str = 165
+str = 135
 ## Define the end-day of life cycle
 endr = 365*2; 
 ## Define the number of eggs to be introduced
@@ -138,7 +139,7 @@ ie = 500;
 ## Define number of iterations
 it = 8
 ## Define the number of parallel processes (for sequential itarations set nc=1)
-nc = 7
+nc = 5
 ## Set folder where the *.RDS output will be saved
 outfolder <- ('./output')
 if(!dir.exists(outfolder)){dir.create(outfolder)}
@@ -218,3 +219,15 @@ ggtitle("Genova - Interquartile abundance per stage") +
 scale_x_date(date_breaks = "3 months", date_labels = "%b-%y")
 
 #ggsave("~/dynamaedes_test_genova.png",dpi=400)
+
+asim<- as.data.frame(t(sapply(aeg.s[[8]],rowSums)))[,1:3]
+tdates <- seq(as.Date("2018-01-01")+str,as.Date("2018-01-01")+endr,by="day")
+names(asim) <- c("e","i","a")
+asim$date <- as.character(tdates)
+asim <- melt(asim,id.vars="date")
+asim$date <- as.Date(asim$date)
+
+ggplot(asim, aes(x=date,y=value+1, group=variable, col=variable)) +
+geom_line() + 
+scale_y_continuous(trans="log10") +
+scale_x_date(date_breaks = "2 months", date_labels = "%b-%y")

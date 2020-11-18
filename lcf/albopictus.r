@@ -38,7 +38,7 @@ a.surv_rate.f <- function(temp.new){
   })
   return( a.surv.rate )  
 }
-# plot(-15:50,a.surv_rate.f(-15:50),col="red",type="l",ylim=c(0,1))
+#plot(-15:50,a.surv_rate.f(-15:50),col="red",type="l",ylim=c(0,1))
 # lines(-15:50,a.surv_rate.f(-15:50),col="blue")
 
 #emergence rate immature -> adult: from Tab. 1 in Delatte et al. (2009), column Pupae-adult
@@ -47,18 +47,19 @@ i.emer_rate.f <- function(temp.new){
   i.em_rate.v <- -log(1-i.em_prop.v) 
   i.em_leng.v <- c(20,8.7,4.1,2.7,1.9,1.7,20)
   i.em_drat.v <- i.em_rate.v/i.em_leng.v
-  temp.v <- c(-15,seq(15,35, by=5),50)
-  lm <- lm(i.em_drat.v ~ poly(temp.v,4))
+  temp.v <- c(-15,15,20,25,30,35,55)
+  lm <- lm(i.em_drat.v ~ poly(temp.v,6))
   i.emer.pred <- predict(lm,data.frame(temp.v=temp.new))
   i.emer.pred <- ifelse(i.emer.pred<0,0,i.emer.pred)
   return( 1-exp(-i.emer.pred) )
 }
-# plot(-15:50,1-exp(-i.emer_rate.f(-15:50)),col="red",type="l")
-# points(i.em_drat.v~temp.v,col="blue")
+# plot(-15:50,1-exp(-i.emer_rate.f(-15:50)),col="red",type="l",ylim=c(0,1))
+# points(1-exp(-i.em_drat.v)~temp.v,col="blue")
 # lines(-15:50,i.emer_rate.f(-15:50),col="blue")
 
 ## Immature daily survival rate at different temperature ##
 ## Data taken from:
+
 i.surv_rate.f <- function(dt){
   a=0.977 
   b=20.8 
@@ -71,10 +72,10 @@ i.surv_rate.f <- function(dt){
 
 ## Density-dependent immature mortality, fit data from Hancock et al. 2009
 # Output is an exponential model for daily mortality probability at different larval density
-i.dens.v =  c(87.72,561.40,1175.44,1280.70,1491.23,1675.44,1982.46,2350.88,2850.88,3122.81,3236.84,3307.02,3359.65,3456.14,3570.18,3640.35,3666.67,3771.93,3877.19,3982.46)
+i.dens.v =  c(87.72,561.40,1175.44,1280.70,1491.23,1675.44,1982.46,2350.88,2850.88,3122.81,3236.84,3307.02,3359.65,3456.14,3570.18,3640.35,3666.67,3771.93,3877.19,3982.46)*2
 i.surv_prop.v = c(0.95,0.43,0.57,0.42,0.49,0.35,0.25,0.17,0.13,0.05,0.2,0.27,0.11, 0.11,0.06,0.04,0.09,0.13,0.07, 0.14)
 i.sur_dur.v = c(7.46,9.96,28.09,17.46,29.12,38.31,42.22,40.95,44.31,42.34,20.91,17.43,
-37.12,29.73,40,43,22,51,50,31)
+  37.12,29.73,40,43,22,51,50,31)
 # Transform survival proportion to multidays mortality rate
 i.mort_rate.v = -log(i.surv_prop.v)
 # Transform multiday survival rate to daily survival rate
@@ -82,34 +83,32 @@ i.dmort_rate.v = i.mort_rate.v/i.sur_dur.v
 # Fit a model for daily survival rate using density as predictor
 i.ddmort_rate.m <- lm(log(i.dmort_rate.v) ~ i.dens.v)
 
+#plot(c(1,100,1000,5000,10000,50000),1-exp(-exp(predict(i.ddmort_rate.m,data.frame(i.dens.v=c(1,100,1000,5000,10000,50000))))),type="l")
+
 ## Egg hatching rate: from Tab. 1 in Delatte et al. (2009), column Egg-L1
+## This rate decides embryonated eggs which hatch or stay
 e.hatch_rate.f <- function(temp.new){
-  e.hatch_prop.v <- c(4.4,8.2,66.9,49.2,51.4,10.0,10)/100
-  e.hatch_rate.v <- -log(1-e.hatch_prop.v)
-  e.hatch_leng.v <- c(11,7.4,2.9,4.5,6.7,7.1,7) 
-  e.hatch_drat.v <- e.hatch_rate.v/e.hatch_leng.v
-  temp.v <- c(5,15,20,25,30,35,41)
-  lm <- lm(e.hatch_drat.v ~ poly(temp.v,4))
-  e.hatch.pred <- predict(lm,data.frame(temp.v=temp.new))
-  e.hatch.pred <- ifelse(e.hatch.pred<0,0,e.hatch.pred)
-  e.hatch.pred[temp.new<5|temp.new>40] <- 0
-  return( 1-exp(-e.hatch.pred) )
+  e.hatch_leng.v <- c(100,7.4,2.9,4.5,6.7,7.1,100) 
+  temp.v <- c(0,15,20,25,30,35,55)
+  lm <- lm(e.hatch_leng.v ~ poly(temp.v,4))
+  e.hatch.pred <- 1/predict(lm,data.frame(temp.v=temp.new))
+  e.hatch.pred[temp.new<10] <- 0
+  return( e.hatch.pred )
 }
 # plot(-15:50,e.hatch_rate.f(-15:50),col="red",type="l",ylim=c(0,0.50))
-# points(e.hatch_drat.v~temp.v)
+# points(1/e.hatch_leng.v~temp.v)
 # points(-15:50,e.hatch_rate.f(-15:50),col="blue")
 
-#Data taken from the Supplementary Materials available in : Metelmann et al. Journal of the Royal Society Interface (2019) 12:524; DOI: https://doi.org/10.6084/m9.figshare.c.4418279.v1
-#eggs
+#From Metelmann et al. (2019)
+## These probabilities decide which eggs die or survive
 e.surv_rate.f <- function(dt){
-  a=0.955 
+  a=0.95 
   b=18.8 
   c=-21.53
   e.surv.pred=a*exp(-0.5*((dt-b)/c)^6)
   return( e.surv.pred ) 
 }
-# plot(-10:50,e.surv_rate.f(-10:50),col="red",ylim=c(0,1),type="l")
-# points(-10:50,e.surv_rate.f(-10:50),col="blue")
+#plot(-10:50,e.surv_rate.f(-10:50),col="red",ylim=c(0,1),type="l")
 
 d.surv_rate.f <- function(dt){
   ed_surv_bl=1
