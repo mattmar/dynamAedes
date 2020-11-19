@@ -179,8 +179,8 @@ dynamAedes <- function(species="aegypti", temps.matrix=NULL,
                 ## Remove emerged immatures from immatures 5d+ old
 				i.temp.v <- p.life.a[2,,6] - i.emer.n
                 ## Apply mortality to non emerged 5d+ old immatures
-				#i.temp.v <- sapply(1:space, function(x){rbinom(1,i.temp.v[x],i.surv.p[x])})
-				i.temp.v <- sapply(1:space, function(x){rbinom(1,i.temp.v[x],0.95)})	
+				i.temp.v <- sapply(1:space, function(x){rbinom(1,i.temp.v[x],i.surv.p[x])})
+				#i.temp.v <- sapply(1:space, function(x){rbinom(1,i.temp.v[x],0.95)})	
                 ### Events in the (`A`) adult compartment
                 ## `A` has 5 sub-compartments representing: adults in day 1 and 2 of oviposition [2:3]; 2d+ old adults host-seeking and non ovipositing [4]; 2d+ old blod-fed adults which are not yet laying [1]; 1d old adults, non-laying and non-dispersing [5].
                 ## Introduce blood-fed females if day is 1
