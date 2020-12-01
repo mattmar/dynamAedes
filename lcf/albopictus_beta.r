@@ -8,20 +8,22 @@ a.gono_rate.f <- function(temp.new){
   a.gono.pred <- predict(model,data.frame(temp.v=temp.new))
   return( a.gono.pred )
 }
-#plot(-10:55,a.gono_rate.f(-10:55),col="red",type="l")
+# plot(-10:55,a.gono_rate.f(-10:55),col="red",type="l")
 # lines(-15:55,a.gono_rate.f(-15:55),col="blue")
 # points(1/gono.v~temp.v,col="blue")
+# cbind(-15:55,round(a.gono_rate.f(-15:55),2))
 
 ## Oviposition rate, i.e., number of eggs laid per female/day at different temperature ##
 a.ovi_rate.f <- function(temp.new){
   ovi_n <-  c(0, 50.8, 65.3, 74.2, 48.7, 0)
-  temp_n <- c(0, 20,   25,   30,   35, 45)
+  temp_n <- c(5, 20,   25,   30,   35, 45)
   model <- drm(ovi_n ~ temp_n, fct = DRC.beta())
   a.ovi.pred <- predict(model,data.frame(temp.v=temp.new))
   return( a.ovi.pred )
 }
 #plot(-15:50,a.ovi_rate.f(-15:50),col="red",type="l",ylim=c(0,100))
 # lines(-15:50,a.ovi_rate.f(-15:50),col="blue")
+#cbind(-15:55,round(a.ovi_rate.f(-15:55),2))
 
 ## Adult female daily mortality rate at different temperatures ##
 ## Data taken from:
@@ -36,13 +38,14 @@ a.surv_rate.f <- function(temp.new){
   })
   return( a.surv.rate )  
 }
-#plot(-15:50,a.surv_rate.f(-15:50),col="red",type="l",ylim=c(0,1))
+# plot(-15:50,a.surv_rate.f(-15:50),col="red",type="l",ylim=c(0,1))
 # lines(-15:50,a.surv_rate.f(-15:50),col="blue")
+# cbind(-15:55,round(a.surv_rate.f(-15:55),2))
 
 #emergence rate immature -> adult: from Tab. 1 in Delatte et al. (2009), column Pupae-adult
 i.emer_rate.f <- function(temp.new){
-  eme_d <- 1/c(10,11,8.7,4.1,2.7,1.9,1.7,5)
-  temp_d <- c(0,5,15,20,25,30,35,45)
+  eme_d <- 1/c(100,8.7,4.1,2.7,1.9,1.7,5)
+  temp_d <- c(5,15,20,25,30,35,40)
   model <- drm(eme_d ~ temp_d, fct = DRC.beta())
   i.emer.pred <- predict(model,data.frame(temp.v=temp.new))
   return( i.emer.pred )
@@ -50,6 +53,7 @@ i.emer_rate.f <- function(temp.new){
 #plot(-15:50,1-exp(-i.emer_rate.f(-15:50)),col="red",type="l",ylim=c(0,1))
 #points(eme_d~temp_d,col="blue")
 # lines(-15:50,i.emer_rate.f(-15:50),col="blue")
+# cbind(-15:55,round(i.emer_rate.f(-15:55),2))
 
 ## Immature daily survival rate at different temperature ##
 ## Data taken from:
@@ -63,6 +67,7 @@ i.surv_rate.f <- function(dt){
 }
 # plot(-15:50,i.surv_rate.f(-15:50),col="red",type="l")
 # lines(-15:50,i.surv_rate.f(-15:50),col="blue")
+# cbind(-15:55,round(i.surv_rate.f(-15:55),2))
 
 ## Density-dependent immature mortality, fit data from Hancock et al. 2009
 # Output is an exponential model for daily mortality probability at different larval density
@@ -91,6 +96,7 @@ e.hatch_rate.f <- function(temp.new){
 # plot(-15:50,e.hatch_rate.f(-15:50),col="red",type="l",ylim=c(0,1))
 # points(hatc_d~temp_d)
 # points(-15:50,e.hatch_rate.f(-15:50),col="blue")
+# cbind(-15:55,round(e.hatch_rate.f(-15:55),2))
 
 #From Metelmann et al. (2019)
 ## These probabilities decide which eggs die or survive
@@ -111,9 +117,11 @@ d.surv_rate.f <- function(dt){
   d.surv.pred= ed_surv_bl*a*exp(-0.5*((dt-b)/c)^6)
   return( d.surv.pred )
 }
-#plot(-20:50,d.surv_rate.f(-20:50),col="red",ylim=c(0,1),type="l")
-#d.surv_rate.f(-10)
+# plot(-20:50,d.surv_rate.f(-20:50),col="red",ylim=c(0,1),type="l")
+# d.surv_rate.f(-10)
 # points(-10:50,e.surv_rate.f(-10:50),col="blue")
+# cbind(-15:55,round(d.surv_rate.f(-15:55),2))
 
 ## Log-Normal probability density of short active dispersal (from DOI: 10.1002/ecs2.2977); from 0 to 600 m with resolution of 10 m.
 f.adis.p <- dlnorm(seq(0,600,10), meanlog=4.95, sdlog=0.66)
+#cbind(seq(0,600,10),round(f.adis.p,5))

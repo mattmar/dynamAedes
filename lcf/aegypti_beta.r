@@ -19,7 +19,7 @@ a.ovi_rate.f <- function(temp.new) {
 	a.ovi.pred <- predict(model,data.frame(temp.v=temp.new))
 	return( a.ovi.pred )
 }
-# plot(-15:55,a.ovi_rate.f(-15:55),col="red",type="l")
+#plot(-15:55,a.ovi_rate.f(-15:55),col="red",type="l")
 # points(ovi_n~temp_n,col="blue")
 
 ## Adult female daily mortality rate at different temperatures ##
@@ -33,18 +33,19 @@ a.surv_rate.f <- function(temp.new) {
 }
 # plot(-15:55,a.surv_rate.f(-15:55),col="red",type="l")
 # points(1-1/surv_d~temp_d,col="blue")
-
+# cbind(-15:55,round(a.surv_rate.f(-15:55),2))
 
 ## Immature daily emergence rate at different temperature ##
 i.emer_rate.f <- function(temp.new) {
-	eme_d <- 1/(c(100,61.7,39.7,84.4,10.0,9.2,8.4,6.3,7.4,5.1,8.1,6.3,30)*0.6439)
-	temp_d <- c(0,14.74,14.84,14.92,26.56,26.84,26.85,30.83,31.61,34.95,36.47,36.55,45)
+	eme_d <- 1/(c(500,61.7,39.7,84.4,10.0,9.2,8.4,6.3,7.4,5.1,8.1,6.3,30)*0.6439)
+	temp_d <- c(12,14.74,14.84,14.92,26.56,26.84,26.85,30.83,31.61,34.95,36.47,36.55,45)
 	model <- drm(eme_d ~ temp_d, fct = DRC.beta())
 	i.emer.pred <- predict(model,data.frame(temp.v=temp.new))
 	return( i.emer.pred ) 
 }
 # plot(-15:50,i.emer_rate.f(-15:50),col="red",type="l")
 # points(temp_d,eme_d)
+# cbind(-15:55,round(i.emer_rate.f(-15:55),2))
 
 ## Immature daily survival rate at different temperature ##
 i.surv_rate.f <- function(temp.new) {
@@ -55,8 +56,9 @@ i.surv_rate.f <- function(temp.new) {
 	i.surv.pred <- 1-1/ifelse(i.surv.pred<1,1,i.surv.pred)
 	return( i.surv.pred ) 
 }
-#plot(-15:50,i.surv_rate.f(-15:50),col="red",type="l")
+# plot(-15:50,i.surv_rate.f(-15:50),col="red",type="l")
 # points(1-1/surv.v~temp.v,col="blue")
+#cbind(-15:55,round(i.surv_rate.f(-15:55),2))
 
 ## Immature Density-dependent mortality from Hancock et al. 2009
 # Output is an exponential model for daily mortality probability at different larval density
@@ -74,7 +76,7 @@ i.ddmort_rate.m <- lm(log(i.dmort_rate.v) ~ i.dens.v)
 #plot(c(1,100,1000,5000,10000,50000),1-exp(-exp(predict(i.ddmort_rate.m,data.frame(i.dens.v=c(1,100,1000,5000,10000,50000))))),type="l")
 
 ## Egg hatching rate
-## This rate decides embryonated eggs which hatch or stay from Soares-Pinheiro et al. 2016.
+## This rate decides embryonated eggs which hatch or stay
 e.hatch_rate.f <- function(temp.new){
   hatc_d <- c(0,  0.025*2,1,0.98, 0.73, 0.30, 0.037, 0.016)/2 
   temp_d <- c(7, 12,   19,  24.5, 26.5, 29.5, 32.5,    34.5)
@@ -84,6 +86,7 @@ e.hatch_rate.f <- function(temp.new){
 }
 # plot(-15:50,e.hatch_rate.f(-15:50),col="red",type="l",ylim=c(0,1))
 # points(hatc_d~temp_d,col="blue")
+# cbind(-15:55,round(e.hatch_rate.f(-15:55),2))
 
 ## Egg hatching rate: from Thomas et al. 2012 (Fig. 2) and Eisen et al. 2014 (Fig.1)
 e.surv_rate.f <- function(temp.new) {
@@ -95,6 +98,7 @@ e.surv_rate.f <- function(temp.new) {
 }
 # plot(-15:50,e.surv_rate.f(-15:50),col="red",type="l",ylim=c(0,1))
 # points(surv.v~temp.v,col="blue")
+# cbind(-15:55,round(e.surv_rate.f(-15:55),2))
 
 ## Log-Normal probability density of short active dispersal (from DOI: 10.1002/ecs2.2977); from 0 to 600 m with resolution of 10 m.
 f.adis.p <- dlnorm(seq(0,600,10), meanlog=4.95, sdlog=0.66)

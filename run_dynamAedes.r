@@ -116,7 +116,9 @@ dist_matrix <- as.matrix(dist(coordinates(df_sp)))
 ### Run the model with the simulated input data
 ## Define temperature matrix
 # IMPORTANT: temperature must be multiplied by 1000
-w <- as.matrix(df_temp[,-c(1:3)]*1000)
+#w <- as.matrix(df_temp[,-c(1:3)]*1000)
+w <- as.matrix(df_temp[1,-c(1:3)]*1000)
+
 storage.mode(w) <- "integer"
 
 ## Define matrix of coordinates for each cell in the grid
@@ -130,14 +132,14 @@ hist(dist_matrix, xlab="Distance (meters)")
 storage.mode(dist_matrix) <- "integer"
 ## Define cells into which introduce propagules
 intro.vector <- type.convert(as.numeric(row.names(dist_matrix)))
-## Define the day of introduction
-str = 135
-## Define the end-day of life cycle
-endr = 365*2; 
+## Define the day of the year for introduction; day 1 is the first day in the temperature time series
+str = as.integer(strftime(as.Date("2018-05-15"),"%j"))
+## Define the last day of the simulation; day 1 is the first day in the temperature time series
+endr = as.integer(as.Date("2020-07-21") - as.Date("2018-01-01"))
 ## Define the number of eggs to be introduced
-ie = 500; 
+ie = 100; 
 ## Define number of iterations
-it = 8
+it = 5
 ## Define the number of parallel processes (for sequential itarations set nc=1)
 nc = 5
 ## Set folder where the *.RDS output will be saved
@@ -149,24 +151,28 @@ setwd('/home/matteo/own_data/PoD/topics/aedes_genmod/')
 ## Source the function
 source('dynamAedes.r')
 
-### Run the model
-aeg.s <- dynamAedes(species="aegypti", temps.matrix=w, cells.coords=cc, road.dist.matrix=dist_matrix, startd=str,endd=endr, n.clusters=nc, cluster.type="SOCK",iter=it,intro.cells=intro.vector,intro.eggs=ie, compressed.output=TRUE,country="es",suffix=paste(outfolder,"/dynamAedes_aeg_testrun_dayintro_",str,"_end",endr,"_niters",it,"_neggs",ie,sep=""))
+species="aegypti"; dispersal=TRUE; temps.matrix=w; cells.coords=cc; lat=0; long=0; road.dist.matrix=dist_matrix; intro.year=2020; startd=1; endd=10; n.clusters=1; cluster.type="SOCK"; iter=1;  intro.cells=NULL; intro.adults=0; intro.immatures=0;  intro.eggs=10; sparse.output=FALSE; compressed.output=FALSE;suffix="dynamAedes"; country="it"
 
-albo.s <- dynamAedes(species="albopictus", temps.matrix=w, cells.coords=cc, road.dist.matrix=dist_matrix, startd=str,endd=endr, n.clusters=nc, cluster.type="SOCK",iter=it,intro.cells=intro.vector,intro.eggs=ie, compressed.output=TRUE,country="es",suffix=paste(outfolder,"/dynamAedes_albo_testrun_dayintro_",str,"_end",endr,"_niters",it,"_neggs",ie,sep=""),lat=44.3,long=11.3,intro.year=2018)
+### Run the model
+aeg.s <- dynamAedes(species="aegypti", dispersal=TRUE, temps.matrix=w, cells.coords=cc, road.dist.matrix=dist_matrix, startd=str,endd=145, n.clusters=nc, cluster.type="SOCK",iter=it,intro.cells=intro.vector,intro.eggs=ie, compressed.output=TRUE,country="es",suffix=paste(outfolder,"/dynamAedes_aeg_testrun_dayintro_",str,"_end",endr,"_niters",it,"_neggs",ie,sep=""))
+
+aeg.s <- dynamAedes(species="aegypti", dispersal=FALSE, temps.matrix=w, startd=str, endd=145, n.clusters=1,iter=1, intro.eggs=ie, country="es",suffix=paste(outfolder,"/dynamAedes_aeg_testrun_dayintro_",str,"_end",endr,"_niters",it,"_neggs",ie,sep=""))
+
+albo.s <- dynamAedes(species="albopictus", temps.matrix=w, cells.coords=cc, road.dist.matrix=dist_matrix, startd=str,endd=endr, n.clusters=nc, cluster.type="SOCK",iter=it,intro.cells=intro.vector,intro.eggs=ie, compressed.output=TRUE,country="es",suffix=paste(outfolder,"/dynamAedes_albo_testrun_dayintro_",str,"_end",endr,"_niters",it,"_neggs",ie,sep=""),lat=44.3,long=8.9,intro.year=2018)
 
 kore.s <- dynamAedes(species="koreicus", temps.matrix=w, cells.coords=cc, road.dist.matrix=dist_matrix, startd=str,endd=endr, n.clusters=nc, cluster.type="SOCK",iter=it,intro.cells=intro.vector,intro.eggs=ie, compressed.output=TRUE,country="es",suffix=paste(outfolder,"/dynamAedes_kore_testrun_dayintro_",str,"_end",endr,"_niters",it,"_neggs",ie,sep=""))
 
 #Coords: Bolzano: 46.5,11.3; Amsterdam: 51.6,4.5; Genova: 44.3,8.9; Barcelona: 41,3. Rio: -22.9,-43.4
 
-s <- albo.s
+s <- aeg.s
 days <- max(sapply(s, function(x) length(x)))
 ## Define temperature dates, assuming the two years are 2019 and 2020
-tdates <- seq(as.Date("2018-01-01"),as.Date("2018-01-01")+endr,by="day")
+tdates <- seq(as.Date("2018-01-01")+str,as.Date("2018-01-01")+endr,by="day")
 
 #%%%%%%%%%%%%%%%%%%%##
 ### Derive probability of a successfull introduction at the end of the simulated period
 pofe <- sum(unlist(mclapply(s, function(x) {
-	days <- length(x)
+	days <- 365*2
 	pe <- length(which(sum(x[days][[1]])>0)) 
 	gc()
 	return(pe)
@@ -189,6 +195,11 @@ dabu95ci <- function(outl=NA,st=1,cores=1,days=0){
 	return(t(outo))
 }
 # Apply function and format dataset for ggplot
+
+albo.s <- aeg.s
+aeg.s <- aeg.s
+kore.s <- aeg.s
+
 dabu_df <- rbind.data.frame(
 	rbind.data.frame(
 		dabu95ci(albo.s,1,days=max(sapply(albo.s, function(x) length(x)))),dabu95ci(albo.s,2,days=max(sapply(albo.s, function(x) length(x)))),dabu95ci(albo.s,3,days=max(sapply(albo.s, function(x) length(x)))),dabu95ci(albo.s,4,days=max(sapply(albo.s, function(x) length(x))))),
@@ -201,7 +212,7 @@ dabu_df <- rbind.data.frame(
 dabu_df$stage <- as.factor(dabu_df$stage)
 levels(dabu_df$stage) <- c("Egg","Immature","Adult","Diapause egg")
 
-dabu_df$date <- as.Date(origin=as.Date("2018-01-01"),dabu_df$day+str)
+dabu_df$date <- as.Date(origin=as.Date("2018-01-01")+str,dabu_df$day)
 dabu_df$sp <- c(
 	rep("albopictus",max(sapply(albo.s, function(x) length(x)))*4),
 	rep("aegypti",max(sapply(aeg.s, function(x) length(x)))*4),
@@ -216,18 +227,29 @@ xlab("Date") +
 facet_wrap(sp~stage,scale="free_y",ncol=4) +
 theme(legend.pos="top") +
 ggtitle("Genova - Interquartile abundance per stage") +
-scale_x_date(date_breaks = "3 months", date_labels = "%b-%y")
+scale_x_date(date_breaks = "1 months", date_labels = "%b") +
+scale_y_continuous(trans = "log10")
 
 #ggsave("~/dynamaedes_test_genova.png",dpi=400)
 
-asim<- as.data.frame(t(sapply(aeg.s[[8]],rowSums)))[,1:3]
-tdates <- seq(as.Date("2018-01-01")+str,as.Date("2018-01-01")+endr,by="day")
+sapply(aeg.s,length)
+
+asim <- as.data.frame(t(sapply(aeg.s[[1]],rowSums)))[,1:3]
+
+tdates <- seq(as.Date("2018-01-01")+str,as.Date("2018-01-01")+nrow(asim)+str-1,by="day")
 names(asim) <- c("e","i","a")
+
+
 asim$date <- as.character(tdates)
 asim <- melt(asim,id.vars="date")
 asim$date <- as.Date(asim$date)
 
-ggplot(asim, aes(x=date,y=value+1, group=variable, col=variable)) +
-geom_line() + 
-scale_y_continuous(trans="log10") +
-scale_x_date(date_breaks = "2 months", date_labels = "%b-%y")
+ggplot(asim, aes(x=date,y=value, group=variable, col=variable)) +
+geom_line(lwd=1) + 
+#facet_wrap(~variable, scale='free_y') +
+coord_cartesian(ylim=c(0,2000)) +
+#scale_x_date(date_breaks = "2 months", date_labels = "%b-%y")
+scale_x_date(date_breaks = "1 months", date_labels = "%b-%y",limits=c(as.Date("2018-11-30"),as.Date("2019-03-31")))
+
+
+###
