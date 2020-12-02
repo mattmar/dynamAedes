@@ -22,7 +22,7 @@ dynamAedes <- function(species="aegypti", dispersal=FALSE, temps.matrix=NULL,
 	startd=1, endd=10, n.clusters=1, cluster.type="SOCK", iter=1, 
 	intro.cells=NULL, intro.adults=0, intro.immatures=0, 
 	intro.eggs=0, sparse.output=FALSE, compressed.output=TRUE,
-	suffix="dynamAedes", country=NA) {
+	suffix="dynamAedes", country=NA, verbose=FALSE) {
     #%%%%%%%%%%%%%%%%%%%#
     ### Preamble: declare variables and prepare the parallel environment for the life cycle ###
 	## Install all required packages if not already installed
@@ -42,8 +42,11 @@ dynamAedes <- function(species="aegypti", dispersal=FALSE, temps.matrix=NULL,
 		jd <- JD(seq(as.POSIXct(paste(intro.year,"/01/01",sep="")),as.POSIXct(as.Date(paste(intro.year,"/01/01",sep=""))+endd),by='day'))
 		dl <- daylength(lat,long,jd,1)[,3]
 	} else{dl <- 20}
+	## Define `margin` for apply
+	mrg <- ifelse(dispersal,1,2)
+	if(!dispersal) message("\n Model without dispersal \n") 
 	## Export variables to the global environment
-	sapply(c("libraries","resample","cluster.type","car.avg.trip","suffix","species","dispersal"), function(x) {assign(x,get(x),envir=.GlobalEnv)})
+	sapply(c("libraries","resample","cluster.type","car.avg.trip","suffix","species","dispersal","mrg","verbose"), function(x) {assign(x,get(x),envir=.GlobalEnv)})
 	## Load required packages
 	suppressPackageStartupMessages(libraries(c("foreach","doSNOW","actuar","fields","slam","Matrix","epiR","insol","aomisc")))
 	## Define the type of cluster computing environment 
@@ -52,16 +55,20 @@ dynamAedes <- function(species="aegypti", dispersal=FALSE, temps.matrix=NULL,
 	} else(message("Default cluster.type is SOCK"))
 	## Register the environment and export newly defined variables and packages to the global environment 
 	doSNOW::registerDoSNOW(cl)
-	parallel::clusterExport(cl=cl, varlist=c("libraries","resample","car.avg.trip","suffix","species","dispersal")) # This loads functions in each child R process
+	parallel::clusterExport(cl=cl, varlist=c("libraries","resample","car.avg.trip","suffix","species","dispersal","mrg","verbose")) # This loads functions in each child R process
 	parallel::clusterCall(cl=cl, function() libraries(c("foreach","slam","epiR","aomisc"))) # This loads packages in each child R process
 	## Define space dimensionality into which simulations occour
 	space <- nrow(temps.matrix)
+	## Set a progress bar
+    pb <- txtProgressBar(title = "Iterative training", min = 0, max = iter, style = 3)
 	### End of preamble ###
 	#%%%%%%%%%%%%%%%%%%%%%#
 	### Iterations: start parallelised introduction "iteration" ###
 	rs <- foreach( iteration=1:iter ) %dopar% {
 		## Condition to satisfy to stop the life cycle: sum(pop) == 0, in case the day before extinction has happened
 		stopit <- FALSE
+		## Update progress bar
+    	setTxtProgressBar(pb, iteration)
 		## Vector of propagules to initiate the life cycle
         # If intro.cells is a vector of cells than sample a value for each iteration
 		if( dispersal ) {
@@ -133,22 +140,22 @@ dynamAedes <- function(species="aegypti", dispersal=FALSE, temps.matrix=NULL,
                 ## Derive daily immature emergence rate then transform rate in daily probabiltiy to emerge.
 				i.emer.p <- i.emer_rate.f(temps.matrix[,day]/1000)
                 ## Immature survival
-                ## Derive daily immature survival rate, then transform rate in daily probabiltiy to survive.
+                ## Derive daily immature survival rate
 				i.mort_rate.v <- -log(i.surv_rate.f(temps.matrix[,day]/1000))
                 ## Derive daily egg hatching rate then transform rate in daily probabiltiy to hatch.
 				e.hatc.p <- e.hatch_rate.f(temps.matrix[,day]/1000)
                 ## Derive daily egg survival rate then transform rate in daily probabiltiy to survive.
 				e.surv.p <- e.surv_rate.f(temps.matrix[,day]/1000)
-				if(species=="albopictus"){
-					d.surv.p <- d.surv_rate.f(temps.matrix[,day]/1000)
-				} else{d.surv.p=0}
+				d.surv.p <- if(species=="albopictus"){
+					d.surv_rate.f(temps.matrix[,day]/1000)
+				} else 0
                 ## Gamma probability density of long passive dispersal (from DOI: 10.2790/7028); from 0 to maximum distance of road segments with 1000 m resolution.
 				if(dispersal) {f.pdis.p <- dgamma(seq(1,max(road.dist.matrix,na.rm=T),1000),shape=car.avg.trip/(10000/car.avg.trip), scale=10000/car.avg.trip)}
-                        ### Events in the (`E`) egg compartment
+                ### Events in the (`E`) egg compartment
                 ## `E` has four sub-compartment: 1:3 for eggs 1-3 days old that can only die or survive, 4 for eggs older than 3 days that can die/survive/hatch
                 ## Binomial draw to find numbers of eggs that die or survive
-				p.life.a[1,,2:4] <- apply(t(p.life.a[1,,1:3]),MARGIN=1,function(x) rbinom(size=x,n=space,p=e.surv.p))
-				p.life.a[4,,2:4] <- apply(t(p.life.a[4,,1:3]),MARGIN=1,function(x) rbinom(size=x,n=space,p=d.surv.p))
+				p.life.a[1,,2:4] <- apply(t(p.life.a[1,,1:3]),MARGIN=mrg,function(x) rbinom(size=x,n=space,p=e.surv.p))
+				p.life.a[4,,2:4] <- apply(t(p.life.a[4,,1:3]),MARGIN=mrg,function(x) rbinom(size=x,n=space,p=d.surv.p))
                 ## Introduce eggs if day==1; introduction happens in E sub-compartment 4 as it can be assumed that eggs are most likely to be introduced in an advanced stage of development 
 				p.life.a[1,,4] <- if( length(counter)==1 ) {
 					e.intro.n
@@ -171,15 +178,13 @@ dynamAedes <- function(species="aegypti", dispersal=FALSE, temps.matrix=NULL,
                 ### Events in the (`I`) immature compartment
                 ## `I` has 6 sub-compartments representing days from hatching; an immature can survive/die for the first 5 days after hatching, from the 5th day on, it can survive/die and `emerge`.
                 ## Derive mortality rate due to density and add to mortality rate due to temperature sum and derive probability of survival in each cell.
-				if(dispersal) {
-					imm.v <- rowSums(p.life.a[2,,2:6])
-				} else {
-					imm.v <- sum(p.life.a[2,,2:6])
-				}
+				imm.v <- if(dispersal) {
+					 rowSums(p.life.a[2,,2:6])
+				} else sum(p.life.a[2,,2:6])
 				i.ddmort_rate.v <- exp(predict(i.ddmort_rate.m,list(i.dens.v=imm.v)))
 				i.surv.p <- 1-(1-exp(-(i.mort_rate.v + i.ddmort_rate.v)))
                 ## Binomial draw to find numbers of immature that die or survive-and-move to the next compartment
-				p.life.a[2,,2:6] <- apply(t(p.life.a[2,,1:5]), MARGIN=1, FUN=function(x) rbinom(size=x, n=space, p=i.surv.p))
+				p.life.a[2,,2:6] <- apply(t(p.life.a[2,,1:5]), MARGIN=mrg, FUN=function(x) rbinom(size=x, n=space, p=i.surv.p))
                 ## Introduce `I` if day==1; introduction happens in `I` sub-compartment 6 
 				p.life.a[2,,6] <- if( length(counter)==1 ) {
 					i.intro.n
@@ -209,7 +214,7 @@ dynamAedes <- function(species="aegypti", dispersal=FALSE, temps.matrix=NULL,
 				p.life.a[3,,1] <- p.life.a[3,,1] - n.ovir.a
                 ## Find number of eggs laid today by ovipositing females
 				if( species=="albopictus" & dl[day]<=11.0 ) {
-					print("Laying diapausing eggs")
+					if(verbose) print("Laying diapausing eggs")
 					a.degg.n <- sapply(1:space, function(x) sum(rpois(sum(p.life.a[3,x,2:3]), a.batc.n[x])))
 					a.egg.n=0
 				} else {
@@ -217,7 +222,7 @@ dynamAedes <- function(species="aegypti", dispersal=FALSE, temps.matrix=NULL,
 					a.degg.n=0
 				}
                 ## Find number of adult females surviving today
-				p.life.a[3,,1:5] <- apply(t(p.life.a[3,,1:5]),MARGIN=1,FUN=function(x) rbinom(size=x,n=space,p=a.surv.p))
+				p.life.a[3,,1:5] <- apply(t(p.life.a[3,,1:5]),MARGIN=mrg,FUN=function(x) rbinom(size=x,n=space,p=a.surv.p))
                 ## Short-distance active dispersal
 				if( dispersal ) {
                 	# It happens only if there is any host-seeking female [4], which are the only actively dispersing
@@ -257,9 +262,9 @@ dynamAedes <- function(species="aegypti", dispersal=FALSE, temps.matrix=NULL,
 								p.life.a[3,e,4] <- p.life.a[3,e,4] - sum(f.adis.v[which(f.adis.v[,i]<max(cell.dist.matrix)),i][toret])
                             	# Add dispersing individuals in the chosen landing cell for each distance
 								p.life.a[3,as.integer(names(a.land.v[toret])),4] <- p.life.a[3,as.integer(names(a.land.v[toret])),4] + f.adis.v[which(f.adis.v[,i]<max(cell.dist.matrix)),i][toret]
-							} else print("Actively dispersing females stay in the cell of origin. Jumping to the next cell of origin...")
+							} else if(verbose) print("Actively dispersing females stay in the cell of origin. Jumping to the next cell of origin...")
 						}
-					} else {print("No active dispersing females today...")}
+					} else {if(verbose) print("No active dispersing females today...")}
 
                 	## Medium-distance passive dispersal
                 	# It happens only if a cell with at least 1 female touches a road segement; thus  the order of colnames(road.dist.matrix)  must be the same of `p.life.a`
@@ -284,12 +289,12 @@ dynamAedes <- function(species="aegypti", dispersal=FALSE, temps.matrix=NULL,
 										p.life.a[3,f.opac.n[op],] <- p.life.a[3,f.opac.n[op],] - f.mdis.n[[op]][landing_d[[op]][lp],]
                                     	# Add long dispersing females to cells of `landing`
 										p.life.a[3,ll,] <- p.life.a[3,ll,] + f.mdis.n[[op]][landing_d[[op]][lp],]
-									}else(print("Passively dispersing females stay in the cell of origin. Jumping to the next cell of origin..."))
+									}else if(verbose) print("Passively dispersing females stay in the cell of origin. Jumping to the next cell of origin...")
 								}
 							}
-						} else print("No medium-dispersing females today...")
+						} else if(verbose) print("No medium-dispersing females today...")
 					}
-				} else print("Model with no dispersal")
+				}
                 ## End-of-day housekeeping
                # Make a new host-seeking compartment and slide blood-fed and ovipositing female status to prepare the life cycle for tomorrow (t+1)
 				p.life.a[3,,1] <- p.life.a[3,,4]
@@ -297,7 +302,7 @@ dynamAedes <- function(species="aegypti", dispersal=FALSE, temps.matrix=NULL,
 				p.life.a[3,,3] <- p.life.a[3,,2]
 				p.life.a[3,,2] <- 0
                 # Print information on population structure today
-				message("\nday ",length(counter),"-- of iteration ",iteration," has ended. Population is e: ",sum(p.life.a[1,,])," i: ",sum(p.life.a[2,,])," a: " ,sum(p.life.a[3,,]), " d: ",sum(p.life.a[4,,]), " eh: ", sum(e.hatc.n+d.hatc.n), " el: ",sum(a.egg.n), " \n")
+				if( verbose ) message("\nday ",length(counter),"-- of iteration ",iteration," has ended. Population is e: ",sum(p.life.a[1,,])," i: ",sum(p.life.a[2,,])," a: " ,sum(p.life.a[3,,]), " d: ",sum(p.life.a[4,,]), " eh: ", sum(e.hatc.n+d.hatc.n), " el: ",sum(a.egg.n), " \n")
                 # Condition for exinction
 				stopit <- sum(p.life.a)==0
                 # Some (unnecessary?) garbage cleaning
@@ -309,19 +314,14 @@ dynamAedes <- function(species="aegypti", dispersal=FALSE, temps.matrix=NULL,
                 # If TRUE a sparse array is returned (save memory but complex to process)
 				if(sparse.output) return(list(as.simple_sparse_array(p.life.a))) else return(list(p.life.aout))
 			}else{
-				message("Extinct")
+				if(verbose) message("Extinct")
 			} #end of stopif condition
 		}
 	}
-		### Complete final tasks, then return data and exit:
-	cat(paste("\nIterations concluded. Saving the output to: ",suffix,".RDS\n\n\n",sep=""))
+	### Complete final tasks, then return data and exit:
+	message(paste("\n\n\nIterations concluded. Saving the output to: ",suffix,".RDS\n\n\n",sep=""))
 	saveRDS(rs, paste(suffix,".RDS",sep=""))
-		# Close MPI clusters
-	if(cluster.type == "MPI") {
-		message("MPI")
-		mpi.quit() 
-	}
-		# Close cluster
+	# Close cluster
 	stopCluster(cl)
 	return(rs)
 }

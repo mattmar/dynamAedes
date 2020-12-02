@@ -116,8 +116,8 @@ dist_matrix <- as.matrix(dist(coordinates(df_sp)))
 ### Run the model with the simulated input data
 ## Define temperature matrix
 # IMPORTANT: temperature must be multiplied by 1000
-#w <- as.matrix(df_temp[,-c(1:3)]*1000)
 w <- as.matrix(df_temp[1,-c(1:3)]*1000)
+#w <- as.matrix(df_temp[,-c(1:3)]*1000)
 
 storage.mode(w) <- "integer"
 
@@ -128,7 +128,7 @@ storage.mode(cc) <- "integer"
 # IMPORTANT: The distance matrix has to be rounded to the thousands 
 colnames(dist_matrix) <- row.names(dist_matrix)
 dist_matrix <- apply(dist_matrix,2,function(x) round(x/1000,1)*1000) 
-hist(dist_matrix, xlab="Distance (meters)")
+#hist(dist_matrix, xlab="Distance (meters)")
 storage.mode(dist_matrix) <- "integer"
 ## Define cells into which introduce propagules
 intro.vector <- type.convert(as.numeric(row.names(dist_matrix)))
@@ -148,15 +148,17 @@ if(!dir.exists(outfolder)){dir.create(outfolder)}
 ## Set working directory: 
 # IMPORTANT: This must be the directory where `DynamAedes.R` is placed
 setwd('/home/matteo/own_data/PoD/topics/aedes_genmod/')
+#setwd('/home/matteo/GitHub/euaeae/')
+
 ## Source the function
 source('dynamAedes.r')
 
-species="aegypti"; dispersal=TRUE; temps.matrix=w; cells.coords=cc; lat=0; long=0; road.dist.matrix=dist_matrix; intro.year=2020; startd=1; endd=10; n.clusters=1; cluster.type="SOCK"; iter=1;  intro.cells=NULL; intro.adults=0; intro.immatures=0;  intro.eggs=10; sparse.output=FALSE; compressed.output=FALSE;suffix="dynamAedes"; country="it"
+# species="aegypti"; dispersal=FALSE; temps.matrix=w; cells.coords=cc; lat=0; long=0; road.dist.matrix=dist_matrix; intro.year=2020; startd=1; endd=10; n.clusters=1; cluster.type="SOCK"; iter=1;  intro.cells=NULL; intro.adults=0; intro.immatures=10;  intro.eggs=10; sparse.output=FALSE; compressed.output=FALSE;suffix="dynamAedes"; country="it"
 
 ### Run the model
-aeg.s <- dynamAedes(species="aegypti", dispersal=TRUE, temps.matrix=w, cells.coords=cc, road.dist.matrix=dist_matrix, startd=str,endd=145, n.clusters=nc, cluster.type="SOCK",iter=it,intro.cells=intro.vector,intro.eggs=ie, compressed.output=TRUE,country="es",suffix=paste(outfolder,"/dynamAedes_aeg_testrun_dayintro_",str,"_end",endr,"_niters",it,"_neggs",ie,sep=""))
+aeg.s <- dynamAedes(species="aegypti", dispersal=TRUE, temps.matrix=w, cells.coords=cc, road.dist.matrix=dist_matrix, startd=str, endd=175, n.clusters=8, cluster.type="SOCK",iter=20,intro.cells=intro.vector,intro.eggs=ie, compressed.output=TRUE,country="es",suffix=paste(outfolder,"/dynamAedes_aeg_testrun_dayintro_",str,"_end",endr,"_niters",it,"_neggs",ie,sep=""))
 
-aeg.s <- dynamAedes(species="aegypti", dispersal=FALSE, temps.matrix=w, startd=str, endd=145, n.clusters=1,iter=1, intro.eggs=ie, country="es",suffix=paste(outfolder,"/dynamAedes_aeg_testrun_dayintro_",str,"_end",endr,"_niters",it,"_neggs",ie,sep=""))
+aeg.s <- dynamAedes(species="aegypti", dispersal=FALSE, temps.matrix=w, startd=str, endd=175, n.clusters=5,iter=20, intro.eggs=ie, country="es",suffix=paste(outfolder,"/dynamAedes_aeg_testrun_dayintro_",str,"_end",endr,"_niters",it,"_neggs",ie,sep=""))
 
 albo.s <- dynamAedes(species="albopictus", temps.matrix=w, cells.coords=cc, road.dist.matrix=dist_matrix, startd=str,endd=endr, n.clusters=nc, cluster.type="SOCK",iter=it,intro.cells=intro.vector,intro.eggs=ie, compressed.output=TRUE,country="es",suffix=paste(outfolder,"/dynamAedes_albo_testrun_dayintro_",str,"_end",endr,"_niters",it,"_neggs",ie,sep=""),lat=44.3,long=8.9,intro.year=2018)
 

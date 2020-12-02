@@ -24,14 +24,14 @@ a.ovi_rate.f <- function(temp.new) {
 
 ## Adult female daily mortality rate at different temperatures ##
 a.surv_rate.f <- function(temp.new) {
-	surv_d <- c(0,13.18,10.91,27.71,30.62,23.72,26.90,32.87,36.91,22.77,29.26,22.53,20.07,0)
-	temp_d <- c(0,10.54,10.76,15.30,16.52,20.05,21.79,25.64,27.64,31.33,31.65,32.55,33.41,45)
+	surv_d <- c(3,13.18,10.91,27.71,30.62,23.72,26.90,32.87,36.91,22.77,29.26,22.53,20.07,5)
+	temp_d <- c(8,10.54,10.76,15.30,16.52,20.05,21.79,25.64,27.64,31.33,31.65,32.55,33.41,40)
 	model <- drm(surv_d ~ temp_d, fct = DRC.beta())
 	a.surv.rate <- predict(model,data.frame(temp.v=temp.new))
 	a.surv.rate <- 1-1/ifelse(a.surv.rate<1,1,a.surv.rate)
 	return( a.surv.rate ) 
 }
-# plot(-15:55,a.surv_rate.f(-15:55),col="red",type="l")
+#plot(-15:55,a.surv_rate.f(-15:55),col="red",type="l")
 # points(1-1/surv_d~temp_d,col="blue")
 # cbind(-15:55,round(a.surv_rate.f(-15:55),2))
 
@@ -43,7 +43,7 @@ i.emer_rate.f <- function(temp.new) {
 	i.emer.pred <- predict(model,data.frame(temp.v=temp.new))
 	return( i.emer.pred ) 
 }
-# plot(-15:50,i.emer_rate.f(-15:50),col="red",type="l")
+#plot(-15:50,i.emer_rate.f(-15:50),col="red",type="l")
 # points(temp_d,eme_d)
 # cbind(-15:55,round(i.emer_rate.f(-15:55),2))
 
