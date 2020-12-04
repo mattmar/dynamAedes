@@ -69,17 +69,17 @@ i.surv_rate.f <- function(dt){
 # lines(-15:50,i.surv_rate.f(-15:50),col="blue")
 # cbind(-15:55,round(i.surv_rate.f(-15:55),2))
 
-## Density-dependent immature mortality, fit data from Hancock et al. 2009
-# Output is an exponential model for daily mortality probability at different larval density
-i.dens.v =  c(87.72,561.40,1175.44,1280.70,1491.23,1675.44,1982.46,2350.88,2850.88,3122.81,3236.84,3307.02,3359.65,3456.14,3570.18,3640.35,3666.67,3771.93,3877.19,3982.46)*2
+## Immature Density-dependent mortality from Hancock et al. 2009
+# Output is an exponential model for daily mortality probability at different larval densities; the density refers to 2L of water (in a 5L container)
+i.dens.v = c(87.72,561.40,1175.44,1280.70,1491.23,1675.44,1982.46,2350.88,2850.88,3122.81,3236.84,3307.02,3359.65,3456.14,3570.18,3640.35,3666.67,3771.93,3877.19,3982.46)
 i.surv_prop.v = c(0.95,0.43,0.57,0.42,0.49,0.35,0.25,0.17,0.13,0.05,0.2,0.27,0.11, 0.11,0.06,0.04,0.09,0.13,0.07, 0.14)
 i.sur_dur.v = c(7.46,9.96,28.09,17.46,29.12,38.31,42.22,40.95,44.31,42.34,20.91,17.43,
   37.12,29.73,40,43,22,51,50,31)
 # Transform survival proportion to multidays mortality rate
 i.mort_rate.v = -log(i.surv_prop.v)
-# Transform multiday survival rate to daily survival rate
+# Transform multiday mortality rate to daily mortality rate
 i.dmort_rate.v = i.mort_rate.v/i.sur_dur.v
-# Fit a model for daily survival rate using density as predictor
+# Fit a model for daily mortality rate using just density as a predictor
 i.ddmort_rate.m <- lm(log(i.dmort_rate.v) ~ i.dens.v)
 
 #plot(c(1,100,1000,5000,10000,50000),1-exp(-exp(predict(i.ddmort_rate.m,data.frame(i.dens.v=c(1,100,1000,5000,10000,50000))))),type="l")

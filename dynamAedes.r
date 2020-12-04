@@ -17,7 +17,7 @@
 ## ---------------------------------------------------##
 ## DOI: 
 ##%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%##
-dynamAedes <- function(species="aegypti", dispersal=FALSE, temps.matrix=NULL,
+dynamAedes <- function(species="aegypti", scale="ws", ihwv=1,temps.matrix=NULL,
 	cells.coords=NULL, lat=0, long=0, road.dist.matrix=NULL, intro.year=2020,
 	startd=1, endd=10, n.clusters=1, cluster.type="SOCK", iter=1, 
 	intro.cells=NULL, intro.adults=0, intro.immatures=0, 
@@ -29,6 +29,7 @@ dynamAedes <- function(species="aegypti", dispersal=FALSE, temps.matrix=NULL,
 	source("./of/libraries.r")
 	## Define globally a "safer" version of "sample" function
 	resample <- function(x, ...) x[sample.int(length(x), ...)]
+	legind <- 0
 	## Define globally the average distance of a trip by car: data taken (from DOI: 10.2790/7028)
 	if( country=="it" ) {
 		car.avg.trip <- 18.43
@@ -42,11 +43,13 @@ dynamAedes <- function(species="aegypti", dispersal=FALSE, temps.matrix=NULL,
 		jd <- JD(seq(as.POSIXct(paste(intro.year,"/01/01",sep="")),as.POSIXct(as.Date(paste(intro.year,"/01/01",sep=""))+endd),by='day'))
 		dl <- daylength(lat,long,jd,1)[,3]
 	} else{dl <- 20}
+	## Set dispersal according to scale
+	dispersal <- if(scale=="lc"){TRUE}else if(scale=="rg"|scale=="ws"){FALSE}else{stop("Wrong scale. Exiting...")}
 	## Define `margin` for apply
-	mrg <- ifelse(dispersal,1,2)
-	if(!dispersal) message("\n Model without dispersal \n") 
+	mrg <- if(scale=="ws"){2}else if(scale=="lc"|scale=="rg"){1}
+	if(!dispersal) message("\n ### Model without dispersal ### \n") 
 	## Export variables to the global environment
-	sapply(c("libraries","resample","cluster.type","car.avg.trip","suffix","species","dispersal","mrg","verbose"), function(x) {assign(x,get(x),envir=.GlobalEnv)})
+	sapply(c("libraries","resample","cluster.type","car.avg.trip","suffix","species","dispersal","mrg","verbose","scale","ihwv","legind"), function(x) {assign(x,get(x),envir=.GlobalEnv)})
 	## Load required packages
 	suppressPackageStartupMessages(libraries(c("foreach","doSNOW","actuar","fields","slam","Matrix","epiR","insol","aomisc")))
 	## Define the type of cluster computing environment 
@@ -55,7 +58,7 @@ dynamAedes <- function(species="aegypti", dispersal=FALSE, temps.matrix=NULL,
 	} else(message("Default cluster.type is SOCK"))
 	## Register the environment and export newly defined variables and packages to the global environment 
 	doSNOW::registerDoSNOW(cl)
-	parallel::clusterExport(cl=cl, varlist=c("libraries","resample","car.avg.trip","suffix","species","dispersal","mrg","verbose")) # This loads functions in each child R process
+	parallel::clusterExport(cl=cl, varlist=c("libraries","resample","car.avg.trip","suffix","species","dispersal","mrg","verbose","scale","ihwv","legind")) # This loads functions in each child R process
 	parallel::clusterCall(cl=cl, function() libraries(c("foreach","slam","epiR","aomisc"))) # This loads packages in each child R process
 	## Define space dimensionality into which simulations occour
 	space <- nrow(temps.matrix)
@@ -68,12 +71,12 @@ dynamAedes <- function(species="aegypti", dispersal=FALSE, temps.matrix=NULL,
 		## Condition to satisfy to stop the life cycle: sum(pop) == 0, in case the day before extinction has happened
 		stopit <- FALSE
 		## Update progress bar
-    	setTxtProgressBar(pb, iteration)
+		legind <- legind+n.clusters
 		## Vector of propagules to initiate the life cycle
         # If intro.cells is a vector of cells than sample a value for each iteration
-		if( dispersal ) {
-			if( nrow(temps.matrix)<2 | nrow(road.dist.matrix) <2 | nrow(cells.coords)<2 ) {
-				stop("If dispersal=TRUE then nrow(temps.matrix|road.dist.matrix|cells.coords) must be > 1")
+		if( scale=="lc" ) {
+			if( nrow(temps.matrix)<2 | !exists("road.dist.matrix") | !exists("cells.coords") ) {
+				stop("If scale='lc' then temps.matrix|road.dist.matrix|cells.coords) must exist and nrows must be > 1")
 			}
 			if( length(intro.cells)>1 ) {
 				intro.cell <- sample(intro.cells,1)
@@ -106,18 +109,25 @@ dynamAedes <- function(species="aegypti", dispersal=FALSE, temps.matrix=NULL,
 					a.intro.n[sample(as.integer(colnames(road.dist.matrix)),1)] <- intro.adults
 				}
 			} else a.intro.n <- intro.adults
-		} else {
+		} else if(scale=="ws") {
 			if( nrow(temps.matrix)>1 ) {
-				stop( "dispersal=FALSE then nrow(temps.matrix) must be 1" )
+				stop( "if scale='lc' then nrow(temps.matrix) must be 1" )
 			} else {
 				e.intro.n <- intro.eggs; i.intro.n <- intro.immatures; a.intro.n <- intro.adults; road.dist.matrix <- as.data.frame(c(0,0)); names(road.dist.matrix) <- 1
 			}
-		}
+		} else if( scale=="rg" ) {
+			if( nrow(temps.matrix)<1 ) {
+				stop( "if scale='rg' then nrow(temps.matrix) must be > 1" )
+			} else {
+				e.intro.n <- intro.eggs; i.intro.n <- intro.immatures; a.intro.n <- intro.adults; road.dist.matrix <- as.data.frame(c(0,0)); names(road.dist.matrix) <- 1
+			}
+		} else stop("Wrong scale.")
         ### Day cycle: Start sequential "day" life cycle into the "iteration" loop ###
 		## Define counter which serves as an introduction benchmark
 		if( exists("counter") ) {
 			rm(counter)
 		}
+		setTxtProgressBar(pb, legind)
 		foreach(day = startd:endd, .combine=c) %do% {
 			if( !stopit ) {
 				if( !exists("counter") ) {
@@ -178,10 +188,11 @@ dynamAedes <- function(species="aegypti", dispersal=FALSE, temps.matrix=NULL,
                 ### Events in the (`I`) immature compartment
                 ## `I` has 6 sub-compartments representing days from hatching; an immature can survive/die for the first 5 days after hatching, from the 5th day on, it can survive/die and `emerge`.
                 ## Derive mortality rate due to density and add to mortality rate due to temperature sum and derive probability of survival in each cell.
-				imm.v <- if(dispersal) {
-					 rowSums(p.life.a[2,,2:6])
-				} else sum(p.life.a[2,,2:6])
-				i.ddmort_rate.v <- exp(predict(i.ddmort_rate.m,list(i.dens.v=imm.v)))
+				imm.v <- if(scale=="ws") {
+					 sum(p.life.a[2,,2:6])
+				} else rowSums(p.life.a[2,,2:6])
+				## Derive density-dependent mortality,*2 is to report densities at 1L (original model is for a 2L water habitat.) / ihwv transform density to new liter/cell habitat volume
+				i.ddmort_rate.v <- exp(predict(i.ddmort_rate.m,list(i.dens.v=(imm.v*2)/ihwv)))
 				i.surv.p <- 1-(1-exp(-(i.mort_rate.v + i.ddmort_rate.v)))
                 ## Binomial draw to find numbers of immature that die or survive-and-move to the next compartment
 				p.life.a[2,,2:6] <- apply(t(p.life.a[2,,1:5]), MARGIN=mrg, FUN=function(x) rbinom(size=x, n=space, p=i.surv.p))
@@ -301,14 +312,14 @@ dynamAedes <- function(species="aegypti", dispersal=FALSE, temps.matrix=NULL,
 				p.life.a[3,,4] <- p.life.a[3,,3] + p.life.a[3,,5]
 				p.life.a[3,,3] <- p.life.a[3,,2]
 				p.life.a[3,,2] <- 0
-                # Print information on population structure today
+    			## Print information on population structure today
 				if( verbose ) message("\nday ",length(counter),"-- of iteration ",iteration," has ended. Population is e: ",sum(p.life.a[1,,])," i: ",sum(p.life.a[2,,])," a: " ,sum(p.life.a[3,,]), " d: ",sum(p.life.a[4,,]), " eh: ", sum(e.hatc.n+d.hatc.n), " el: ",sum(a.egg.n), " \n")
                 # Condition for exinction
 				stopit <- sum(p.life.a)==0
                 # Some (unnecessary?) garbage cleaning
 				gc()
                 # if TRUE arrays are compressed (by summing) in matrices so that information on sub-compartements is irreparably lost.
-				if( compressed.output ) {
+    			if( compressed.output ) {
 					p.life.aout <- apply(p.life.a, MARGIN=c(1, 2), sum)
 				}
                 # If TRUE a sparse array is returned (save memory but complex to process)
