@@ -19,10 +19,10 @@
 ##%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%##
 dynamAedes <- function(species="aegypti", scale="ws", ihwv=1,temps.matrix=NULL,
 	cells.coords=NULL, lat=0, long=0, road.dist.matrix=NULL, intro.year=2020,
-	startd=1, endd=10, n.clusters=1, cluster.type="SOCK", iter=1, 
+	startd=1, endd=10, n.clusters=1, cluster.type="PSOCK", iter=1, 
 	intro.cells=NULL, intro.adults=0, intro.immatures=0, 
 	intro.eggs=0, sparse.output=FALSE, compressed.output=TRUE,
-	suffix="dynamAedes", country=NA, verbose=FALSE) {
+	suffix=NA, country=NA, verbose=FALSE) {
     #%%%%%%%%%%%%%%%%%%%#
     ### Preamble: declare variables and prepare the parallel environment for the life cycle ###
 	## Install all required packages if not already installed
@@ -49,21 +49,21 @@ dynamAedes <- function(species="aegypti", scale="ws", ihwv=1,temps.matrix=NULL,
 	mrg <- if(scale=="ws"){2}else if(scale=="lc"|scale=="rg"){1}
 	if(!dispersal) message("\n ### Model without dispersal ### \n") 
 	## Export variables to the global environment
-	sapply(c("libraries","resample","cluster.type","car.avg.trip","suffix","species","dispersal","mrg","verbose","scale","ihwv","legind"), function(x) {assign(x,get(x),envir=.GlobalEnv)})
+	sapply(c("libraries","resample","cluster.type","car.avg.trip","suffix","species","dispersal","mrg","verbose","scale","ihwv","legind","n.clusters"), function(x) {assign(x,get(x),envir=.GlobalEnv)})
 	## Load required packages
-	suppressPackageStartupMessages(libraries(c("foreach","doSNOW","actuar","fields","slam","Matrix","epiR","insol","aomisc")))
+	suppressPackageStartupMessages(libraries(c("foreach","doParallel","actuar","fields","slam","Matrix","epiR","insol","aomisc")))
 	## Define the type of cluster computing environment 
-	if(cluster.type=="SOCK" || cluster.type=="FORK") {
-		cl <- makeCluster(n.clusters,type=cluster.type, outfile="",useXDR=FALSE,methods=FALSE,output="")
-	} else(message("Default cluster.type is SOCK"))
+	if(cluster.type=="PSOCK") {
+		cl <- parallel::makeCluster(spec=n.clusters, type=cluster.type, nnodes=n.clusters, outfile="")
+	} else(message("The only supported cluster.type is SOCK"))
 	## Register the environment and export newly defined variables and packages to the global environment 
-	doSNOW::registerDoSNOW(cl)
-	parallel::clusterExport(cl=cl, varlist=c("libraries","resample","car.avg.trip","suffix","species","dispersal","mrg","verbose","scale","ihwv","legind")) # This loads functions in each child R process
+	registerDoParallel(cl, cores=n.clusters)
+	parallel::clusterExport(cl=cl, varlist=c("libraries","resample","car.avg.trip","suffix","species","dispersal","mrg","verbose","scale","ihwv","legind","n.clusters")) # This loads functions in each child R process
 	parallel::clusterCall(cl=cl, function() libraries(c("foreach","slam","epiR","aomisc"))) # This loads packages in each child R process
 	## Define space dimensionality into which simulations occour
 	space <- nrow(temps.matrix)
 	## Set a progress bar
-    pb <- txtProgressBar(title = "Iterative training", min = 0, max = iter, style = 3)
+	pb <- txtProgressBar(char = "=", min = 0, max = iter, style = 3)
 	### End of preamble ###
 	#%%%%%%%%%%%%%%%%%%%%%#
 	### Iterations: start parallelised introduction "iteration" ###
@@ -111,7 +111,7 @@ dynamAedes <- function(species="aegypti", scale="ws", ihwv=1,temps.matrix=NULL,
 			} else a.intro.n <- intro.adults
 		} else if(scale=="ws") {
 			if( nrow(temps.matrix)>1 ) {
-				stop( "if scale='lc' then nrow(temps.matrix) must be 1" )
+				stop( "if sscale='lc' then nrow(temps.matrix) must be 1" )
 			} else {
 				e.intro.n <- intro.eggs; i.intro.n <- intro.immatures; a.intro.n <- intro.adults; road.dist.matrix <- as.data.frame(c(0,0)); names(road.dist.matrix) <- 1
 			}
@@ -189,7 +189,7 @@ dynamAedes <- function(species="aegypti", scale="ws", ihwv=1,temps.matrix=NULL,
                 ## `I` has 6 sub-compartments representing days from hatching; an immature can survive/die for the first 5 days after hatching, from the 5th day on, it can survive/die and `emerge`.
                 ## Derive mortality rate due to density and add to mortality rate due to temperature sum and derive probability of survival in each cell.
 				imm.v <- if(scale=="ws") {
-					 sum(p.life.a[2,,2:6])
+					sum(p.life.a[2,,2:6])
 				} else rowSums(p.life.a[2,,2:6])
 				## Derive density-dependent mortality,*2 is to report densities at 1L (original model is for a 2L water habitat.) / ihwv transform density to new liter/cell habitat volume
 				i.ddmort_rate.v <- exp(predict(i.ddmort_rate.m,list(i.dens.v=(imm.v*2)/ihwv)))
@@ -226,7 +226,7 @@ dynamAedes <- function(species="aegypti", scale="ws", ihwv=1,temps.matrix=NULL,
                 ## Find number of eggs laid today by ovipositing females
 				if( species=="albopictus" & dl[day]<=11.0 ) {
 					if(verbose) print("Laying diapausing eggs")
-					a.degg.n <- sapply(1:space, function(x) sum(rpois(sum(p.life.a[3,x,2:3]), a.batc.n[x])))
+						a.degg.n <- sapply(1:space, function(x) sum(rpois(sum(p.life.a[3,x,2:3]), a.batc.n[x])))
 					a.egg.n=0
 				} else {
 					a.egg.n <- sapply(1:space, function(x) sum(rpois(sum(p.life.a[3,x,2:3]), a.batc.n[x])))
@@ -315,11 +315,11 @@ dynamAedes <- function(species="aegypti", scale="ws", ihwv=1,temps.matrix=NULL,
     			## Print information on population structure today
 				if( verbose ) message("\nday ",length(counter),"-- of iteration ",iteration," has ended. Population is e: ",sum(p.life.a[1,,])," i: ",sum(p.life.a[2,,])," a: " ,sum(p.life.a[3,,]), " d: ",sum(p.life.a[4,,]), " eh: ", sum(e.hatc.n+d.hatc.n), " el: ",sum(a.egg.n), " \n")
                 # Condition for exinction
-				stopit <- sum(p.life.a)==0
+					stopit <- sum(p.life.a)==0
                 # Some (unnecessary?) garbage cleaning
 				gc()
                 # if TRUE arrays are compressed (by summing) in matrices so that information on sub-compartements is irreparably lost.
-    			if( compressed.output ) {
+				if( compressed.output ) {
 					p.life.aout <- apply(p.life.a, MARGIN=c(1, 2), sum)
 				}
                 # If TRUE a sparse array is returned (save memory but complex to process)
@@ -327,13 +327,15 @@ dynamAedes <- function(species="aegypti", scale="ws", ihwv=1,temps.matrix=NULL,
 			}else{
 				if(verbose) message("Extinct")
 			} #end of stopif condition
-		}
 	}
-	### Complete final tasks, then return data and exit:
+}
+### Complete final tasks, then return data and exit:
+if( !is.na(suffix) ) {
 	message(paste("\n\n\nIterations concluded. Saving the output to: ",suffix,".RDS\n\n\n",sep=""))
 	saveRDS(rs, paste(suffix,".RDS",sep=""))
-	# Close cluster
-	stopCluster(cl)
-	return(rs)
+} else message("\n\n\nIterations concluded.")
+# Close cluster
+parallel::stopCluster(cl)
+return(rs)
 }
 
