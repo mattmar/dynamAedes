@@ -1,0 +1,14 @@
+---
+title: "dynamAedes: Simulating Aedes mosquitoes life cycle."
+author: "Matteo Marcantonio, Daniele Da Re"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{dynamAedes: Basics}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(fig.width=10, fig.height=10,fig.asp = 0.618, out.width = "95%", fig.align = "center", fig.dpi = 150, collapse = FALSE, comment = "#") 
+#knitr::opts_chunk$set(dev = 'pdf')
+```
