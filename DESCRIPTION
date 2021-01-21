@@ -1,0 +1,14 @@
+Package: dynamAedes
+Version: 1.0.0
+Date: 2021-01-08
+Title: Simulating life cycle
+Authors@R: c(person("Matteo", "Marcantonio", role = c("aut", "cre"), email = "marcantoniomatteo@gmail.com"),person("Daniele", "Da Re", role = c("aut"), email = "daniele.dare@uclouvain.be")) 
+Depends: R (>= 3.6.0)
+Imports: doParallel, drc, fields, foreach, insol, knitr, parallel, slam
+LazyData: FALSE
+BugReports: https://github.com/mattmar/dynamAedes
+Description: Simulating the life cycle of `Aedes` mosquitoes.
+VignetteBuilder: knitr
+Encoding: UTF-8
+Language: en-GB
+License: GPL(>=2)

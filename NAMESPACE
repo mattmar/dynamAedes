@@ -1,0 +1,22 @@
+
+#####################################
+##               Import            ##
+#####################################
+importFrom("parallel", "makeCluster", "stopCluster")
+importFrom("doParallel", "registerDoParallel")
+importFrom("foreach", "%dopar%", "foreach", "%do%")
+importFrom("utils", "setTxtProgressBar", "txtProgressBar")
+importFrom("stats", "dgamma", "dlnorm", "lm", "predict", "rbinom", "rmultinom", "rpois", "sortedXyData")
+importFrom("fields", "rdist")
+importFrom("slam", "as.simple_sparse_array")
+importFrom("drc", "drm")
+importFrom("insol", "JD", "daylength")
+
+#####################################
+##               Export            ##
+#####################################
+export(dynamAedes, .beta.fun, .DRC.beta, .beta.init)
+export(.a.gono_rate.f, .a.ovi_rate.f, 
+.a.surv_rate.f, .i.emer_rate.f,
+.i.surv_rate.f, .e.hatch_rate.f, 
+.i.ddmort_rate.f)

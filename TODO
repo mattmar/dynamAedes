@@ -1,0 +1,7 @@
+# dynamAedes 1.0.0
+## package: Add vignettes
+## package: Add plotting functions
+## package: Add manuals
+## model: Check physiological parameters with experts
+## model: Add option for a generalised mosquito
+## model: Make possible the switch between data and expert opinion-based temperature-dependent functions
