@@ -19,4 +19,4 @@ export(dynamAedes, .beta.fun, .DRC.beta, .beta.init)
 export(.a.gono_rate.f, .a.ovi_rate.f, 
 .a.surv_rate.f, .i.emer_rate.f,
 .i.surv_rate.f, .e.hatch_rate.f, 
-.i.ddmort_rate.f)
+.i.ddmort_rate.f, get_rates_spatial,prob_succ_intro, indiv_abund_ci, invaded_cells_ci)
