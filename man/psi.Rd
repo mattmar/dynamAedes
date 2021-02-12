@@ -13,7 +13,7 @@ psi(input_sim=NULL, eval_date=NULL, stage=0)
 \item{stage}{input data.}
 }
 \value{
-When \emp{stage=0} a population is considered exinct when there is no individual (in any stage) in any of the cells of the arena on the evaluated date. If stage!=0 then extinction is relative to the stage compartment. 
+When \emph{stage=0} a population is considered exinct when there is no individual (in any stage) in any of the cells of the arena on the evaluated date. If stage!=0 then extinction is relative to the stage compartment. 
 }
 \author{
 Daniele Da Re \email{daniele.dare@uclouvain.be} \cr
