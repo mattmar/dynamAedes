@@ -4,7 +4,7 @@ Date: 2021-01-08
 Title: Simulating life cycle
 Authors@R: c(person("Matteo", "Marcantonio", role = c("aut", "cre"), email = "marcantoniomatteo@gmail.com"),person("Daniele", "Da Re", role = c("aut"), email = "daniele.dare@uclouvain.be")) 
 Depends: R (>= 3.6.0)
-Imports: doParallel, drc, fields, foreach, insol, knitr, parallel, slam
+Imports: doParallel, drc, fields, foreach, insol, knitr, lattice, parallel, sp, raster, slam
 LazyData: FALSE
 BugReports: https://github.com/mattmar/dynamAedes
 Description: Simulating the life cycle of `Aedes` mosquitoes.

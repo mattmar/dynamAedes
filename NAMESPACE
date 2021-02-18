@@ -2,15 +2,17 @@
 #####################################
 ##               Import            ##
 #####################################
-importFrom("parallel", "makeCluster", "stopCluster")
+importFrom("parallel", "makeCluster", "stopCluster", "mclapply")
 importFrom("doParallel", "registerDoParallel")
 importFrom("foreach", "%dopar%", "foreach", "%do%")
 importFrom("utils", "setTxtProgressBar", "txtProgressBar")
-importFrom("stats", "dgamma", "dlnorm", "lm", "predict", "rbinom", "rmultinom", "rpois", "sortedXyData")
+importFrom("stats", "dgamma", "dlnorm", "lm", "predict", "rbinom", "rmultinom", "rpois", "sortedXyData", "quantile", "setNames")
 importFrom("fields", "rdist")
 importFrom("slam", "as.simple_sparse_array")
 importFrom("drc", "drm")
 importFrom("insol", "JD", "daylength")
+importFrom("raster", "stack", "raster")
+importFrom("sp", "coordinates", "gridded")
 
 #####################################
 ##               Export            ##
@@ -19,4 +21,4 @@ export(dynamAedes, .beta.fun, .DRC.beta, .beta.init)
 export(.a.gono_rate.f, .a.ovi_rate.f, 
 .a.surv_rate.f, .i.emer_rate.f,
 .i.surv_rate.f, .e.hatch_rate.f, 
-.i.ddmort_rate.f, psi, psi_sp, icci, adci, adci_sp, get_rates_spatial)
+.i.ddmort_rate.f, psi, psi_sp, icci, adci, adci_sp, get_rates_spatial, dici, .returndis, .euc, .meuc)

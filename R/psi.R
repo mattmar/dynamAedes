@@ -1,14 +1,17 @@
 psi <- function(input_sim=NULL, eval_date=NULL, stage=0){
-	st <- c("all","adult","egg","juvenile","diapausing egg")
+	if(stage<0|stage>3) {
+		stop("stage can be 0 (all), 1 (egg), 2 (juvenile), 3 (adult) ...")
+	}
+	st <- c("all","egg","juvenile","adult","diapausing egg")
 	if( max(eval_date) > max(sapply(input_sim,length)) ) {
-		stop("eval_date >than number of simulated days...")
+		stop("eval_date > than maximum number of simulated days across all iterations...")
 	} else {
 		pe_out <- sapply(eval_date, function(y) {
 			pe <- sum(unlist(lapply(input_sim, function(x) {
-				if(st==0) {
+				if(stage==0) {
 					length(which(sum(unlist(x[y]))>0));
 				} else {
-					length(which(unlist(x[y])[stage]>0))
+					length(which(x[y][[1]][stage,]>0))
 				}
 			}))) / length(input_sim)
 			return(pe)
