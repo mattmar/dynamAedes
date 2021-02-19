@@ -1,1 +1,1 @@
-utils::globalVariables(names=c("f.adis.p", "iteration", "day", "sp"), add=F)
+utils::globalVariables(names=c("iteration", "day"), add=F)

@@ -17,22 +17,22 @@ psi_sp = function(coords=NULL, input_sim=NULL, eval_date=NULL) {
 					x
 				}
 			})
-  		#add days and convert to 1 all pixel having a number of individuals >1
+  			#add days and convert to 1 all pixel having a number of individuals >1
 			col_names <- paste0( "d_", 1:maxl )
 			mylist <- lapply(mylist, setNames, col_names)
 			mylist <- lapply(mylist, function(x) {x[x>0] <- 1; return(x)})
-  		#subset
+  			#subset
 			my_names=col_names[eval_date]
 			mylist = lapply(mylist, "[",  my_names)
-  		#matrix operation
+  			#matrix operation
 			my.out=Reduce('+', mylist)/length(input_sim)
   		#rasterize
 		}
 		return(stack(apply(my.out, 2, function(x) {
-			rate.sp=as.data.frame(cbind(cc, data.frame(x)))
+			rate.sp=as.data.frame(cbind(coords, data.frame(x)))
 			names(rate.sp)=c("X", "Y", "ProbIntro")
-			coordinates(rate.sp) <- ~X + Y
-			gridded(rate.sp) <- TRUE
+			sp::coordinates(rate.sp) <- ~X + Y
+			sp::gridded(rate.sp) <- TRUE
 			return(raster(rate.sp))
 		})))
 	}

@@ -29,10 +29,10 @@ adci_sp = function(input_sim=NULL, coords=NULL, eval_date=NULL, stage=1,  breaks
 			rate.sp <- data.frame(t(my.out[, , x]))
 			rb <- lapply(1:length(breaks),function(y) {
 				tmp=rate.sp[, y]
-				tmp=as.data.frame(cbind(cc,tmp))
+				tmp=as.data.frame(cbind(coords,tmp))
 				names(tmp)[1:2]=c("X", "Y")
-				coordinates(tmp) <- ~X+Y
-				gridded(tmp) <- TRUE
+				sp::coordinates(tmp) <- ~X+Y
+				sp::gridded(tmp) <- TRUE
 				tmp=raster(tmp)
 				names(tmp)=paste0("p",breaks[y])
 				return(tmp)

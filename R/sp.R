@@ -67,6 +67,17 @@
 	}else(stop("Species not supported."))
 }
 
+## Log-Normal probability density of short active dispersal from Marcantonio et al, 2019; Marini et al. 2019. 0 to 600 m with resolution of 10 m.
+.a.a_disp.f <- function(sp) {
+	if(sp=="aegypti"){
+		dispk <- dlnorm(seq(0,600,10), meanlog=4.95, sdlog=0.66)
+	}else if(sp=="albopictus") {
+		dispk <- dlnorm(seq(0,600,10), meanlog=4.54, sdlog=0.58)
+	}else if(sp=="koreicus") {
+		dispk <- dlnorm(seq(0,600,10), meanlog=4.54, sdlog=0.58)
+	}else(stop("Species not supported."))
+}
+
 ## Immature daily emergence rate at different temperature ##
 .i.emer_rate.f <- function(temp.new, sp) {
 	if(sp=="aegypti") {
@@ -165,10 +176,6 @@
 	}else(stop("Species not supported."))
 }
 
-
-## Log-Normal probability density of short active dispersal (from DOI: 10.1002/ecs2.2977); from 0 to 600 m with resolution of 10 m.
-f.adis.p <- dlnorm(seq(0,600,10), meanlog=4.95, sdlog=0.66)
-
 ## Diapausing hatching rate: from Thomas et al. 2012 (Fig. 2) and Eisen et al. 2014 (Fig.1)
 .d.surv_rate.f <- function(temp.new){
 	ed_surv_bl=1
@@ -178,4 +185,3 @@ f.adis.p <- dlnorm(seq(0,600,10), meanlog=4.95, sdlog=0.66)
 	d.surv.pred=ed_surv_bl*a*exp(-0.5*((temp.new-b)/c)^6)
 	return( d.surv.pred )
 }
-

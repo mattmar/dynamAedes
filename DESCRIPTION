@@ -1,13 +1,14 @@
 Package: dynamAedes
-Version: 1.0.0
-Date: 2021-01-08
-Title: Simulating life cycle
+Version: 1.0.1
+Date: 2021-02-19
+Title: Generalised model for the population dynamics of invasive Aedes.
 Authors@R: c(person("Matteo", "Marcantonio", role = c("aut", "cre"), email = "marcantoniomatteo@gmail.com"),person("Daniele", "Da Re", role = c("aut"), email = "daniele.dare@uclouvain.be")) 
-Depends: R (>= 3.6.0)
-Imports: doParallel, drc, fields, foreach, insol, knitr, lattice, parallel, sp, raster, slam
+Depends: R (>= 3.6.0), raster
+Imports: drc, fields, foreach, insol, slam, doParallel, sp
+Suggests: parallel, knitr, rmarkdown
 LazyData: FALSE
 BugReports: https://github.com/mattmar/dynamAedes
-Description: Simulating the life cycle of `Aedes` mosquitoes.
+Description: Generalised model for the population dynamics of invasive Aedes.
 VignetteBuilder: knitr
 Encoding: UTF-8
 Language: en-GB

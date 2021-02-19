@@ -21,13 +21,13 @@ dici <- function(input_sim=NULL, coords=NULL, eval_date=NULL, breaks=c(0.25,0.5,
 			return(cbind.data.frame(.returndis(distl=cdist,days=eval_date, breaks=breaks),day=eval_date))
 		}else{
 			maxdate <- max(eval_date)
-		outs <- lapply(inv_cells, function(x) {
+			outs <- lapply(inv_cells, function(x) {
 				coords1 <- as.data.frame(coords)
 				coords1$inv <- 0
 				coords1$inv[x[[maxdate]]] <- 1
-				names(coords1)=c("X", "Y", "inv_cells_d")
-				coordinates(coords1) <- ~X + Y
-				gridded(coords1) <- TRUE
+				names(coords1)=c("X", "Y", paste0("day",maxdate,"_inv_cells_Iteration"))
+				sp::coordinates(coords1) <- ~X + Y
+				sp::gridded(coords1) <- TRUE
 				return(raster(coords1))
 			})
 			return(stack(outs))

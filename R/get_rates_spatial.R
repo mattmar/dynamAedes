@@ -11,8 +11,8 @@ get_rates_spatial = function(coords=NULL, daily_temp=NULL, species=NULL, rate_fu
 	if(spatial) {
 		rate.ras <- stack(mclapply(rate.v,function(x) {
 			rate.sp <- cbind.data.frame(X=coords[,1],Y=coords[,2],Var=x)
-			coordinates(rate.sp) <- ~X+Y
-			gridded(rate.sp) <- TRUE
+			sp::coordinates(rate.sp) <- ~X+Y
+			sp::gridded(rate.sp) <- TRUE
 			raster(rate.sp)
 		}, mc.cores=np))
 		names(rate.ras) <- paste0("d",1:dim(rate.ras)[3])
