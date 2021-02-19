@@ -33,6 +33,7 @@ psucc_sp <- psi_sp(aeg.lc, coords=cc, eval_date=100) #Pixel-by-pixel raster (onl
 
 ```{r}
 abu <- adci(aeg.lc, eval_date=1:100, stage=1) #Arena-wide matrix
+
 abu_sp <- adci_sp(aeg.lc, coords=cc, eval_date=100, stage=1) #Pixel-by-pixel raster
 ```
 
@@ -40,13 +41,20 @@ abu_sp <- adci_sp(aeg.lc, coords=cc, eval_date=100, stage=1) #Pixel-by-pixel ras
 
 ```{r}
 inv_cells <- icci(aeg.lc, eval_date=1:100) #Arena-wide matrix
+```
+
 ### Get the dispersal distance CI for the specified date(s)
+
+```{r}
 disp <- dici(aeg.lc, coords=cc, eval_date=1:100, space=FALSE)
 ```
 
 ### Get invaded cells for the specified date(s) per iteration
 ```{r}
 disp <- dici(aeg.lc, coords=cc, eval_date=100, space=TRUE) #Stack of binary rasters
+```
+
 ### Get physiological rates in each pixel given a temperature matrix (row=cells; column=days) 
+```{r}
 rates <- get_rates_spatial(coords=cc,daily_temp=(wsp)[,200:210]/1000, species="aegypti", rate_fun=".a.ovi_rate.f",spatial=TRUE, np=8)
 ```
