@@ -252,28 +252,28 @@ dynamAedes <- function(species="aegypti", scale="ws", ihwv=1, temps.matrix=NULL,
 							}
 						} else {if(verbose) print("No active dispersing females today...")}
 
-                	## Medium-distance passive dispersal
-                	# It happens only if a cell with at least 1 female touches a road segement; thus  the order of colnames(road.dist.matrix)  must be the same of `p.life.a`
+                		## Medium-distance passive dispersal
+                		# It happens only if a cell with at least 1 female touches a road segement; thus  the order of colnames(road.dist.matrix)  must be the same of `p.life.a`
 						if( any(which(p.life.a[3,,]>0)%in%colnames(road.dist.matrix)) ) {
-                    	# Extract cells (`origin`) which contain medium-distance dispersing females
+                    		# Extract cells (`origin`) which contain medium-distance dispersing females
 							f.opac.n <- unique(which(p.life.a[3,,]>0,arr.ind=T)[,1])[which(unique(which(p.life.a[3,,]>0,arr.ind=T)[,1])%in%colnames(road.dist.matrix))]
-                    	# Binomial draw to select fraction of females which are moved by a car (from DOI: 10.1038/s41598-017-12652-5) in each of the selected `origin`
+                    		# Binomial draw to select fraction of females which are moved by a car (from DOI: 10.1038/s41598-017-12652-5) in each of the selected `origin`
 							f.pdis.n <- lapply(f.opac.n, function(x) sapply(p.life.a[3,x,], function(y) rbinom(1,y,prob=0.0051)))
-                    	# Find distance along roads at which females from each `origin` will move (each row*1000 is a distance category)
+                    		# Find distance along roads at which females from each `origin` will move (each row*1000 is a distance category)
 							f.mdis.n <- lapply(f.pdis.n, function(x) sapply(x, function(y) rmultinom(1,y,f.pdis.p)))
-                    	# Select only distances>0
+                    		# Select only distances>0
 							landing_d <- lapply(f.mdis.n, function(x) which(rowSums(x)>0))
-                    	# Move dispersing females to a landing cells and remove them from `origin` cells
+                    		# Move dispersing females to a landing cells and remove them from `origin` cells
 							if( length(landing_d)>0 ) {
 								for ( op in 1:length(f.opac.n) ) {
 									for ( lp in 1:length(landing_d[op]) ) {
-                            		# Select landing cells along road corresponing to the dispersing distance and subset them at random to a single landing cell for each `origin`
+                            			# Select landing cells along road corresponing to the dispersing distance and subset them at random to a single landing cell for each `origin`
 										ll <- as.integer(colnames(road.dist.matrix)[which(road.dist.matrix[,which(colnames(road.dist.matrix)%in%f.opac.n[op])]%in%(landing_d[[op]]*1000))])
 										if( length(ll)>0 ){
 											ll <- sample(ll,1,replace=T)
-                                    	# Remove long dispersing females from cell of `origin`
+                                    		# Remove long dispersing females from cell of `origin`
 											p.life.a[3,f.opac.n[op],] <- p.life.a[3,f.opac.n[op],] - f.mdis.n[[op]][landing_d[[op]][lp],]
-                                    	# Add long dispersing females to cells of `landing`
+                                    		# Add long dispersing females to cells of `landing`
 											p.life.a[3,ll,] <- p.life.a[3,ll,] + f.mdis.n[[op]][landing_d[[op]][lp],]
 										}else if(verbose) print("Passively dispersing females stay in the cell of origin. Jumping to the next cell of origin...")
 									}
@@ -281,35 +281,37 @@ dynamAedes <- function(species="aegypti", scale="ws", ihwv=1, temps.matrix=NULL,
 							} else if(verbose) print("No medium-dispersing females today...")
 						}
 					}
-                ## End-of-day housekeeping
-                # Make a new host-seeking compartment and slide blood-fed and ovipositing female status to prepare the life cycle for tomorrow (t+1)
+                	## End-of-day housekeeping
+                	# Make a new host-seeking compartment and slide blood-fed and ovipositing female status to prepare the life cycle for tomorrow (t+1)
 					p.life.a[3,,1] <- p.life.a[3,,4]
 					p.life.a[3,,4] <- p.life.a[3,,3] + p.life.a[3,,5]
 					p.life.a[3,,3] <- p.life.a[3,,2]
 					p.life.a[3,,2] <- 0
-    			## Print information on population structure today
+    				## Print information on population structure today
 					if( verbose ) message("\nday ",length(counter),"-- of iteration ",iteration," has ended. Population is e: ",sum(p.life.a[1,,])," i: ",sum(p.life.a[2,,])," a: " ,sum(p.life.a[3,,]), " d: ",sum(p.life.a[4,,]), " eh: ", sum(e.hatc.n+d.hatc.n), " el: ",sum(a.egg.n), " \n")
-                # Condition for exinction
+                		# Condition for exinction
 						stopit <- sum(p.life.a)==0
-                # Some (unnecessary?) garbage cleaning
+                	# Some (unnecessary?) garbage cleaning
 					gc()
-                # if TRUE arrays are compressed (by summing) in matrices so that information on sub-compartements is irreparably lost.
-					if( compressed.output ) {
-						p.life.aout <- apply(p.life.a, MARGIN=c(1, 2), sum)
+                	# if TRUE arrays are compressed (by summing) in matrices so that information on sub-compartements is irreparably lost.
+					p.life.aout <- if( compressed.output ) {
+						apply(p.life.a, MARGIN=c(1, 2), sum)
+					} else { 
+						p.life.aout <- p.life.a 
 					}
-                # If TRUE a sparse array is returned (save memory but complex to process)
+                	# If TRUE a sparse array is returned (save memory but complex to process)
 					if(sparse.output) return(list(as.simple_sparse_array(p.life.a))) else return(list(p.life.aout))
 				}else{
 					if(verbose) message("Extinct")
 				} #end of stopif condition
 		}
 	}
-### Complete final tasks, then return data and exit:
+	### Complete final tasks, then return data and exit:
 	if( !is.na(suffix) ) {
 		message(paste("\n\n\nIterations concluded. Saving the output to: ",suffix,".RDS\n\n\n",sep=""))
 		saveRDS(rs, paste(suffix,".RDS",sep=""))
 	} else message("\n\n\nIterations concluded.")
-# Close cluster
+	# Close cluster
 	stopCluster(cl)
 	return(rs)
 }
