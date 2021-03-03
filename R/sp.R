@@ -68,13 +68,13 @@
 }
 
 ## Log-Normal probability density of short active dispersal from Marcantonio et al, 2019; Marini et al. 2019. 0 to 600 m with resolution of 10 m.
-.a.a_disp.f <- function(sp) {
+.a.a_disp.f <- function(sp, max.a.disp, disp.bins) {
 	if(sp=="aegypti"){
-		dispk <- dlnorm(seq(0,600,10), meanlog=4.95, sdlog=0.66)
+		dispk <- dlnorm(seq(0,max.a.disp,disp.bins), meanlog=4.95, sdlog=0.66)
 	}else if(sp=="albopictus") {
-		dispk <- dlnorm(seq(0,600,10), meanlog=4.54, sdlog=0.58)
+		dispk <- dlnorm(seq(0,max.a.disp,disp.bins), meanlog=4.54, sdlog=0.58)
 	}else if(sp=="koreicus") {
-		dispk <- dlnorm(seq(0,600,10), meanlog=4.54, sdlog=0.58)
+		dispk <- dlnorm(seq(0,max.a.disp,disp.bins), meanlog=4.54, sdlog=0.58)
 	}else(stop("Species not supported."))
 }
 

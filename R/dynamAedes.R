@@ -3,7 +3,7 @@ dynamAedes <- function(species="aegypti", scale="ws", ihwv=1, temps.matrix=NULL,
 	startd=1, endd=10, n.clusters=1, cluster.type="PSOCK", iter=1, 
 	intro.cells=NULL, intro.adults=0, intro.immatures=0, 
 	intro.eggs=0, sparse.output=FALSE, compressed.output=TRUE,
-	suffix=NA, country=NA, cellsize=250, verbose=FALSE) {
+	suffix=NA, country=NA, cellsize=250, maxadisp=600, dispbins=10, verbose=FALSE) {
     #%%%%%%%%%%%%%%%%%%%#
     ### Preamble: declare variables and prepare the parallel environment for the life cycle ###
 	.resample <- function(x, ...) x[sample.int(length(x), ...)]
@@ -133,7 +133,7 @@ dynamAedes <- function(species="aegypti", scale="ws", ihwv=1, temps.matrix=NULL,
 						.d.surv_rate.f(temps.matrix[,day]/1000)
 					} else 0
 					# Binned (10m) (Log-normal) probability density for active dispersal up to 600m 
-					if(dispersal) {f.adis.p <- .a.a_disp.f(sp=species)}
+					if(dispersal) {f.adis.p <- .a.a_disp.f(sp=species, max.a.disp=maxadisp, disp.bins=dispbins)}
 					## Gamma probability density of long passive dispersal (from DOI: 10.2790/7028); from 0 to maximum distance of road segments with 1000 m resolution.
 					if(dispersal) {f.pdis.p <- dgamma(seq(1,max(road.dist.matrix,na.rm=T),1000),shape=car.avg.trip/(10000/car.avg.trip), scale=10000/car.avg.trip)}
                 	### Events in the (`E`) egg compartment
