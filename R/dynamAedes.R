@@ -1,9 +1,8 @@
-dynamAedes <- function(species="aegypti", scale="ws", ihwv=1, temps.matrix=NULL,
-	cells.coords=NULL, lat=0, long=0, road.dist.matrix=NULL, intro.year=2020,
-	startd=1, endd=10, n.clusters=1, cluster.type="PSOCK", iter=1, 
-	intro.cells=NULL, intro.adults=0, intro.immatures=0, 
-	intro.eggs=0, sparse.output=FALSE, compressed.output=TRUE,
-	suffix=NA, country=NA, cellsize=250, maxadisp=600, dispbins=10, verbose=FALSE) {
+dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.juveniles=0, 
+	scale="ws", intro.cells=NULL, ihwv=1, temps.matrix=NULL, startd=1, endd=10,
+	cells.coords=NULL, lat=0, long=0, road.dist.matrix=NULL, country=NA, intro.year=2020,
+	iter=1, n.clusters=1, cluster.type="PSOCK", sparse.output=FALSE, compressed.output=TRUE,
+	suffix=NA, cellsize=250, maxadisp=600, dispbins=10, verbose=FALSE) {
     #%%%%%%%%%%%%%%%%%%%#
     ### Preamble: declare variables and prepare the parallel environment for the life cycle ###
 	.resample <- function(x, ...) x[sample.int(length(x), ...)]
@@ -28,26 +27,26 @@ dynamAedes <- function(species="aegypti", scale="ws", ihwv=1, temps.matrix=NULL,
 	## Define `margin` for apply
 	mrg <- if(scale=="ws"){2}else if(scale=="lc"|scale=="rg"){1}
 	if(!dispersal) message("\n ### Model without dispersal ### \n") 
-	## Define the type of cluster computing environment 
+		## Define the type of cluster computing environment 
 		if(cluster.type=="PSOCK") {
 			cl <- makeCluster(spec=n.clusters, type=cluster.type, nnodes=n.clusters, outfile="")
 		} else(message("The only supported cluster.type is SOCK"))
-	## Register the environment 
+		## Register the environment 
 		registerDoParallel(cl, cores=n.clusters)
-	## Define space dimensionality into which simulations occour
+		## Define space dimensionality into which simulations occour
 		space <- nrow(temps.matrix)
-	## Set a progress bar
+		## Set a progress bar
 		pb <- txtProgressBar(char = "=", min = 0, max = iter, style = 3)
-	### End of preamble ###
-	#%%%%%%%%%%%%%%%%%%%%%#
-	### Iterations: start parallelised introduction "iteration" ###
+		### End of preamble ###
+		#%%%%%%%%%%%%%%%%%%%%%#
+		### Iterations: start parallelised introduction "iteration" ###
 		rs <- foreach( iteration=1:iter, .packages="foreach", .export = ls(globalenv()) ) %dopar% {
-		## Condition to satisfy to stop the life cycle: sum(pop) == 0, in case the day before extinction has happened
+			## Condition to satisfy to stop the life cycle: sum(pop) == 0, in case the day before extinction has happened
 			stopit <- FALSE
-		## Update progress bar
+			## Update progress bar
 			legind <- legind+n.clusters
-		## Vector of propagules to initiate the life cycle
-        # If intro.cells is a vector of cells than sample a value for each iteration
+			## Vector of propagules to initiate the life cycle
+        	# If intro.cells is a vector of cells than sample a value for each iteration
 			if( scale=="lc" ) {
 				if( nrow(temps.matrix)<2 | !exists("road.dist.matrix") | !exists("cells.coords") ) {
 					stop("If scale='lc' then temps.matrix|road.dist.matrix|cells.coords) must exist and nrows must be > 1")
@@ -55,8 +54,8 @@ dynamAedes <- function(species="aegypti", scale="ws", ihwv=1, temps.matrix=NULL,
 				if( length(intro.cells)>1 ) {
 					intro.cell <- sample(intro.cells,1)
 				} else {intro.cell <- NA}
-        	# if intro.cell is not NA than use intro.cell, else sample at random a cell along roads (column of road.dist.matrix)
-			# Eggs
+        		# if intro.cell is not NA than use intro.cell, else sample at random a cell along roads (column of road.dist.matrix)
+				# Eggs
 				if( intro.eggs!=0 ) {
 					e.intro.n <- rep(0,space)
 					if( !is.na(intro.cell) ) {
@@ -65,16 +64,16 @@ dynamAedes <- function(species="aegypti", scale="ws", ihwv=1, temps.matrix=NULL,
 						e.intro.n[sample(as.integer(colnames(road.dist.matrix)),1)] <- intro.eggs
 					}
 				} else e.intro.n <- intro.eggs
-        	# Immatures
-				if( intro.immatures!=0 ) {
+        		# Immatures
+				if( intro.juveniles!=0 ) {
 					i.intro.n <- rep(0,space)
 					if( !is.na(intro.cell) ) {
-						i.intro.n[intro.cell] <- intro.immatures
+						i.intro.n[intro.cell] <- intro.juveniles
 					} else {
-						i.intro.n[sample(as.integer(colnames(road.dist.matrix)),1)] <- intro.immatures
+						i.intro.n[sample(as.integer(colnames(road.dist.matrix)),1)] <- intro.juveniles
 					} 
-				} else i.intro.n <- intro.immatures
-        	# Adults
+				} else i.intro.n <- intro.juveniles
+        		# Adults
 				if( intro.adults!=0 ) {
 					a.intro.n <- rep(0,space)
 					if( !is.na(intro.cell) ) {
@@ -87,13 +86,13 @@ dynamAedes <- function(species="aegypti", scale="ws", ihwv=1, temps.matrix=NULL,
 				if( nrow(temps.matrix)>1 ) {
 					stop( "if sscale='lc' then nrow(temps.matrix) must be 1" )
 				} else {
-					e.intro.n <- intro.eggs; i.intro.n <- intro.immatures; a.intro.n <- intro.adults; road.dist.matrix <- as.data.frame(c(0,0)); names(road.dist.matrix) <- 1
+					e.intro.n <- intro.eggs; i.intro.n <- intro.juveniles; a.intro.n <- intro.adults; road.dist.matrix <- as.data.frame(c(0,0)); names(road.dist.matrix) <- 1
 				}
 			} else if( scale=="rg" ) {
 				if( nrow(temps.matrix)<1 ) {
 					stop( "if scale='rg' then nrow(temps.matrix) must be > 1" )
 				} else {
-					e.intro.n <- intro.eggs; i.intro.n <- intro.immatures; a.intro.n <- intro.adults; road.dist.matrix <- as.data.frame(c(0,0)); names(road.dist.matrix) <- 1
+					e.intro.n <- intro.eggs; i.intro.n <- intro.juveniles; a.intro.n <- intro.adults; road.dist.matrix <- as.data.frame(c(0,0)); names(road.dist.matrix) <- 1
 				}
 			} else stop("Wrong scale.")
         	### Day cycle: Start sequential "day" life cycle into the "iteration" loop ###
@@ -105,8 +104,10 @@ dynamAedes <- function(species="aegypti", scale="ws", ihwv=1, temps.matrix=NULL,
 			foreach(day = startd:endd, .combine=c, .export = ls(globalenv())) %do% {
 				if( !stopit ) {
 					if( !exists("counter") ) {
-                    	# Define objects required to store data during a day
-						counter <- 0; i.surv.m <- matrix(0,ncol=5,nrow=2); i.temp.v <- 0; d.temp.v <- 0; e.temp.v <- 0; a.egg.n <- 0; a.degg.n <- 0; p.life.a <- array(0,c(4,nrow(temps.matrix),6), dimnames = list(c("egg", "juvenile", "adult", "diapause_egg"), NULL, c("sc1", "sc2", "sc3", "sc4", "sc5", "sc6"))); storage.mode(p.life.a) <- "integer"; outl <- list()
+                    	# Index for dynamic array
+                    	da <- if(species=="koreicus"|species=="japonicus") 2 else 1
+						# Define objects required to store data during a day
+						counter <- 0; i.temp.v <- 0; d.temp.v <- 0; e.temp.v <- 0; a.egg.n <- 0; a.degg.n <- 0; p.life.a <- array(0,c(4,nrow(temps.matrix),6*da), dimnames = list(c("egg", "juvenile", "adult", "diapause_egg"), NULL, paste0("sc",1:(6*da)))); storage.mode(p.life.a) <- "integer"; outl <- list()
 					} else counter <- append(counter,day)
 
                 	### Header:
@@ -139,24 +140,24 @@ dynamAedes <- function(species="aegypti", scale="ws", ihwv=1, temps.matrix=NULL,
                 	### Events in the (`E`) egg compartment
                 	## `E` has four sub-compartment: 1:3 for eggs 1-3 days old that can only die or survive, 4 for eggs older than 3 days that can die/survive/hatch
                 	## Binomial draw to find numbers of eggs that die or survive
-					p.life.a[1,,2:4] <- apply(t(p.life.a[1,,1:3]),MARGIN=mrg,function(x) rbinom(size=x,n=space,prob=e.surv.p))
-					p.life.a[4,,2:4] <- apply(t(p.life.a[4,,1:3]),MARGIN=mrg,function(x) rbinom(size=x,n=space,prob=d.surv.p))
+					p.life.a[1,,2:(4*da)] <- apply(t(p.life.a[1,,1:(4*da-1)]),MARGIN=mrg,function(x) rbinom(size=x,n=space,prob=e.surv.p))
+					if(species=="albopicts") p.life.a[4,,2:4] <- apply(t(p.life.a[4,,1:3]),MARGIN=mrg,function(x) rbinom(size=x,n=space,prob=d.surv.p))
                 	## Introduce eggs if day==1; introduction happens in E sub-compartment 4 as it can be assumed that eggs are most likely to be introduced in an advanced stage of development 
-					p.life.a[1,,4] <- if( length(counter)==1 ) {
+					p.life.a[1,,(4*da)] <- if( length(counter)==1 ) {
 						e.intro.n
-					} else p.life.a[1,,4]
+					} else p.life.a[1,,(4*da)]
                 	# Add eggs laid by females the day before (t-1) stored in a.egg.n (end of the day)
 					p.life.a[1,,1] <- a.egg.n
-					p.life.a[4,,1] <- a.degg.n
+					if(species=="albopicts") p.life.a[4,,1] <- a.degg.n
                 	# Add eggs that did not hatch yesterday to egg that today are ready to hatch
-					p.life.a[1,,4] <- p.life.a[1,,4] + e.temp.v
-					p.life.a[4,,4] <- p.life.a[4,,4] + d.temp.v
+					p.life.a[1,,c(4*da)] <- p.life.a[1,,c(4*da)] + e.temp.v
+					if(species=="albopicts") p.life.a[4,,4] <- p.life.a[4,,4] + d.temp.v
                 	# Binomial draw to find numbers of eggs 4-day+ old that hatch today
-					e.hatc.n <- rbinom(length(1:space), p.life.a[1,,4], prob=e.hatc.p)
-					d.hatc.n <- rbinom(length(1:space), p.life.a[4,,4], prob=e.hatc.p)
+					e.hatc.n <- rbinom(length(1:space), p.life.a[1,,c(4*da)], prob=e.hatc.p)
+					if(species=="albopicts") d.hatc.n <- rbinom(length(1:space), p.life.a[4,,c(4*da)], prob=e.hatc.p)
                 	# Remove hatched eggs from eggs 4d+ old
-					e.temp.v <- p.life.a[1,,4] - e.hatc.n
-					d.temp.v <- p.life.a[4,,4] - d.hatc.n
+					e.temp.v <- p.life.a[1,,(4*da)] - e.hatc.n
+					if(species=="albopicts") d.temp.v <- p.life.a[4,,4] - if(species=="albopicts") d.hatc.n
                 	# Apply mortality to non hatched 4d+ old eggs
 					e.temp.v <- rbinom(length(1:space), e.temp.v, prob=0.99)
 					d.temp.v <- rbinom(length(1:space), d.temp.v, prob=0.99)
@@ -176,7 +177,7 @@ dynamAedes <- function(species="aegypti", scale="ws", ihwv=1, temps.matrix=NULL,
 						i.intro.n
 					} else p.life.a[2,,6]
                 	## Add immatures hatched the same day
-					p.life.a[2,,1] <- e.hatc.n + d.hatc.n
+					p.life.a[2,,1] <- e.hatc.n + if(species=="albopicts") d.hatc.n else 0
                 	## Add immatures that did not emerge yesterday to immatures that today are ready to emerge
 					p.life.a[2,,6] <- p.life.a[2,,6] + i.temp.v
                 	## Find numbers of immature 5d+ old that emerge before applying mortality (applied as newly emerged adults today)
@@ -288,7 +289,7 @@ dynamAedes <- function(species="aegypti", scale="ws", ihwv=1, temps.matrix=NULL,
 					p.life.a[3,,3] <- p.life.a[3,,2]
 					p.life.a[3,,2] <- 0
     				## Print information on population structure today
-					if( verbose ) message("\nday ",length(counter),"-- of iteration ",iteration," has ended. Population is e: ",sum(p.life.a[1,,])," i: ",sum(p.life.a[2,,])," a: " ,sum(p.life.a[3,,]), " d: ",sum(p.life.a[4,,]), " eh: ", sum(e.hatc.n+d.hatc.n), " el: ",sum(a.egg.n), " \n")
+					if( verbose ) message("\nday ",length(counter),"-- of iteration ",iteration," has ended. Population is e: ",sum(p.life.a[1,,])," i: ",sum(p.life.a[2,,])," a: " ,sum(p.life.a[3,,]), " d: ",sum(p.life.a[4,,]), " eh: ", sum(e.hatc.n+if(species=="albopictus") d.hatc.n else 0), " el: ",sum(a.egg.n), " \n")
                 		# Condition for exinction
 						stopit <- sum(p.life.a)==0
                 	# Some (unnecessary?) garbage cleaning

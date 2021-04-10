@@ -86,7 +86,7 @@
 		model <- drm(eme_d ~ temp_d, fct = .DRC.beta())
 		i.emer.pred <- predict(model,data.frame(temp.v=temp.new))
 	}else if(sp=="albopictus") {
-		eme_d <- 1/c(100,8.7,4.1,2.7,1.9,1.7,5)
+		eme_d <- 1/c(100, 8.7,4.1,2.7,1.9,1.7,5)
 		temp_d <- c(5,15,20,25,30,35,40)
 		model <- drm(eme_d ~ temp_d, fct = .DRC.beta())
 		i.emer.pred <- predict(model,data.frame(temp.v=temp.new))
