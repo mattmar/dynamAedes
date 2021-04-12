@@ -42,7 +42,8 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 		## Define space dimensionality into which simulations occour
 		space <- nrow(temps.matrix)
 		## Set a progress bar
-		pb <- txtProgressBar(char = "=", min = 0, max = iter, style = 3)
+		message("##########################################\n## Iterations processing has started... ##\n##########################################")
+		pb <- txtProgressBar(char = "%", min = 0, max = iter, style = 3)
 		### End of preamble ###
 		#%%%%%%%%%%%%%%%%%%%%%#
 		### Iterations: start parallelised introduction "iteration" ###
@@ -149,23 +150,23 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
                 	## `E` has eight sub-compartment: 1:7 for eggs 1-7 days old that can only die or survive, 8 for eggs older than 7 days that can die/survive/hatch
                 	## Binomial draw to find numbers of eggs that die or survive
 					p.life.a[1,,2:(4*da)] <- apply(t(p.life.a[1,,1:(4*da-1)]),MARGIN=mrg,function(x) rbinom(size=x,n=space,prob=e.surv.p))
-					if(species=="albopicts") p.life.a[4,,2:4] <- apply(t(p.life.a[4,,1:3]),MARGIN=mrg,function(x) rbinom(size=x,n=space,prob=d.surv.p))
+					if(species=="albopictus") p.life.a[4,,2:4] <- apply(t(p.life.a[4,,1:3]),MARGIN=mrg,function(x) rbinom(size=x,n=space,prob=d.surv.p))
                 	## Introduce eggs if day==1; introduction happens in E sub-compartment 8 as it can be assumed that eggs are most likely to be introduced in an advanced stage of development 
 					p.life.a[1,,(4*da)] <- if( length(counter)==1 ) {
 						e.intro.n
 					} else p.life.a[1,,(4*da)]
                 	# Add eggs laid by females the day before (t-1) stored in a.egg.n (end of the day)
 					p.life.a[1,,1] <- a.egg.n
-					if(species=="albopicts") p.life.a[4,,1] <- a.degg.n
+					if(species=="albopictus") p.life.a[4,,1] <- a.degg.n
                 	# Add eggs that did not hatch yesterday to egg that today are ready to hatch
 					p.life.a[1,,c(4*da)] <- p.life.a[1,,c(4*da)] + e.temp.v
-					if(species=="albopicts") p.life.a[4,,4] <- p.life.a[4,,4] + d.temp.v
+					if(species=="albopictus") p.life.a[4,,4] <- p.life.a[4,,4] + d.temp.v
                 	# Binomial draw to find numbers of eggs 8-d+ old that hatch today
 					e.hatc.n <- rbinom(length(1:space), p.life.a[1,,c(4*da)], prob=e.hatc.p)
-					if(species=="albopicts") d.hatc.n <- rbinom(length(1:space), p.life.a[4,,c(4*da)], prob=e.hatc.p)
+					if(species=="albopictus") d.hatc.n <- rbinom(length(1:space), p.life.a[4,,c(4*da)], prob=e.hatc.p)
                 	# Remove hatched eggs from eggs 8d+ old
 					e.temp.v <- p.life.a[1,,(4*da)] - e.hatc.n
-					if(species=="albopicts") d.temp.v <- p.life.a[4,,4] - if(species=="albopicts") d.hatc.n
+					if(species=="albopictus") d.temp.v <- p.life.a[4,,4] - if(species=="albopictus") d.hatc.n else 0
                 	# Apply mortality to non hatched 8d+ old eggs
 					e.temp.v <- rbinom(length(1:space), e.temp.v, prob=0.99)
 					d.temp.v <- rbinom(length(1:space), d.temp.v, prob=0.99)
@@ -185,7 +186,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 						i.intro.n
 					} else p.life.a[2,,(6*dj)]
                 	## Add immatures hatched the same day
-					p.life.a[2,,1] <- e.hatc.n + if(species=="albopicts") d.hatc.n else 0
+					p.life.a[2,,1] <- e.hatc.n + if(species=="albopictus") d.hatc.n else 0
                 	## Add immatures that did not emerge yesterday to immatures that today are ready to emerge
 					p.life.a[2,,(6*dj)] <- p.life.a[2,,(6*dj)] + i.temp.v
                 	## Find numbers of immature 5d+ old that emerge before applying mortality (applied as newly emerged adults today)
@@ -319,7 +320,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 	if( !is.na(suffix) ) {
 		message(paste("\n\n\nIterations concluded. Saving the output to: ",suffix,".RDS\n\n\n",sep=""))
 		saveRDS(rs, paste(suffix,".RDS",sep=""))
-	} else message("\n\n\nIterations concluded.")
+	} else 		message("\n\n\n########################################\n## Iterations concluded.              ##\n########################################\n\n\n")
 	# Close cluster
 	stopCluster(cl)
 	return(rs)

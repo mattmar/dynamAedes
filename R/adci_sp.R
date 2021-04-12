@@ -41,5 +41,4 @@ adci_sp = function(input_sim=NULL, coords=NULL, eval_date=NULL, stage=1,  breaks
 		})
 	}
 	return( if(length(outr)==1) outr[[1]] else outr ) 
-	#return(outr)
 }
