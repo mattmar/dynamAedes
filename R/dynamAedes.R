@@ -4,6 +4,8 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 	iter=1, n.clusters=1, cluster.type="PSOCK", sparse.output=FALSE, compressed.output=TRUE,
 	suffix=NA, cellsize=250, maxadisp=600, dispbins=10, verbose=FALSE) {
     #%%%%%%%%%%%%%%%%%%%#
+    ### Initial checks
+    if(!species%in%c("aegypti","albopictus","koreicus","japonicus")) stop("Species not supported, exiting...")
     ### Preamble: declare variables and prepare the parallel environment for the life cycle ###
 	.resample <- function(x, ...) x[sample.int(length(x), ...)]
 	legind <- 0
