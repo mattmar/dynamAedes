@@ -170,8 +170,8 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 					e.temp.v <- p.life.a[1,,(4*da)] - e.hatc.n
 					if(species=="albopictus") d.temp.v <- p.life.a[4,,4] - if(species=="albopictus") d.hatc.n else 0
                 	# Apply mortality to non hatched 8d+ old eggs
-					e.temp.v <- rbinom(length(1:space), e.temp.v, prob=0.99)
-					d.temp.v <- rbinom(length(1:space), d.temp.v, prob=0.99)
+					#e.temp.v <- rbinom(length(1:space), e.temp.v, prob=0.99)
+					#d.temp.v <- rbinom(length(1:space), d.temp.v, prob=0.99)
 	                ### Events in the (`I`) immature compartment
 	                ## `I` has 6 sub-compartments representing days from hatching; an immature can survive/die for the first 5 days after hatching, from the 5th day on, it can survive/die and `emerge`.
 	                ## Derive mortality rate due to density and add to mortality rate due to temperature sum and derive probability of survival in each cell.
