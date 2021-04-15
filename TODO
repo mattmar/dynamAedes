@@ -3,5 +3,10 @@
 ## package: Add plotting functions
 ## package: Add manuals
 ## model: Check physiological parameters with experts
+## model: Add ifelse statement on the physiological parameters functions: ifelse(predicted value >1, 1, ifelse(predicted value <0,0, NA))
 ## model: Add option for a generalised mosquito
 ## model: Make possible the switch between data and expert opinion-based temperature-dependent functions
+## model: if enough data are available, switch between different mosquito strain temperature-dependent functions
+## model: add additional mortality rate in the juvenile for Ae. aegypti, Ae. japonicus and Ae. koreicus due to competition with Ae. albopictus (if present)
+## model: add additional mortality rate in egg, juvenile and adult stage to simulate the effect of e.g. eggcide, larvicide, fogging, etc
+## model: allow multiple random introduction during the period of the simulation
