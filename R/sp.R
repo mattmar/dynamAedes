@@ -86,8 +86,8 @@ NLS.beta <- selfStart(.beta.fun, .beta.init, parameters=c("b", "d", "Xb", "Xo", 
 ## Oviposition rate, i.e., number of eggs laid per female/day at different temperature ##
 .a.ovi_rate.f <- function(temp.new, sp) {
   if(sp=="aegypti") {
-    ovi_n <- c(0,0.35,1.12,3.37,3.6,6.98,7.6,9.58,7.28,11.22,7.27,5,2) * 10
-    temp_n <- c(10.5,15.30,16.52,20.05,21.79,25.64,27.64,31.33,31.65,32.55,33.41,34,40)
+    ovi_n <- c(0,3.37,3.6,6.98,7.6,9.58,7.28,11.22,7.27,5) * 10
+    temp_n <- c(2,20.05,21.79,25.64,27.64,31.33,31.65,32.55,33.41,34)
     model <- drm(ovi_n ~ temp_n, fct = .DRC.beta())
     a.ovi.pred <- predict(model,data.frame(temp.v=temp.new))
   }else if(sp=="albopictus") {
