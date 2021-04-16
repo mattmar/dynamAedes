@@ -2,9 +2,13 @@
 ## package: Add vignettes
 ## package: Add plotting functions
 ## package: Add manuals
+
+## physiological functions: see Monteiro 2007 used in https://doi.org/10.1016/j.actatropica.2019.105228
+
 ## model: Check physiological parameters with experts
 ## model: Add ifelse statement on the physiological parameters functions: ifelse(predicted value >1, 1, ifelse(predicted value <0,0, NA))
 ## model: Add option for a generalised mosquito
+## model: Add diapause estimation for each grid cell at regional level when species==albopictus
 ## model: Make possible the switch between data and expert opinion-based temperature-dependent functions
 ## model: if enough data are available, switch between different mosquito strain temperature-dependent functions
 ## model: add additional mortality rate in the juvenile for Ae. aegypti, Ae. japonicus and Ae. koreicus due to competition with Ae. albopictus (if present)
