@@ -6,6 +6,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
     #%%%%%%%%%%%%%%%%%%%#
     ### Initial checks
     if(!species%in%c("aegypti","albopictus","koreicus","japonicus")) stop("Species not supported, exiting...")
+    if(endd>ncol(temps.matrix)) stop("You're trying to run the model for more days than columns in 'temps.matrix', exiting...")
     ### Preamble: declare variables and prepare the parallel environment for the life cycle ###
 	.resample <- function(x, ...) x[sample.int(length(x), ...)]
 	legind <- 0
