@@ -96,13 +96,13 @@ NLS.beta <- selfStart(.beta.fun, .beta.init, parameters=c("b", "d", "Xb", "Xo", 
     model <- drm(ovi_n ~ temp_n, fct = .DRC.beta())
     a.ovi.pred <- predict(model,data.frame(temp.v=temp.new))
   }else if(sp=="koreicus") {
-    ovi_n <- c(0, 5,20,  25, 30,38, 40, 40, 38, 20, 10, 10,0) #Based on Daniele Arnoldi's opinion
+    ovi_n <- c(0, 5, 20, 25, 30, 38, 40, 40, 38, 20, 10, 10, 0)
     temp_n <-c(8, 10,12, 15,17, 20, 23,  25, 27, 30, 33, 35,37)
     model <- drm(ovi_n ~ temp_n, fct = .DRC.beta())
     a.ovi.pred <- predict(model,data.frame(temp.v=temp.new))
   }else if(sp=="japonicus") {
     ovi_n <- c(0, 108.2, 111.6, 106.8, 112.2, 97.1, 99.1, 94.5, 80.6, 82.1, 71.6, 67.4, 68.4, 55.0, 47.4,0)
-    temp_n <-c(5,10,  12,  14, 15, 17, 19, 20, 23, 25, 26, 27, 28, 29, 31, 40)
+    temp_n <-c(5,10, 12, 14, 15, 17, 19, 20, 23, 25, 26, 27, 28, 29, 31, 40)
     model <- drm(ovi_n ~ temp_n, fct = .DRC.beta())
     a.ovi.pred <- predict(model,data.frame(temp.v=temp.new))/2
   }else(stop("Species not supported."))
@@ -256,9 +256,9 @@ NLS.beta <- selfStart(.beta.fun, .beta.init, parameters=c("b", "d", "Xb", "Xo", 
     e.surv.pred=a*exp(-0.5*((temp.new-b)/c)^6)
   }else if(sp=="koreicus") {
     ed_surv_bl=1
-    a=0.98
+    a= 0.98
     b= 15.8
-    c=-15.8
+    c= -15.8
     d.surv.pred= ed_surv_bl*a*exp(-0.5*((temp.new-b)/c)^6)
   }else if(sp=="japonicus") {
     surv_r <-  c(0, 0.44, 0.79, 0.9017, 0.8817, 0)

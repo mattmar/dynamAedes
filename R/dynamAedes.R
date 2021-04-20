@@ -152,7 +152,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
                 	### Events in the (`E`) egg compartment
                 	## `E` has eight sub-compartment: 1:7 for eggs 1-7 days old that can only die or survive, 8 for eggs older than 7 days that can die/survive/hatch
                 	## Binomial draw to find numbers of eggs that die or survive
-					p.life.a[1,,2:(4*da)] <- apply(t(p.life.a[1,,1:(4*da-1)]),MARGIN=mrg,function(x) rbinom(size=x,n=space,prob=e.surv.p))
+					p.life.a[1,,2:(4*da)] <- apply(t(p.life.a[1,,1:(4*da-1)]),MARGIN=mrg,function(x) rbinom(size=x,n=space,prob=e.surv.p)) * da # patch: raddoppio il numero di uova che sopravvivono
 					if(species=="albopictus") p.life.a[4,,2:4] <- apply(t(p.life.a[4,,1:3]),MARGIN=mrg,function(x) rbinom(size=x,n=space,prob=d.surv.p))
                 	## Introduce eggs if day==1; introduction happens in E sub-compartment 8 as it can be assumed that eggs are most likely to be introduced in an advanced stage of development 
 					p.life.a[1,,(4*da)] <- if( length(counter)==1 ) {
@@ -171,8 +171,8 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 					e.temp.v <- p.life.a[1,,(4*da)] - e.hatc.n
 					if(species=="albopictus") d.temp.v <- p.life.a[4,,4] - if(species=="albopictus") d.hatc.n else 0
                 	# Apply mortality to non hatched 8d+ old eggs
-					#e.temp.v <- rbinom(length(1:space), e.temp.v, prob=0.99)
-					#d.temp.v <- rbinom(length(1:space), d.temp.v, prob=0.99)
+					e.temp.v <- rbinom(length(1:space), e.temp.v, prob=0.99)
+					d.temp.v <- rbinom(length(1:space), d.temp.v, prob=0.99)
 	                ### Events in the (`I`) immature compartment
 	                ## `I` has 6 sub-compartments representing days from hatching; an immature can survive/die for the first 5 days after hatching, from the 5th day on, it can survive/die and `emerge`.
 	                ## Derive mortality rate due to density and add to mortality rate due to temperature sum and derive probability of survival in each cell.
@@ -183,7 +183,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 					i.ddmort_rate.v <- exp(.i.ddmort_rate.f(list(i.dens.v=(imm.v*2)/ihwv)))
 					i.surv.p <- 1-(1-exp(-(i.mort_rate.v + i.ddmort_rate.v)))
                 	## Binomial draw to find numbers of immature that die or survive-and-move to the next compartment
-					p.life.a[2,,2:(6*dj)] <- apply(t(p.life.a[2,,1:((6*dj)-1)]), MARGIN=mrg, FUN=function(x) rbinom(size=x, n=space, prob=i.surv.p))
+					p.life.a[2,,2:(6*dj)] <- apply(t(p.life.a[2,,1:((6*dj)-1)]), MARGIN=mrg, FUN=function(x) rbinom(size=x, n=space, prob=i.surv.p)) * dj # patch: raddoppio il numero di larve che sopravvivono
                 	## Introduce `I` if day==1; introduction happens in `I` sub-compartment 6 
 					p.life.a[2,,(6*dj)] <- if( length(counter)==1 ) {
 						i.intro.n

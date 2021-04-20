@@ -18,7 +18,7 @@ importFrom("sp", "gridded", "coordinates")
 #####################################
 export(dynamAedes, .beta.fun, .DRC.beta, .beta.init)
 export(.a.a_disp.f, .a.gono_rate.f, .a.ovi_rate.f, 
-.a.surv_rate.f, .i.emer_rate.f, 
+.a.surv_rate.f, .i.emer_rate.f, .e.surv_rate.f,
 .i.surv_rate.f, .e.hatch_rate.f, 
 .i.ddmort_rate.f, psi, psi_sp, icci, adci, adci_sp, 
 get_rates_spatial, dici, .returndis, .euc, .meuc)
