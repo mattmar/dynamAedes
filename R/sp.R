@@ -104,7 +104,7 @@ NLS.beta <- selfStart(.beta.fun, .beta.init, parameters=c("b", "d", "Xb", "Xo", 
     ovi_n <- c(0, 108.2, 111.6, 106.8, 112.2, 97.1, 99.1, 94.5, 80.6, 82.1, 71.6, 67.4, 68.4, 55.0, 47.4,0)
     temp_n <-c(5,10, 12, 14, 15, 17, 19, 20, 23, 25, 26, 27, 28, 29, 31, 40)
     model <- drm(ovi_n ~ temp_n, fct = .DRC.beta())
-    a.ovi.pred <- predict(model,data.frame(temp.v=temp.new))/2
+    a.ovi.pred <- predict(model,data.frame(temp.v=temp.new)) # Patch
   }else(stop("Species not supported."))
 }
 
@@ -125,7 +125,7 @@ NLS.beta <- selfStart(.beta.fun, .beta.init, parameters=c("b", "d", "Xb", "Xo", 
         a*exp(-0.5*((x-b)/c)^6)
       }
     })
-  }else if(sp=="koreicus") {
+  }else if(sp=="koreicus" | sp=="japonicus") {
     surv_d <- 1-(1/c(1,2,52.33,46.77,66.33,5.87, 3, 1))
     temp_d <- c(0,5, 18,23,28,33, 35, 38)
     model <- drm(surv_d ~ temp_d, fct = .DRC.beta())
@@ -229,9 +229,9 @@ NLS.beta <- selfStart(.beta.fun, .beta.init, parameters=c("b", "d", "Xb", "Xo", 
     temp_d <-seq(5,40, by=5)
     model <- drm(hatc_d ~ temp_d, fct = .DRC.beta())
     e.hatch.pred <- predict(model,data.frame(temp.v=temp.new))
-  }else if(sp=="koreicus") {
-    hatc_d <- (c(0, 7.25, 50.50, 53.75, 51.00, 57.25,20, 0)/100)/0.636
-    temp_d <- c(0,8,13,23,28,33,36, 40)
+  }else if(sp=="koreicus" | sp=="japonicus") {
+    hatc_d <- (c(0, 53.75, 51.00, 57.25,20, 0)/100)/0.636 #patch
+    temp_d <- c(15, 23,    28,    33,   36, 40) #patch
     model <- drm(hatc_d ~ temp_d, fct = .DRC.beta())
     e.hatch.pred <- predict(model,data.frame(temp.v=temp.new))
   }else if(sp=="japonicus") {
@@ -277,3 +277,4 @@ NLS.beta <- selfStart(.beta.fun, .beta.init, parameters=c("b", "d", "Xb", "Xo", 
   d.surv.pred=ed_surv_bl*a*exp(-0.5*((temp.new-b)/c)^6)
   return( d.surv.pred )
 }
+
