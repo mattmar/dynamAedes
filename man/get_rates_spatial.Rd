@@ -16,7 +16,7 @@ get_rates_spatial(coords=NULL, daily_temp=NULL, species=NULL, rate_fun=NULL, spa
 \item{rate}{input data.}
 }
 \value{
-To be done
+A RasterStack.
 }
 \author{
 Daniele Da Re \email{daniele.dare@uclouvain.be} \cr
