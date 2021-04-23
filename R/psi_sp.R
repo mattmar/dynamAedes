@@ -31,9 +31,8 @@ psi_sp = function(coords=NULL, input_sim=NULL, eval_date=NULL, np=1) {
 		return(stack(apply(my.out, 2, function(x) {
 			rate.sp=as.data.frame(cbind(coords, data.frame(x)))
 			names(rate.sp)=c("X", "Y", "ProbIntro")
-			sp::coordinates(rate.sp) <- ~X + Y
-			sp::gridded(rate.sp) <- TRUE
-			return(raster(rate.sp))
+			rate.sp<-rasterFromXYZ(rate.sp)
+			return(rate.sp)
 		})))
 	}
 }
