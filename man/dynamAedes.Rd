@@ -44,7 +44,7 @@ dynamAedes(species="aegypti", intro.eggs=0, intro.adults=0,
 \item{verbose}{input data.}
 }
 \value{
-Matrix or a list of matrixes with the Shannon index computed through moving window of the given size.
+Matrix or a list of matrixes containing, for each iteration, the number of individuals in each life stage per day (and for each grid cell of the study area if scale="lc" or "rg". If the argument compressed.output=FALSE (default TRUE), he model returns the daily number of individuals in each life stage sub-compartment.	
 }
 \author{
 Marcantonio Matteo \email{marcantoniomatteo@gmail.com} \cr
