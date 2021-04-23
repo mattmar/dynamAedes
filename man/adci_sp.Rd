@@ -14,8 +14,7 @@ dynamAedes(coords=NULL, input_sim=NULL, eval.date=NULL, st=1,  breaks=NULL)
 \item{st}{input data.}
 \item{breaks}{input data.}
 }
-\value{
-To be done
+\value{A RasterStack or a list of RasterStack.
 }
 \author{
 Daniele Da Re \email{daniele.dare@uclouvain.be} \cr
