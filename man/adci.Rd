@@ -14,8 +14,7 @@ adci(input_sim=NA, stage=1, eval_date=0, breaks=c(0.25,0.5,0.75),np=1)
 \item{breaks}{input data.}
 \item{np}{input data.}
 }
-\value{
-To be done
+\value{Numerical matrix
 }
 \author{
 Daniele Da Re \email{daniele.dare@uclouvain.be} \cr
