@@ -145,7 +145,7 @@ NLS.beta <- selfStart(.beta.fun, .beta.init, parameters=c("b", "d", "Xb", "Xo", 
         #koreicus Adults longevity (Tab. 3, Marini et al 2019)
         temp_dev=c(5,18,23,28,33) #I've added an estimate of adult longevity at 5°C equal to 5days 
         obs_dev=c(5, 52.33, 46.77, 66.33, 5.87)
-        m=lm(obs_gono~poly(temp_dev,2))
+        m=lm(obs_dev~poly(temp_dev,2))
         dev_time=predict(m, newdata = data.frame(temp_dev=temp.new), response=TRUE)
         dev_time=ifelse(dev_time<=1, 1, dev_time)
         a.surv.rate= round(a.surv.rate^(1/dev_time),3)
