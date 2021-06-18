@@ -75,14 +75,6 @@ NLS.beta <- selfStart(.beta.fun, .beta.init, parameters=c("b", "d", "Xb", "Xo", 
     model <- drm(gono_d ~ temp_d, fct = .DRC.beta())
     a.gono.pred <- predict(model,data.frame(temp.v=temp.new))
 
-  #koreicus Adults gono cycle (Tab. 3, Marini et al 2019)
-        temp_dev=c(5, 18,23,28,33)#I've added an estimate of adult longevity at 5°C equal to 1 days
-        obs_gono=c(1, 14.75, 9.21, 10.81, 1)
-        m=lm(obs_gono~poly(temp_dev,2))
-        dev_time=predict(m, newdata = data.frame(temp_dev=temp.new), response=TRUE)
-        dev_time=ifelse(dev_time<=1, 1, dev_time)
-        a.gono.pred= round(a.gono.pred^(1/dev_time),3)
-
   }  else if(sp=="japonicus") {
     gono_d <- 1/c(14.75, 11.5, 9.21, 10.81, 100)
     temp_d <- c(  18,    23,   23,    28,    33)
@@ -143,8 +135,8 @@ NLS.beta <- selfStart(.beta.fun, .beta.init, parameters=c("b", "d", "Xb", "Xo", 
     # a.surv.rate <- 1-1/ifelse(a.surv.rate<1,1,a.surv.rate)
 
         #koreicus Adults longevity (Tab. 3, Marini et al 2019)
-        temp_dev=c(5,18,23,28,33) #I've added an estimate of adult longevity at 5°C equal to 5days 
-        obs_dev=c(5, 52.33, 46.77, 66.33, 5.87)
+        temp_dev=c(1,5,18,23,28,33) #I've added an estimate of adult longevity at 5°C equal to 30 days, and adult longevity at 1°C equal to 1 days 
+        obs_dev=c(1, 30, 52.33, 46.77, 66.33, 5.87)
         m=lm(obs_dev~poly(temp_dev,2))
         dev_time=predict(m, newdata = data.frame(temp_dev=temp.new), response=TRUE)
         dev_time=ifelse(dev_time<=1, 1, dev_time)
