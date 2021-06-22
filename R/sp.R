@@ -65,7 +65,7 @@ NLS.beta <- selfStart(.beta.fun, .beta.init, parameters=c("b", "d", "Xb", "Xo", 
     model <- drm(gono_d ~ temp_d, fct = .DRC.beta())
     a.gono.pred <- predict(model,data.frame(temp.v=temp.new))
   }else if(sp=="albopictus") {
-    gono_d <- 1/c(8.1, 4.5, 3.5, 4.4,100)
+    gono_d <- 1/c(8.1, 4.5, 3.5, 4.4, 100)
     temp_d <-   c(20,  25,  30,  35, 45)
     model <- drm(gono_d ~ temp_d, fct = .DRC.beta())
     a.gono.pred <- predict(model,data.frame(temp.v=temp.new))
@@ -73,8 +73,7 @@ NLS.beta <- selfStart(.beta.fun, .beta.init, parameters=c("b", "d", "Xb", "Xo", 
     gono_d <- 1/c(14.75, 11.5, 9.21, 10.81, 100)
     temp_d <- c(  18,    23,   23,    28,    33)
     model <- drm(gono_d ~ temp_d, fct = .DRC.beta())
-    a.gono.pred <- predict(model,data.frame(temp.v=temp.new))
-
+    a.gono.pred <- predict(model,data.frame(temp.v=temp.new)
   }  else if(sp=="japonicus") {
     gono_d <- 1/c(14.75, 11.5, 9.21, 10.81, 100)
     temp_d <- c(  18,    23,   23,    28,    33)
@@ -83,7 +82,6 @@ NLS.beta <- selfStart(.beta.fun, .beta.init, parameters=c("b", "d", "Xb", "Xo", 
   }  else(stop("Species not supported."))
   return(a.gono.pred)
 }
-
 
 ## Oviposition rate, i.e., number of eggs laid per female/day at different temperature ##
 .a.ovi_rate.f <- function(temp.new, sp) {
@@ -104,9 +102,9 @@ NLS.beta <- selfStart(.beta.fun, .beta.init, parameters=c("b", "d", "Xb", "Xo", 
     a.ovi.pred <- predict(model,data.frame(temp.v=temp.new))
   }else if(sp=="japonicus") {
     ovi_n <- c(0, 108.2, 111.6, 106.8, 112.2, 97.1, 99.1, 94.5, 80.6, 82.1, 71.6, 67.4, 68.4, 55.0, 47.4,0)
-    temp_n <-c(5,10, 12, 14, 15, 17, 19, 20, 23, 25, 26, 27, 28, 29, 31, 40)
+    temp_n <-c(5, 10, 12, 14, 15, 17, 19, 20, 23, 25, 26, 27, 28, 29, 31, 40)
     model <- drm(ovi_n ~ temp_n, fct = .DRC.beta())
-    a.ovi.pred <- predict(model,data.frame(temp.v=temp.new)) # Patch
+    a.ovi.pred <- predict(model,data.frame(temp.v=temp.new))
   }else(stop("Species not supported."))
 }
 
@@ -132,18 +130,16 @@ NLS.beta <- selfStart(.beta.fun, .beta.init, parameters=c("b", "d", "Xb", "Xo", 
     temp_d <- c(0,5, 18,23,28,33, 35, 38)
     model <- drm(surv_d ~ temp_d, fct = .DRC.beta())
     a.surv.rate <- predict(model,data.frame(temp.v=temp.new))
-    # a.surv.rate <- 1-1/ifelse(a.surv.rate<1,1,a.surv.rate)
-
-        #koreicus Adults longevity (Tab. 3, Marini et al 2019)
-        temp_dev=c(1,5,18,23,28,33) #I've added an estimate of adult longevity at 5°C equal to 30 days, and adult longevity at 1°C equal to 1 days 
-        obs_dev=c(1, 30, 52.33, 46.77, 66.33, 5.87)
-        m=lm(obs_dev~poly(temp_dev,2))
-        dev_time=predict(m, newdata = data.frame(temp_dev=temp.new), response=TRUE)
-        dev_time=ifelse(dev_time<=1, 1, dev_time)
-        a.surv.rate= round(a.surv.rate^(1/dev_time),3)
-
+    #koreicus adults longevity (Tab. 3, Marini et al 2019)
+    temp_dev=c(1,5,18,23,28,33) #I've added arbitrary adult longevity at 5°C equal to 30 days, and adult longevity at 1°C equal to 1 days 
+    obs_dev=c(1, 30, 52.33, 46.77, 66.33, 5.87)
+    m=lm(obs_dev~poly(temp_dev,2))
+    dev_time=predict(m, newdata = data.frame(temp_dev=temp.new), response=TRUE)
+    dev_time=ifelse(dev_time<=1, 1, dev_time)
+    #correction with development time to get daily survival rate 
+    a.surv.rate= round(a.surv.rate^(1/dev_time),3)
   }else if(sp=="japonicus") {
-    surv_d<-c(0, 99.0, 97.2, 91.8, 98.8, 91.0, 81.6, 93.6, 68.9, 71.4, 71.4, 60.7, 68.9, 34.0, 40.8,0 )/100
+    surv_d <- c(0, 99.0, 97.2, 91.8, 98.8, 91.0, 81.6, 93.6, 68.9, 71.4, 71.4, 60.7, 68.9, 34.0, 40.8,0 )/100
     temp_n <- c(-5, 10, 12, 14, 15, 17, 19, 20, 23, 25, 26, 27, 28, 29, 31, 40)
     model <- drm(surv_d ~ temp_n, fct = .DRC.beta())
     a.surv.rate <- predict(model,data.frame(temp.v=temp.new))
@@ -179,6 +175,7 @@ NLS.beta <- selfStart(.beta.fun, .beta.init, parameters=c("b", "d", "Xb", "Xo", 
     model <- drm(eme_d ~ temp_d, fct = .DRC.beta())
     i.emer.pred <- predict(model,data.frame(temp.v=temp.new))
   }else if(sp=="japonicus") {
+    # This refers to the total % of emergency, it must be corrected with the durations to get a daily rate
     eme_d= c( 0.07, 0.1, 0.15, 0.17, 0.21, 0.32, 0.29, 0.35, 0.43, 0.43, 0.44, 0.45, 0.5, 0.67, 0.4,0.2, 0)
     temp_d <- c(10, 12, 14, 15, 17, 19, 20, 23, 25, 26, 27, 28, 29, 31, 33, 35,40)
     model <- drm(eme_d ~ temp_d, fct = .DRC.beta())
@@ -189,7 +186,7 @@ NLS.beta <- selfStart(.beta.fun, .beta.init, parameters=c("b", "d", "Xb", "Xo", 
 ## Immature daily survival rate at different temperature ##
 .i.surv_rate.f <- function(temp.new, sp) {
   if(sp=="aegypti") {
-    surv_d <-1-(1/ c(1,6.2,10.3,12,2,4.5,2.1,5.7,4.8,47.9,42.7,55.3,27.2,48.5,30.2,14.7,15.8,15.7,9.5,16.8,8.6,14.2,10.0,3.1,3.7,3.5,2))
+    surv_d <- 1-(1/ c(1,6.2,10.3,12,2,4.5,2.1,5.7,4.8,47.9,42.7,55.3,27.2,48.5,30.2,14.7,15.8,15.7,9.5,16.8,8.6,14.2,10.0,3.1,3.7,3.5,2))
     temp_d <- c(5, 10,10,10,10,10.38,10.45,10.45,10,14.74,14.84,14.92,18.86,19.04,19.18,26.56,26.84,26.85,30.83,31.61,34.95,36.47,36.55,39.95,40.16,40.64,42)
     model <- drm(surv_d ~ temp_d, fct = .DRC.beta())
     i.surv.pred <- predict(model,data.frame(temp.v=temp.new))
@@ -203,13 +200,12 @@ NLS.beta <- selfStart(.beta.fun, .beta.init, parameters=c("b", "d", "Xb", "Xo", 
     temp_d <- c(-5, 8, 13,   18,   23,   28,   33,   37)
     model <- drm(surv_d ~ temp_d, fct = .DRC.beta())
     i.surv.pred <- predict(model,data.frame(temp.v=temp.new))
-
-        temp_dev=c(13, 18,23,28,33)
-        obs_dev=c(9.47,5.71,3.66,2.72,2.78)
-        m=lm(obs_dev~poly(temp_dev,2))
-        dev_time=predict(m, newdata = data.frame(temp_dev=temp.new), response=TRUE)
-     i.surv.pred= round(i.surv.pred^(1/dev_time),3)
-
+    #koreicus adults longevity (Tab. 2, Marini et al 2019)
+    temp_dev=c(13, 18,23,28,33)
+    obs_dev=c(9.47,5.71,3.66,2.72,2.78)
+    m=lm(obs_dev~poly(temp_dev,2))
+    dev_time=predict(m, newdata = data.frame(temp_dev=temp.new), response=TRUE)
+    i.surv.pred= round(i.surv.pred^(1/dev_time),3)
   } else if(sp=="japonicus") {
     surv_d <- c(0, 0, 92.5, 78.77, 90.59, 92.19, 90.32, 83.86, 94.08, 91.35, 75.5, 90.63, 96.95, 90.83, 53, 38.65, 0)/100
     temp_d <- c(0, 5, 10, 12, 14, 15, 17, 19, 20, 21, 23, 25, 26, 27, 29, 31,45)
@@ -220,7 +216,7 @@ NLS.beta <- selfStart(.beta.fun, .beta.init, parameters=c("b", "d", "Xb", "Xo", 
 
 
 ## Immature Density-dependent mortality
-.i.ddmort_rate.f <- function(dens.new) {
+ .i.ddmort_rate.f <- function(dens.new) {
   i.dens.v = c(87.72,561.40,1175.44,1280.70,1491.23,1675.44,1982.46,2350.88,2850.88,3122.81,3236.84,3307.02,3359.65,3456.14,3570.18,3640.35,3666.67,3771.93,3877.19,3982.46)
   i.dsurv_prop.v = c(0.95,0.43,0.57,0.42,0.49,0.35,0.25,0.17,0.13,0.05,0.2,0.27,0.11, 0.11,0.06,0.04,0.09,0.13,0.07, 0.14)
   i.dsur_dur.v = c(7.46,9.96,28.09,17.46,29.12,38.31,42.22,40.95,44.31,42.34,20.91,17.43,
@@ -280,13 +276,12 @@ NLS.beta <- selfStart(.beta.fun, .beta.init, parameters=c("b", "d", "Xb", "Xo", 
     b= 15.8
     c= -15.8
     e.surv.pred= ed_surv_bl*a*exp(-0.5*((temp.new-b)/c)^6)
-
-        #koreicus eggs average dev time (Tab. 2, Marini et al 2019)
-        temp_dev=c(8, 13 ,23,28,33)
-        obs_dev=c(2.45, 1.35, 1.07, 1.08, 1.04)
-        m=lm(obs_dev~poly(temp_dev,3))
-        dev_time=predict(m, newdata = data.frame(temp_dev=temp.new), response=TRUE)
-     e.surv.pred= round(e.surv.pred^(1/dev_time),3)
+    #koreicus eggs average dev time (Tab. 2, Marini et al 2019)
+    temp_dev=c(8, 13 ,23,28,33)
+    obs_dev=c(2.45, 1.35, 1.07, 1.08, 1.04)
+    m=lm(obs_dev~poly(temp_dev,3))
+    dev_time=predict(m, newdata = data.frame(temp_dev=temp.new), response=TRUE)
+    e.surv.pred= round(e.surv.pred^(1/dev_time),3)
   }else if(sp=="japonicus") {
     surv_r <-  c(0, 0.44, 0.79, 0.9017, 0.8817, 0)
     temp_r <-c(-15,0,10,20,30,35)
@@ -294,7 +289,6 @@ NLS.beta <- selfStart(.beta.fun, .beta.init, parameters=c("b", "d", "Xb", "Xo", 
     e.surv.pred <- predict(model,data.frame(temp.v=temp.new))
   }else(stop("Species not supported."))
 }
-
 
 ## Diapause egg daily survival rate at different temperature ##
 .d.surv_rate.f <- function(temp.new){
