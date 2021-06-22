@@ -115,30 +115,28 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 				if( !stopit ) {
 					if( !exists("counter") ) {
                     	# Index for dynamic array eggs
-                    	#da <- if(species=="koreicus"|species=="japonicus") 1 else 1
-						da <- 1
-						# Index for dynamic array juveniles
-                    	#dj <- if(species=="koreicus"|species=="japonicus") 1 else 1
-						dj <- 1
+                    	da <- if(species=="koreicus"|species=="japonicus") 2.25 else 1
+			# Index for dynamic array juveniles
+                    	dj <- if(species=="koreicus"|species=="japonicus") 2 else 1
 						# Define objects required to store data during a day
 						counter <- 0; i.temp.v <- 0; d.temp.v <- 0; e.temp.v <- 0; a.egg.n <- 0; a.degg.n <- 0; p.life.a <- array(0,c(4,nrow(temps.matrix),6*da), dimnames = list(c("egg", "juvenile", "adult", "diapause_egg"), NULL, paste0("sc",1:(6*da)))); storage.mode(p.life.a) <- "integer"; outl <- list()
 					} else counter <- append(counter,day)
 
-                	### Header:
-                	## Gonotrophic cycle
-                	## Derive daily rate for gonotrophic cycle, i.e. blood meal to oviposition, then transform rate in daily probabiltiy to terminate the gonotrophic cycle.
+                			### Header:
+                			## Gonotrophic cycle
+                			## Derive daily rate for gonotrophic cycle, i.e. blood meal to oviposition, then transform rate in daily probabiltiy to terminate the gonotrophic cycle.
 					a.gono.p <- .a.gono_rate.f(temps.matrix[,day]/1000, species)
-                	## Oviposition rate
-                	## Derive oviposition rate, i.e. number of eggs laid per female per day.
+                			## Oviposition rate
+                			## Derive oviposition rate, i.e. number of eggs laid per female per day.
 					a.batc.n <- .a.ovi_rate.f(temps.matrix[,day]/1000, species)
-                	## Adult survival
-                	## Derive daily adult female survival rate
+                			## Adult survival
+                			## Derive daily adult female survival rate
 					a.surv.p <- .a.surv_rate.f(temps.matrix[,day]/1000, species)
-                	## Immature emergence
-                	## Derive daily immature emergence rate
+                			## Immature emergence
+                			## Derive daily immature emergence rate
 					i.emer.p <- .i.emer_rate.f(temps.matrix[,day]/1000, species)
-                	## Immature survival
-                	## Derive daily immature survival rate
+                			## Immature survival
+                			## Derive daily immature survival rate
 					i.mort_rate.v <- -log(.i.surv_rate.f(temps.matrix[,day]/1000, species))
                 	## Derive daily egg hatching rate
 					e.hatc.p <- .e.hatch_rate.f(temps.matrix[,day]/1000, species)
