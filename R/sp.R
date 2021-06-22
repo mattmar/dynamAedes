@@ -73,7 +73,7 @@ NLS.beta <- selfStart(.beta.fun, .beta.init, parameters=c("b", "d", "Xb", "Xo", 
     gono_d <- 1/c(14.75, 11.5, 9.21, 10.81, 100)
     temp_d <- c(  18,    23,   23,    28,    33)
     model <- drm(gono_d ~ temp_d, fct = .DRC.beta())
-    a.gono.pred <- predict(model,data.frame(temp.v=temp.new)
+    a.gono.pred <- predict(model,data.frame(temp.v=temp.new))
   }  else if(sp=="japonicus") {
     gono_d <- 1/c(14.75, 11.5, 9.21, 10.81, 100)
     temp_d <- c(  18,    23,   23,    28,    33)
