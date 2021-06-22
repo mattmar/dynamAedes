@@ -206,7 +206,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
                 			## Introduce blood-fed females if day is 1
 					p.life.a[3,,1] <- if( length(counter)==1 ) {
 						a.intro.n
-					} else p.life.a[3,,1)]
+					} else p.life.a[3,,1]
                 			## Binomial random draw to remove males adult from newly emerged adults
 					p.life.a[3,,5] <- rbinom(space,i.emer.n, prob=0.5)
                 			## Add blood-fed females which today matured eggs to females with matured eggs from yesterday 
