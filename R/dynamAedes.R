@@ -115,13 +115,14 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 				if( !stopit ) {
 					if( !exists("counter") ) {
                     	# Index for dynamic array eggs
-                    	da <- if(species=="koreicus"|species=="japonicus") 2.25 else 1
+                    	de <- if(species=="koreicus"|species=="japonicus") 2 else 1
 			# Index for dynamic array juveniles
                     	dj <- if(species=="koreicus"|species=="japonicus") 2 else 1
-						# Define objects required to store data during a day
-						counter <- 0; i.temp.v <- 0; d.temp.v <- 0; e.temp.v <- 0; a.egg.n <- 0; a.degg.n <- 0; p.life.a <- array(0,c(4,nrow(temps.matrix),6*da), dimnames = list(c("egg", "juvenile", "adult", "diapause_egg"), NULL, paste0("sc",1:(6*da)))); storage.mode(p.life.a) <- "integer"; outl <- list()
+			# Index for dynamic array adults
+                    	da <- if(species=="koreicus"|species=="japonicus") 2.25 else 1
+					# Define objects required to store data during a day
+					counter <- 0; i.temp.v <- 0; d.temp.v <- 0; e.temp.v <- 0; a.egg.n <- 0; a.degg.n <- 0; p.life.a <- array(0,c(4,nrow(temps.matrix),6*de), dimnames = list(c("egg", "juvenile", "adult", "diapause_egg"), NULL, paste0("sc",1:(6*de)))); storage.mode(p.life.a) <- "integer"; outl <- list()
 					} else counter <- append(counter,day)
-
                 			### Header:
                 			## Gonotrophic cycle
                 			## Derive daily rate for gonotrophic cycle, i.e. blood meal to oviposition, then transform rate in daily probabiltiy to terminate the gonotrophic cycle.
@@ -138,9 +139,9 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
                 			## Immature survival
                 			## Derive daily immature survival rate
 					i.mort_rate.v <- -log(.i.surv_rate.f(temps.matrix[,day]/1000, species))
-                	## Derive daily egg hatching rate
+                			## Derive daily egg hatching rate
 					e.hatc.p <- .e.hatch_rate.f(temps.matrix[,day]/1000, species)
-                	## Derive daily egg survival rate
+                			## Derive daily egg survival rate
 					e.surv.p <- .e.surv_rate.f(temps.matrix[,day]/1000, species)
 					d.surv.p <- if(species=="albopictus"){
 						.d.surv_rate.f(temps.matrix[,day]/1000)
@@ -149,71 +150,71 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 					if(dispersal) {f.adis.p <- .a.a_disp.f(sp=species, max.a.disp=maxadisp, disp.bins=dispbins)}
 					## Gamma probability density of long passive dispersal (from DOI: 10.2790/7028); from 0 to maximum distance of road segments with 1000 m resolution.
 					if(dispersal) {f.pdis.p <- dgamma(seq(1,max(road.dist.matrix,na.rm=T),1000),shape=car.avg.trip/(10000/car.avg.trip), scale=10000/car.avg.trip)}
-                	### Events in the (`E`) egg compartment
-                	## `E` has eight sub-compartment: 1:7 for eggs 1-7 days old that can only die or survive, 8 for eggs older than 7 days that can die/survive/hatch
-                	## Binomial draw to find numbers of eggs that die or survive
-					p.life.a[1,,2:(4*da)] <- apply(t(p.life.a[1,,1:(4*da-1)]),MARGIN=mrg,function(x) rbinom(size=x,n=space,prob=e.surv.p))
+                			### Events in the (`E`) egg compartment
+                			## `E` has eight sub-compartment: 1:7 for eggs 1-7 days old that can only die or survive, 8 for eggs older than 7 days that can die/survive/hatch
+                			## Binomial draw to find numbers of eggs that die or survive
+					p.life.a[1,,2:(4*de)] <- apply(t(p.life.a[1,,1:(4*de-1)]),MARGIN=mrg,function(x) rbinom(size=x,n=space,prob=e.surv.p))
 					if(species=="albopictus") p.life.a[4,,2:4] <- apply(t(p.life.a[4,,1:3]),MARGIN=mrg,function(x) rbinom(size=x,n=space,prob=d.surv.p))
-                	## Introduce eggs if day==1; introduction happens in E sub-compartment 8 as it can be assumed that eggs are most likely to be introduced in an advanced stage of development 
-					p.life.a[1,,(4*da)] <- if( length(counter)==1 ) {
+                			## Introduce eggs if day==1; introduction happens in E sub-compartment 8 as it can be assumed that eggs are most likely to be introduced in an advanced stage of development 
+					p.life.a[1,,(4*de)] <- if( length(counter)==1 ) {
 						e.intro.n
-					} else p.life.a[1,,(4*da)]
-                	# Add eggs laid by females the day before (t-1) stored in a.egg.n (end of the day)
+					} else p.life.a[1,,(4*de)]
+                			# Add eggs laid by females the day before (t-1) stored in a.egg.n (end of the day)
 					p.life.a[1,,1] <- a.egg.n
 					if(species=="albopictus") p.life.a[4,,1] <- a.degg.n
-                	# Add eggs that did not hatch yesterday to egg that today are ready to hatch
-					p.life.a[1,,c(4*da)] <- p.life.a[1,,c(4*da)] + e.temp.v
+                			# Add eggs that did not hatch yesterday to egg that today are ready to hatch
+					p.life.a[1,,c(4*de)] <- p.life.a[1,,c(4*de)] + e.temp.v
 					if(species=="albopictus") p.life.a[4,,4] <- p.life.a[4,,4] + d.temp.v
-                	# Binomial draw to find numbers of eggs 8-d+ old that hatch today
-					e.hatc.n <- rbinom(length(1:space), p.life.a[1,,c(4*da)], prob=e.hatc.p)
+                			# Binomial draw to find numbers of eggs 8-d+ old that hatch today
+					e.hatc.n <- rbinom(length(1:space), p.life.a[1,,c(4*de)], prob=e.hatc.p)
 					message(e.hatc.p)
 					message(temps.matrix[,day])
-					if(species=="albopictus") d.hatc.n <- rbinom(length(1:space), p.life.a[4,,c(4*da)], prob=e.hatc.p)
-                	# Remove hatched eggs from eggs 8d+ old
-					e.temp.v <- p.life.a[1,,(4*da)] - e.hatc.n
+					if(species=="albopictus") d.hatc.n <- rbinom(length(1:space), p.life.a[4,,c(4*de)], prob=e.hatc.p)
+                			# Remove hatched eggs from eggs 8d+ old
+					e.temp.v <- p.life.a[1,,(4*de)] - e.hatc.n
 					if(species=="albopictus") d.temp.v <- p.life.a[4,,4] - if(species=="albopictus") d.hatc.n else 0
-                	# Apply mortality to non hatched 8d+ old eggs
+                			# Apply mortality to non hatched 8d+ old eggs
 					e.temp.v <- rbinom(length(1:space), e.temp.v, prob=0.99)
 					d.temp.v <- rbinom(length(1:space), d.temp.v, prob=0.99)
-	                ### Events in the (`I`) immature compartment
-	                ## `I` has 6 sub-compartments representing days from hatching; an immature can survive/die for the first 5 days after hatching, from the 5th day on, it can survive/die and `emerge`.
-	                ## Derive mortality rate due to density and add to mortality rate due to temperature sum and derive probability of survival in each cell.
+	                		### Events in the (`I`) immature compartment
+	                		## `I` has 6 sub-compartments representing days from hatching; an immature can survive/die for the first 5 days after hatching, from the 5th day on, it can survive/die and `emerge`.
+	                		## Derive mortality rate due to density and add to mortality rate due to temperature sum and derive probability of survival in each cell.
 					imm.v <- if(scale=="ws") {
 						sum(p.life.a[2,,2:(6*dj)])
 					} else rowSums(p.life.a[2,,2:(6*dj)])
 					## Derive density-dependent mortality,*2 is to report densities at 1L (original model is for a 2L water habitat.) / ihwv transform density to new liter/cell habitat volume
 					i.ddmort_rate.v <- exp(.i.ddmort_rate.f(list(i.dens.v=(imm.v*2)/ihwv)))
 					i.surv.p <- 1-(1-exp(-(i.mort_rate.v + i.ddmort_rate.v)))
-                	## Binomial draw to find numbers of immature that die or survive-and-move to the next compartment
+                			## Binomial draw to find numbers of immature that die or survive-and-move to the next compartment
 					p.life.a[2,,2:(6*dj)] <- apply(t(p.life.a[2,,1:((6*dj)-1)]), MARGIN=mrg, FUN=function(x) rbinom(size=x, n=space, prob=i.surv.p)) 
-                	## Introduce `I` if day==1; introduction happens in `I` sub-compartment 6 
+                			## Introduce `I` if day==1; introduction happens in `I` sub-compartment 6 
 					p.life.a[2,,(6*dj)] <- if( length(counter)==1 ) {
 						i.intro.n
 					} else p.life.a[2,,(6*dj)]
-                	## Add immatures hatched the same day
+                			## Add immatures hatched the same day
 					p.life.a[2,,1] <- e.hatc.n + if(species=="albopictus") d.hatc.n else 0
-                	## Add immatures that did not emerge yesterday to immatures that today are ready to emerge
+                			## Add immatures that did not emerge yesterday to immatures that today are ready to emerge
 					p.life.a[2,,(6*dj)] <- p.life.a[2,,(6*dj)] + i.temp.v
-                	## Find numbers of immature 5d+ old that emerge before applying mortality (applied as newly emerged adults today)
+                			## Find numbers of immature 5d+ old that emerge before applying mortality (applied as newly emerged adults today)
 					i.emer.n <- rbinom(length(1:space), p.life.a[2,,(6*dj)], prob=i.emer.p)
-                	## Remove emerged immatures from immatures 5d+ old
+                			## Remove emerged immatures from immatures 5d+ old
 					i.temp.v <- p.life.a[2,,(6*dj)] - i.emer.n
-                	## Apply mortality to non emerged 5d+ old immatures
+                			## Apply mortality to non emerged 5d+ old immatures
 					i.temp.v <- sapply(1:space, function(x){rbinom(1,i.temp.v[x],prob=i.surv.p[x])})
-                	### Events in the (`A`) adult compartment
-                	## `A` has 5 sub-compartments representing: adults in day 1 and 2 of oviposition [2:3]; 2d+ old adults host-seeking and non ovipositing [4]; 2d+ old blod-fed adults which are not yet laying [1]; 1d old adults, non-laying and non-dispersing [5].
-                	## Introduce blood-fed females if day is 1
+                			### Events in the (`A`) adult compartment
+                			## `A` has 5 sub-compartments representing: adults in day 1 and 2 of oviposition [2:3]; 2d+ old adults host-seeking and non ovipositing [4]; 2d+ old blod-fed adults which are not yet laying [1]; 1d old adults, non-laying and non-dispersing [5].
+                			## Introduce blood-fed females if day is 1
 					p.life.a[3,,1] <- if( length(counter)==1 ) {
 						a.intro.n
-					} else p.life.a[3,,1]
-                	## Binomial random draw to remove males adult from newly emerged adults
+					} else p.life.a[3,,1)]
+                			## Binomial random draw to remove males adult from newly emerged adults
 					p.life.a[3,,5] <- rbinom(space,i.emer.n, prob=0.5)
-                	## Add blood-fed females which today matured eggs to females with matured eggs from yesteday 
+                			## Add blood-fed females which today matured eggs to females with matured eggs from yesterday 
 					n.ovir.a <- rbinom(space, p.life.a[3,,1], prob=a.gono.p)
 					p.life.a[3,,2] <- n.ovir.a
-                	## Remove females which today matured eggs from the host-fed compartment
+                			## Remove females which today matured eggs from the host-fed compartment
 					p.life.a[3,,1] <- p.life.a[3,,1] - n.ovir.a
-                	## Find number of eggs laid today by ovipositing females
+                			## Find number of eggs laid today by ovipositing females
 					if( species=="albopictus" & dl[day]<=11.0 ) {
 						if(verbose) print("Laying diapausing eggs")
 							a.degg.n <- sapply(1:space, function(x) sum(rpois(sum(p.life.a[3,x,2:3]), a.batc.n[x])))
