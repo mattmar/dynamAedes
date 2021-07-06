@@ -271,17 +271,22 @@ NLS.beta <- selfStart(.beta.fun, .beta.init, parameters=c("b", "d", "Xb", "Xo", 
     c= -17 
     e.surv.pred=a*exp(-0.5*((temp.new-b)/c)^6)
   }else if(sp=="koreicus") {
-    ed_surv_bl=1
-    a= 0.98
-    b= 15.8
-    c= -15.8
-    e.surv.pred= ed_surv_bl*a*exp(-0.5*((temp.new-b)/c)^6)
+    #ed_surv_bl=1
+    #a= 0.98
+    #b= 15.8
+    #c= -15.8
+    #e.surv.pred= ed_surv_bl*a*exp(-0.5*((temp.new-b)/c)^6)
     #koreicus eggs average dev time (Tab. 2, Marini et al 2019)
-    temp_dev=c(8, 13 ,23,28,33)
-    obs_dev=c(2.45, 1.35, 1.07, 1.08, 1.04)
-    m=lm(obs_dev~poly(temp_dev,3))
-    dev_time=predict(m, newdata = data.frame(temp_dev=temp.new), response=TRUE)
-    e.surv.pred= round(e.surv.pred^(1/dev_time),3)
+    #temp_dev=c(8, 13 ,23,28,33)
+    #obs_dev=c(2.45, 1.35, 1.07, 1.08, 1.04)
+    #m=lm(obs_dev~poly(temp_dev,3))
+    #dev_time=predict(m, newdata = data.frame(temp_dev=temp.new), response=TRUE)
+    #e.surv.pred= round(e.surv.pred^(1/dev_time),3)
+    a=0.77
+    b=7308.51
+    c=-0.93
+    e.surv.pred=a+(b*exp(c*temp.new))
+    e.surv.pred=round(1-exp(-e.surv.pred),3) 
   }else if(sp=="japonicus") {
     surv_r <-  c(0, 0.44, 0.79, 0.9017, 0.8817, 0)
     temp_r <-c(-15,0,10,20,30,35)
