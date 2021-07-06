@@ -246,10 +246,11 @@ NLS.beta <- selfStart(.beta.fun, .beta.init, parameters=c("b", "d", "Xb", "Xo", 
   }else if(sp=="koreicus" | sp=="japonicus") {
     #hatc_d <- (c(0, 53.75, 51.00, 57.25,20, 0)/100)/0.636 #patch
     #temp_d <- c(12, 23,    28,    33,   36, 40) #patch
-    hatc_d <- (c(0, 7.25, 50.50, 53.75, 51.00, 57.25,20, 0)/100)/0.636
-    temp_d <- c(0,8,13,23,28,33,36, 40)
-    model <- drm(hatc_d ~ temp_d, fct = .DRC.beta())
-    e.hatch.pred <- predict(model,data.frame(temp.v=temp.new))
+    #hatc_d <- (c(0, 7.25, 50.50, 53.75, 51.00, 57.25,20, 0)/100)/0.636
+    #temp_d <- c(0,8,13,23,28,33,36, 40)
+    #model <- drm(hatc_d ~ temp_d, fct = .DRC.beta())
+    #e.hatch.pred <- predict(model,data.frame(temp.v=temp.new))
+    e.hatch.pred=0.2
   }else if(sp=="japonicus") {
     hatc_d <- c(0.4075, 0.8275, 0.9175, 0.89,0)  
     temp_d <- c(0,10,20,30,35)
