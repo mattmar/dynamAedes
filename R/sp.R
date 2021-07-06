@@ -282,11 +282,7 @@ NLS.beta <- selfStart(.beta.fun, .beta.init, parameters=c("b", "d", "Xb", "Xo", 
     #m=lm(obs_dev~poly(temp_dev,3))
     #dev_time=predict(m, newdata = data.frame(temp_dev=temp.new), response=TRUE)
     #e.surv.pred= round(e.surv.pred^(1/dev_time),3)
-    a=0.77
-    b=7308.51
-    c=-0.93
-    e.surv.pred=a+(b*exp(c*temp.new))
-    e.surv.pred=round(1-exp(-e.surv.pred),3) 
+    e.surv.pred=0.95 
   }else if(sp=="japonicus") {
     surv_r <-  c(0, 0.44, 0.79, 0.9017, 0.8817, 0)
     temp_r <-c(-15,0,10,20,30,35)
