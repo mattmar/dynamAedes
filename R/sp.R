@@ -246,12 +246,11 @@ NLS.beta <- selfStart(.beta.fun, .beta.init, parameters=c("b", "d", "Xb", "Xo", 
   }else if(sp=="koreicus" | sp=="japonicus") {
     #hatc_d <- (c(0, 53.75, 51.00, 57.25,20, 0)/100)/0.636 #patch
     #temp_d <- c(12, 23,    28,    33,   36, 40) #patch
-    #hatc_d <- (c(0, 7.25, 50.50, 53.75, 51.00, 57.25,20, 0)/100)/0.636
-    #temp_d <- c(0,8,13,23,28,33,36, 40)
-    #model <- drm(hatc_d ~ temp_d, fct = .DRC.beta())
-    #e.hatch.pred <- predict(model,data.frame(temp.v=temp.new))
-    #e.hatch.pred=ifelse(temp.new>=8, 0.5, 0)
-    e.hatch.pred=0
+    hatc_d <- (c(0, 7.25, 50.50, 53.75, 51.00, 57.25,20, 0)/100)/0.636
+    temp_d <- c(0,8,13,23,28,33,36, 40)
+    model <- drm(hatc_d ~ temp_d, fct = .DRC.beta())
+    e.hatch.pred <- predict(model,data.frame(temp.v=temp.new))
+    #e.hatch.pred=0
   }else if(sp=="japonicus") {
     hatc_d <- c(0.4075, 0.8275, 0.9175, 0.89,0)  
     temp_d <- c(0,10,20,30,35)
@@ -273,18 +272,18 @@ NLS.beta <- selfStart(.beta.fun, .beta.init, parameters=c("b", "d", "Xb", "Xo", 
     c= -17 
     e.surv.pred=a*exp(-0.5*((temp.new-b)/c)^6)
   }else if(sp=="koreicus") {
-    #ed_surv_bl=1
-    #a= 0.98
-    #b= 15.8
-    #c= -15.8
-    #e.surv.pred= ed_surv_bl*a*exp(-0.5*((temp.new-b)/c)^6)
+    ed_surv_bl=1
+    a= 0.98
+    b= 15.8
+    c= -15.8
+    e.surv.pred= ed_surv_bl*a*exp(-0.5*((temp.new-b)/c)^6)
     #koreicus eggs average dev time (Tab. 2, Marini et al 2019)
     #temp_dev=c(8, 13 ,23,28,33)
     #obs_dev=c(2.45, 1.35, 1.07, 1.08, 1.04)
     #m=lm(obs_dev~poly(temp_dev,3))
     #dev_time=predict(m, newdata = data.frame(temp_dev=temp.new), response=TRUE)
     #e.surv.pred= round(e.surv.pred^(1/dev_time),3)
-    e.surv.pred=0.95 
+    #e.surv.pred=0.95 
   }else if(sp=="japonicus") {
     surv_r <-  c(0, 0.44, 0.79, 0.9017, 0.8817, 0)
     temp_r <-c(-15,0,10,20,30,35)
