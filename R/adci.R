@@ -1,6 +1,6 @@
 adci <- function(input_sim=NA, stage=1, cores=1, eval_date=0, breaks=c(0.25,0.5,0.75)){
-	if(stage<1|stage>3) {
-		stop("stage can be 1 (egg), 2 (juvenile), 3 (adult) ...")
+	if(stage<1|stage>4) {
+		stop("stage can be 1 (egg), 2 (juvenile), 3 (adult), 4 (diapausing eggs) ...")
 	}
 	if( max(eval_date) > max(sapply(input_sim,length)) ) {
 		stop("eval_date > than number of simulated days...")

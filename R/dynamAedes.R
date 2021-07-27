@@ -26,7 +26,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 	} else if( country=="uk" ) {
 		car.avg.trip <- 19.03
 	} else (stop("Country not supported yet..."))
-	## Derive daylength for laying of diapausing eggs in albopictus
+	## Derive daylength for laying of diapausing eggs in albopictus/koreicus/japonicu
 	if(species!="aegypti"){
 		jd <- JD(seq(as.POSIXct(paste(intro.year,"/01/01",sep="")),as.POSIXct(as.Date(paste(intro.year,"/01/01",sep=""))+endd),by='day'))
 		dl <- daylength(lat,long,jd,1)[,3]
@@ -45,7 +45,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 		## Define space dimensionality into which simulations occour
 		space <- nrow(temps.matrix)
 		## Set a progress bar
-		message("##########################################\n## Iterations processing has started... ##\n##########################################")
+		message("##########################################\n## Life cycle iterations have begun... ##\n##########################################")
 		pb <- txtProgressBar(char = "%", min = 0, max = iter, style = 3)
 		### End of preamble ###
 		#%%%%%%%%%%%%%%%%%%%%%#
@@ -153,13 +153,13 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
                 	### Events in the (`E`) egg compartment
                 	## `E` has eight sub-compartment: 1:7 for eggs 1-7 days old that can only die or survive, 8 for eggs older than 7 days that can die/survive/hatch
                 	## Binomial draw to find numbers of eggs that die or survive
-					p.life.a[1,,2:(4*de)] <- apply(t(p.life.a[1,,1:(4*de-1)]),MARGIN=mrg,function(x) rbinom(size=x,n=space,prob=e.surv.p))
-					if(species!="aegypti") p.life.a[4,,2:(4*de)] <- apply(t(p.life.a[4,,1:(3*de)]),MARGIN=mrg,function(x) rbinom(size=x,n=space,prob=d.surv.p))
+                    p.life.a[1,,2:(4*de)] <- apply(t(p.life.a[1,,1:(4*de-1)]),MARGIN=mrg,function(x) rbinom(size=x,n=space,prob=e.surv.p))
+					if(species!="aegypti") p.life.a[4,,2:(4*de)] <- apply(t(p.life.a[4,,1:(4*de-1)]),MARGIN=mrg,function(x) rbinom(size=x,n=space,prob=d.surv.p))
                 	## Introduce eggs if day==1; introduction happens in E sub-compartment 8 as it can be assumed that eggs are most likely to be introduced in an advanced stage of development 
-					p.life.a[1,,(4*de)] <- if( length(counter)==1 ) {
+				    p.life.a[1,,(4*de)] <- if( length(counter)==1 ) {
 						e.intro.n
 					} else p.life.a[1,,(4*de)]
-                	# Add eggs laid by females the day before (t-1) stored in a.egg.n (end of the day)
+                    # Add eggs laid by females the day before (t-1) stored in a.egg.n (end of the day)
 					p.life.a[1,,1] <- a.egg.n
 					if(species!="aegypti") p.life.a[4,,c(1*de)] <- a.degg.n
                 	# Add eggs that did not hatch yesterday to egg that today are ready to hatch
@@ -169,7 +169,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 					e.hatc.n <- rbinom(length(1:space), p.life.a[1,,c(4*de)], prob=e.hatc.p)
 					message(e.hatc.p)
 					message(temps.matrix[,day])
-					if(species!="aegypti") d.hatc.n <- rbinom(length(1:space), p.life.a[4,,c(4*de)], prob=e.hatc.p)
+					if(species!="aegypti" & dl[day]>10) d.hatc.n <- rbinom(length(1:space), p.life.a[4,,c(4*de)], prob=e.hatc.p)
                 	# Remove hatched eggs from eggs 8d+ old
 					e.temp.v <- p.life.a[1,,(4*de)] - e.hatc.n
 					if(species!="aegypti") d.temp.v <- p.life.a[4,,c(4*de)] - if(species!="aegypti") d.hatc.n else 0
@@ -186,7 +186,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 					i.ddmort_rate.v <- exp(.i.ddmort_rate.f(list(i.dens.v=(imm.v*2)/ihwv)))
 					i.surv.p <- 1-(1-exp(-(i.mort_rate.v + i.ddmort_rate.v)))
                 	## Binomial draw to find numbers of immature that die or survive-and-move to the next compartment
-					p.life.a[2,,2:(6*dj)] <- apply(t(p.life.a[2,,1:((6*dj)-1)]), MARGIN=mrg, FUN=function(x) rbinom(size=x, n=space, prob=i.surv.p)) 
+					p.life.a[2,,2:(6*dj)] <- apply(t(p.life.a[2,,1:(6*dj-1)]), MARGIN=mrg, FUN=function(x) rbinom(size=x, n=space, prob=i.surv.p)) 
                 	## Introduce `I` if day==1; introduction happens in `I` sub-compartment 6 
 					p.life.a[2,,(6*dj)] <- if( length(counter)==1 ) {
 						i.intro.n
@@ -215,7 +215,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
                 			## Remove females which today matured eggs from the host-fed compartment
 					p.life.a[3,,1] <- p.life.a[3,,1] - n.ovir.a
                 			## Find number of eggs laid today by ovipositing females
-					if( (species=="albopictus" & dl[day]<=11.0) | (species=="koreicus" | species=="japonicus" & dl[day]<=10.0) ) {
+					if( (species=="albopictus" & dl[day]<=11.0) | ((species=="koreicus" | species=="japonicus") & dl[day]<=10.0) ) {
 						if(verbose) print("Laying diapausing eggs")
 							a.degg.n <- sapply(1:space, function(x) sum(rpois(sum(p.life.a[3,x,2:3]), a.batc.n[x])))
 						a.egg.n=0

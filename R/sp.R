@@ -106,6 +106,7 @@
       model <- drm(ovi_n ~ temp_n, fct = .DRC.beta())
       a.ovi.pred <- predict(model,data.frame(temp.v=temp.new))
     }else(stop("Species not supported."))
+    return( a.ovi.pred )
   }
 
   ## Adult female daily mortality rate at different temperatures ##
@@ -145,6 +146,7 @@
       a.surv.rate <- predict(model,data.frame(temp.v=temp.new))
     }
     else(stop("Species not supported."))
+    return( a.surv.rate )
   }
   ## Log-Normal probability density of short active dispersal from Marcantonio et al. 2019; Marini et al. 2019. 0 to 600 m with resolution of 10 m.
   .a.a_disp.f <- function(sp, max.a.disp, disp.bins) {
@@ -155,6 +157,7 @@
     }else if(sp=="koreicus") {
       dispk <- dlnorm(seq(0,max.a.disp,disp.bins), meanlog=4.54, sdlog=0.58) #check paper svizzera
     }else(stop("Species not supported."))
+    return( dispk )
   }
 
   ## Immature daily emergence rate at different temperature ##
@@ -181,6 +184,7 @@
       model <- drm(eme_d ~ temp_d, fct = .DRC.beta())
       i.emer.pred <- predict(model,data.frame(temp.v=temp.new))
     }else(stop("Species not supported."))
+    return( i.emer.pred )
   }
 
   ## Immature daily survival rate at different temperature ##
@@ -196,6 +200,8 @@
       c=-12.6
       i.surv.pred <- a*exp(-0.5*((temp.new-b)/c)^6)
     }else if(sp=="koreicus") {
+      #surv_d <- c(0, 50, 80, 97.8, 93.5, 95.6, 92.8, 84.7, 0)/100 # patch
+      #temp_d <- c(-5, 0, 8, 13,   18,   23,   28,   33,   37) #patch 
       surv_d <- c(0, 80, 97.8, 93.5, 95.6, 92.8, 84.7, 0)/100 
       temp_d <- c(-5, 8, 13,   18,   23,   28,   33,   37)
       model <- drm(surv_d ~ temp_d, fct = .DRC.beta())
@@ -212,22 +218,23 @@
       model <- drm(surv_d ~ temp_d, fct = .DRC.beta())
       i.surv.pred <- predict(model,data.frame(temp.v=temp.new))
     }else(stop("Species not supported."))
+    return( i.surv.pred )
   }
 
-
   ## Immature Density-dependent mortality
-   .i.ddmort_rate.f <- function(dens.new) {
+  .i.ddmort_rate.f <- function(dens.new) {
     i.dens.v = c(87.72,561.40,1175.44,1280.70,1491.23,1675.44,1982.46,2350.88,2850.88,3122.81,3236.84,3307.02,3359.65,3456.14,3570.18,3640.35,3666.67,3771.93,3877.19,3982.46)
     i.dsurv_prop.v = c(0.95,0.43,0.57,0.42,0.49,0.35,0.25,0.17,0.13,0.05,0.2,0.27,0.11, 0.11,0.06,0.04,0.09,0.13,0.07, 0.14)
     i.dsur_dur.v = c(7.46,9.96,28.09,17.46,29.12,38.31,42.22,40.95,44.31,42.34,20.91,17.43,
-                     37.12,29.73,40,43,22,51,50,31)
+     37.12,29.73,40,43,22,51,50,31)
     # Transform survival proportion to multidays mortality rate
     i.dmort_rate.v = -log(i.dsurv_prop.v)
     # Transform multiday mortality rate to daily mortality rate
     i.dmort_rate.v = i.dmort_rate.v/i.dsur_dur.v
     # Fit a model for daily mortality rate using just density as a predictor
     i.dmort.lm <- lm(log(i.dmort_rate.v) ~ i.dens.v)
-    predict(i.dmort.lm, dens.new)
+    i.dmort.pred <- predict(i.dmort.lm, dens.new)
+    return( i.dmort.pred )
   }
 
   ## Egg hatching rate
@@ -245,7 +252,7 @@
       e.hatch.pred <- predict(model,data.frame(temp.v=temp.new))
     }else if(sp=="koreicus") {
       #hatc_d <- (c(0, 53.75, 51.00, 57.25,20, 0)/100)/0.636 #patch
-      #temp_d <- c(12, 23,    28,    33,   36, 40) #patch
+      #temp_d <- c(15, 23,    28,    33,   36, 40) #patch
       hatc_d <- (c(0, 7.25, 50.50, 53.75, 51.00, 57.25,20, 0)/100)/0.636
       temp_d <- c(0,8,13,23,28,33,36, 40)
       model <- drm(hatc_d ~ temp_d, fct = .DRC.beta())
@@ -256,6 +263,7 @@
       model <- drm(hatc_d ~ temp_d, fct = .DRC.beta())
       e.hatch.pred <- predict(model,data.frame(temp.v=temp.new))
     }else(stop("Species not supported."))
+    return( e.hatch.pred )
   }
 
   ## Egg daily survival rate at different temperature ##
@@ -275,7 +283,7 @@
       a= 0.98
       b= 15.8
       c= -15.8
-      e.surv.pred= ed_surv_bl*a*exp(-0.5*((temp.new-b)/c)^6)
+      e.surv.pred=ed_surv_bl*a*exp(-0.5*((temp.new-b)/c)^6)
       #koreicus eggs average dev time (Tab. 2, Marini et al 2019)
       #temp_dev=c(8, 13 ,23,28,33)
       #obs_dev=c(2.45, 1.35, 1.07, 1.08, 1.04)
@@ -289,18 +297,19 @@
       model <- drm(surv_r ~ temp_r, fct = .DRC.beta())
       e.surv.pred <- predict(model,data.frame(temp.v=temp.new))
     }else(stop("Species not supported."))
+    return( e.surv.pred )
   }
 
   ## Diapause egg daily survival rate at different temperature ##
   .d.surv_rate.f <- function(temp.new, sp){
     if(sp=="albopictus") {
-    ed_surv_bl=1
-    a=0.955
-    b=11.68
-    c=-15.67
-    d.surv.pred=ed_surv_bl*a*exp(-0.5*((temp.new-b)/c)^6)
+      ed_surv_bl=1
+      a=0.955
+      b=11.68
+      c=-15.67
+      d.surv.pred=ed_surv_bl*a*exp(-0.5*((temp.new-b)/c)^6)
+    }else if(sp=="koreicus" | sp=="japonicus") {
+      d.surv.pred=rep(0.999,length(temp.new))
+    }else(stop("Species not supported."))
     return( d.surv.pred )
-  }else if(sp=="koreicus" | sp=="japonicus") {
-    d.surv.pred=rep(0.99,length(temp.new))
   }
-}
