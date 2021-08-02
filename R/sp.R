@@ -332,7 +332,7 @@
        12.72841, 12.72266, 12.73417, 13.44218, 13.09681, 13.09105, 13.43642, 13.44218, 13.78179,
        13.77603, 13.77603, 14.10989, 14.10413, 14.41497, 14.40921, 14.41497)
       model <- glm(dia_inc~photo, family = "binomial" )
-      e.diap.pred <- predict(model,data.frame(photo=photoperiod), type = "response")
+      e.diap.pred <- predict(model, data.frame(photo=photoperiod), type="response")
     }else if(sp=="koreicus" | sp=="japonicus") {
       dia_inc <- c(0.28609, 0.02362, 0.07874, 0.03150, 0.29134, 0.11286, 0.19685, 0.04462, 0.09186, 0.19423,
        0.50131, 0.23360, 0.70341, 0.76640, 0.90551, 0.93176, 0.99738, 0.91076, 1.00000, 0.02625,
@@ -344,7 +344,7 @@
         16.08485, 16.13031, 16.10505, 16.01052, 15.85145, 15.36988, 15.06490, 
         14.72851, 14.36811, 13.98989, 13.59878, 13.19864, 12.79245, 11.97090, 11.55943)
       model <- glm(dia_inc~photo, family = "binomial" )
-      e.diap.pred <- predict(model,data.frame(photo=photoperiod), type = "response")
+      e.diap.pred <- predict(model, data.frame(photo=photoperiod), type="response")
     }  else(stop("Species not supported."))
     return(e.diap.pred)
   }

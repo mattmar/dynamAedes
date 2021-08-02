@@ -140,14 +140,12 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
                 	## Derive daily immature survival rate
 						i.mort_rate.v <- -log(.i.surv_rate.f(temps.matrix[,day]/1000, species))
                 	# Set diapause allocation
-			            e.diap.p <- .e.dia_rate.f(dl[day], species)
+						e.diap.p <- if( dl[day-1]>dl[day] ) .e.dia_rate.f(dl[length(counter)], species) else 1
                 	## Derive daily egg hatching rate
 						e.hatc.p <- .e.hatch_rate.f(temps.matrix[,day]/1000, species)
                 	## Derive daily egg survival rate
 						e.surv.p <- .e.surv_rate.f(temps.matrix[,day]/1000, species)
-						d.surv.p <- if(species!="aegypti"){
-							.d.surv_rate.f(temps.matrix[,day]/1000, species)
-						} else 0
+						d.surv.p <- if( species!="aegypti" ) .d.surv_rate.f(temps.matrix[,day]/1000, species) else 0
 					# Binned (10m) (Log-normal) probability density for active dispersal up to 600m 
 						if(dispersal) {f.adis.p <- .a.a_disp.f(sp=species, max.a.disp=maxadisp, disp.bins=dispbins)}
 					## Gamma probability density of long passive dispersal (from DOI: 10.2790/7028); from 0 to maximum distance of road segments with 1000 m resolution.
@@ -171,9 +169,9 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 							e.hatc.n <- rbinom(length(1:space), p.life.a[1,,c(4*de)], prob=e.hatc.p)
 							#message(e.hatc.p)
 							#message(temps.matrix[,day])
-							if(species!="aegypti") d.hatc.n <- rbinom(length(1:space), p.life.a[4,,c(4*de)], prob=e.hatc.p)
+							if( species!="aegypti" & dl[day]>11 & dl[day]>dl[day-1] ) d.hatc.n <- rbinom(length(1:space), p.life.a[4,,c(4*de)], prob=e.hatc.p) else d.hatc.n <- 0
                 	# Remove hatched eggs from eggs 8d+ old
-								e.temp.v <- p.life.a[1,,(4*de)] - e.hatc.n
+							e.temp.v <- p.life.a[1,,(4*de)] - e.hatc.n
 							if(species!="aegypti") d.temp.v <- p.life.a[4,,c(4*de)] - if(species!="aegypti") d.hatc.n else 0
                 	# Apply mortality to non hatched 8d+ old eggs
 							e.temp.v <- rbinom(length(1:space), e.temp.v, prob=0.99)
@@ -217,13 +215,16 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
                 			## Remove females which today matured eggs from the host-fed compartment
 							p.life.a[3,,1] <- p.life.a[3,,1] - n.ovir.a
                 			## Find number of eggs laid today by ovipositing females
-							if( species!="aegypti" ) {
+							#message(length(counter))
+							#message(1-e.diap.p)
+							#message(d.surv.p)
+							if( species!="aegypti" & e.diap.p!=1 ) {
 								if(verbose) print("Laying diapausing eggs")
 								## Total number of eggs laid per cell
 								a.tegg.n <- sapply(1:space, function(x) sum(rpois(sum(p.life.a[3,x,2:3]), a.batc.n[x])))
 								## Proportion of diapausing and normal eggs
 								a.degg.n <- sapply(1:space, function(x){rbinom(1,a.tegg.n[x],prob=(1-e.diap.p))})
-								a.egg.n <- a.tegg.n-a.egg.n
+								a.egg.n <- a.tegg.n-a.degg.n
 							} else {
 								a.egg.n <- sapply(1:space, function(x) sum(rpois(sum(p.life.a[3,x,2:3]), a.batc.n[x])))
 								a.degg.n <- 0
