@@ -5,6 +5,7 @@
 
 ## physiological functions: see Monteiro 2007 used in https://doi.org/10.1016/j.actatropica.2019.105228
 
+## model check: add stop() at the beginning of the computation, if temperature matrix has NAs, then stop the iteration
 ## model: Check physiological parameters with experts
 ## model: Add ifelse statement on the physiological parameters functions: ifelse(predicted value >1, 1, ifelse(predicted value <0,0, NA))
 ## model: Add option for a generalised mosquito
