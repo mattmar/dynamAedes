@@ -169,11 +169,15 @@
 								e.hatc.n <- rbinom(length(1:space), p.life.a[1,,c(4*de)], prob=e.hatc.p)
 								#message(e.hatc.p)
 								#message(temps.matrix[,day])
-								if( species=="albopictus" & dl[day]>11.44 & dl[day]>dl[day-1] ) {
-									d.hatc.n <- rbinom(length(1:space), p.life.a[4,,c(4*de)], prob=e.hatc.p)
-								} else if( (species=="koreicus"|species=="japonicus") & dl[day]>10.71 & dl[day]>dl[day-1] ) {
-								 d.hatc.n <- rbinom(length(1:space), p.life.a[4,,c(4*de)], prob=e.hatc.p)
-							} else d.hatc.n <- 0
+								if( species=="albopictus" ) {
+									if( dl[day]>11.44 & dl[day]>dl[day-1] ) {
+										d.hatc.n <- rbinom(length(1:space), p.life.a[4,,c(4*de)], prob=e.hatc.p)
+									} else d.hatc.n <- 0			
+								}else if( species=="koreicus"|species=="japonicus" ) {
+									if( dl[day]>10.71 & dl[day]>dl[day-1] ) {
+										d.hatc.n <- rbinom(length(1:space), p.life.a[4,,c(4*de)], prob=e.hatc.p)
+									} else d.hatc.n <- 0
+								} else d.hatc.n <- 0
 	                	# Remove hatched eggs from eggs 8d+ old
 								e.temp.v <- p.life.a[1,,(4*de)] - e.hatc.n
 								if(species!="aegypti") d.temp.v <- p.life.a[4,,c(4*de)] - if(species!="aegypti") d.hatc.n else 0
