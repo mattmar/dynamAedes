@@ -246,10 +246,12 @@
       model <- drm(hatc_d ~ temp_d, fct = .DRC.beta())
       e.hatch.pred <- predict(model,data.frame(temp.v=temp.new))
     }else if(sp=="albopictus") {
-      hatc_d <-c(4.4,4.0,8.2,66.9,49.2,51.4,10.0,0)/100 
-      temp_d <-seq(5,40, by=5)
-      model <- drm(hatc_d ~ temp_d, fct = .DRC.beta())
-      e.hatch.pred <- predict(model,data.frame(temp.v=temp.new))
+      hatc_d <-c(2,4.4,4.0,8.2,66.9,49.2,51.4,10.0,0)/100 
+      temp_d <-seq(0,40, by=5)
+      model <- lm(hatc_d ~ poly(temp_d,3))
+      e.hatch.pred <- predict(model,newdata=data.frame(temp.v=temp.new), type="response") 
+      e.hatch.pred <- ifelse(e.hatch.pred<0, 0, e.hatch.pred)
+      e.hatch.pred[which(temp.new<4)] = 0
     }else if(sp=="koreicus") {
       #hatc_d <- (c(0, 53.75, 51.00, 57.25,20, 0)/100)/0.636 #patch
       #temp_d <- c(15, 23,    28,    33,   36, 40) #patch
