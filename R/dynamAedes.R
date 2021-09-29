@@ -145,7 +145,7 @@
 							e.hatc.p <- .e.hatch_rate.f(temps.matrix[,day]/1000, species)
 	                	## Derive daily egg survival rate
 							e.surv.p <- .e.surv_rate.f(temps.matrix[,day]/1000, species)
-							d.surv.p <- if( species!="aegypti" ) .d.surv_rate.f(temps.matrix[,day]/1000, species) else 0
+							d.surv.p <- if( species!="aegypti" ) .d.surv_rate.f(Stemps.matrix[,day]/1000, species) else 0
 						# Binned (10m) (Log-normal) probability density for active dispersal up to 600m 
 							if(dispersal) {f.adis.p <- .a.a_disp.f(sp=species, max.a.disp=maxadisp, disp.bins=dispbins)}
 						## Gamma probability density of long passive dispersal (from DOI: 10.2790/7028); from 0 to maximum distance of road segments with 1000 m resolution.
@@ -167,7 +167,7 @@
 								if(species!="aegypti") p.life.a[4,,c(4*de)] <- p.life.a[4,,c(4*de)] + d.temp.v
 	                	# Binomial draw to find numbers of eggs 8-d+ old that hatch today
 								e.hatc.n <- rbinom(length(1:space), p.life.a[1,,c(4*de)], prob=e.hatc.p)
-								#message(e.hatc.p)
+								message(e.hatc.p)
 								#message(temps.matrix[,day])
 								if( species=="albopictus" ) {
 									if( dl[day]>11.44 & dl[day]>dl[day-1] ) {
