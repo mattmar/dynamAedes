@@ -30,7 +30,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 		if(species!="aegypti"){
 			jd <- JD(seq(as.POSIXct(paste(intro.year,"/01/01",sep="")),as.POSIXct(as.Date(paste(intro.year,"/01/01",sep=""))+endd),by='day'))
 			dl <- daylength(lat,long,jd,1)[,3]
-		} else{dl <- 24}
+		} else{dl <- rep(24,(endd))}
 	## Set dispersal according to scale
 		dispersal <- if(scale=="lc"){TRUE}else if(scale=="rg"|scale=="ws"){FALSE}else{stop("Wrong scale. Exiting...")}
 	## Define `margin` for apply
@@ -145,7 +145,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 						e.hatc.p <- .e.hatch_rate.f(temps.matrix[,day]/1000, species)
                 	## Derive daily egg survival rate
 						e.surv.p <- .e.surv_rate.f(temps.matrix[,day]/1000, species)
-						d.surv.p <- if( species!="aegypti" ) .d.surv_rate.f(temps.matrix[,day]/1000, species) else 0
+						d.surv.p <- if( species!="aegypti" ) {.d.surv_rate.f(temps.matrix[,day]/1000, species)} else {0}
 					# Binned (10m) (Log-normal) probability density for active dispersal up to 600m 
 						if(dispersal) {f.adis.p <- .a.a_disp.f(sp=species, max.a.disp=maxadisp, disp.bins=dispbins)}
 					## Gamma probability density of long passive dispersal (from DOI: 10.2790/7028); from 0 to maximum distance of road segments with 1000 m resolution.
@@ -154,17 +154,17 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
                 	## `E` has eight sub-compartment: 1:7 for eggs 1-7 days old that can only die or survive, 8 for eggs older than 7 days that can die/survive/hatch
                 	## Binomial draw to find numbers of eggs that die or survive
 						p.life.a[1,,2:(4*de)] <- apply(t(p.life.a[1,,1:(4*de-1)]),MARGIN=mrg,function(x) rbinom(size=x,n=space,prob=e.surv.p))
-						if(species!="aegypti") p.life.a[4,,2:(4*de)] <- apply(t(p.life.a[4,,1:(4*de-1)]),MARGIN=mrg,function(x) rbinom(size=x,n=space,prob=d.surv.p))
+						if(species!="aegypti") {p.life.a[4,,2:(4*de)] <- apply(t(p.life.a[4,,1:(4*de-1)]),MARGIN=mrg,function(x) rbinom(size=x,n=space,prob=d.surv.p))} else {p.life.a[4,,2:(4*de)] <- 0}
                 	## Introduce eggs if day==1; introduction happens in E sub-compartment 8 as it can be assumed that eggs are most likely to be introduced in an advanced stage of development 
 							p.life.a[1,,(4*de)] <- if( length(counter)==1 ) {
 								e.intro.n
 							} else p.life.a[1,,(4*de)]
                     # Add eggs laid by females the day before (t-1) stored in a.egg.n (end of the day)
 							p.life.a[1,,1] <- a.egg.n
-							if(species!="aegypti") p.life.a[4,,c(1*de)] <- a.degg.n
+							if(species!="aegypti") {p.life.a[4,,c(1*de)] <- a.degg.n}
                 	# Add eggs that did not hatch yesterday to egg that today are ready to hatch
 							p.life.a[1,,c(4*de)] <- p.life.a[1,,c(4*de)] + e.temp.v
-							if(species!="aegypti") p.life.a[4,,c(4*de)] <- p.life.a[4,,c(4*de)] + d.temp.v
+							if(species!="aegypti") {p.life.a[4,,c(4*de)] <- p.life.a[4,,c(4*de)] + d.temp.v}
                 	# Binomial draw to find numbers of eggs 8-d+ old that hatch today
 							e.hatc.n <- rbinom(length(1:space), p.life.a[1,,c(4*de)], prob=e.hatc.p)
 							#message(e.hatc.p)
@@ -180,7 +180,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 							} else d.hatc.n <- 0
                 	# Remove hatched eggs from eggs 8d+ old
 							e.temp.v <- p.life.a[1,,(4*de)] - e.hatc.n
-							if(species!="aegypti") d.temp.v <- p.life.a[4,,c(4*de)] - if(species!="aegypti") d.hatc.n else 0
+							if(species!="aegypti") {d.temp.v <- p.life.a[4,,c(4*de)] - if(species!="aegypti") {d.hatc.n} else {0}}
                 	# Apply mortality to non hatched 8d+ old eggs
 							e.temp.v <- rbinom(length(1:space), e.temp.v, prob=0.99)
 							d.temp.v <- rbinom(length(1:space), d.temp.v, prob=0.99)
@@ -200,7 +200,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 								i.intro.n
 							} else p.life.a[2,,(6*dj)]
                 	## Add immatures hatched the same day
-							p.life.a[2,,1] <- e.hatc.n + if(species!="aegypti") d.hatc.n else 0
+							p.life.a[2,,1] <- e.hatc.n + if(species!="aegypti") {d.hatc.n} else {0}
                 	## Add immatures that did not emerge yesterday to immatures that today are ready to emerge
 							p.life.a[2,,(6*dj)] <- p.life.a[2,,(6*dj)] + i.temp.v
                 	## Find numbers of immature 5d+ old that emerge before applying mortality (applied as newly emerged adults today)
@@ -318,7 +318,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 							p.life.a[3,,3] <- p.life.a[3,,2]
 							p.life.a[3,,2] <- 0
     				## Print information on population structure today
-							if( verbose ) message("\nday ",length(counter),"-- of iteration ",iteration," has ended. Population is e: ",sum(p.life.a[1,,])," i: ",sum(p.life.a[2,,])," a: " ,sum(p.life.a[3,,]), " d: ",sum(p.life.a[4,,]), " eh: ", sum(e.hatc.n+if(species!="aegypti") d.hatc.n else 0), " el: ",sum(a.egg.n), " \n")
+							if( verbose ) message("\nday ",length(counter),"-- of iteration ",iteration," has ended. Population is e: ",sum(p.life.a[1,,])," i: ",sum(p.life.a[2,,])," a: " ,sum(p.life.a[3,,]), " d: ",sum(p.life.a[4,,]), " eh: ", sum(e.hatc.n+if(species!="aegypti") {d.hatc.n} else {0}), " el: ",sum(a.egg.n), " \n")
                 		# Condition for exinction
 								stopit <- sum(p.life.a)==0
                 	# Some (unnecessary?) garbage cleaning
