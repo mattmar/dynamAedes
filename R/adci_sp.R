@@ -1,3 +1,15 @@
+#' Summaries of mosquito abundance (spatial)
+#'
+#' Summaries of mosquito abundance at each life stage for each day 
+#' @param input_sim (matrix) dynamAedes compressed output matrix 
+#' @param eval_date (integer) define the day of successful introduction evaluation, referring to the column number of the temperature matrix used to inform the model. 
+#' @param stage (integer) 0 (all), 1 (egg), 2 (juvenile), 3 (adult), 4 (diapausing egg).
+#' @param coords (matrix) (matrix) a matrix reporting the spatial coordinates of the temperature observations.
+#' @param breaks quantile breaks, default the first, the second and the third c(0.25,0.5,0.75)
+#' @return Returns a raster with the summary of mosquito abundance at each life stage for each day. 
+#' @author Matteo Marcantonio \email{marcantoniomatteo@gmail.com}, Daniele Da Re \email{daniele.dare@uclouvain.be}
+#' @export
+
 adci_sp=function (input_sim = NULL, coords = NULL, eval_date = NULL, stage = 1, breaks = c(0.25, 0.5, 0.75)){
   if (stage < 1 | stage > 3) {
     stop("stage can be 1 (egg), 2 (juvenile), 3 (adult) ...")
@@ -49,7 +61,7 @@ adci_sp=function (input_sim = NULL, coords = NULL, eval_date = NULL, stage = 1, 
 })
   }
   names(myOut)=paste0("d_", eval_date)
-  return(if (length(myOut) == 1) outr[[1]] else myOut)
+  return(if (length(myOut) == 1) myOut[[1]] else myOut)
 }
 
 

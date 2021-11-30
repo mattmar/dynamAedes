@@ -1,4 +1,18 @@
-get_rates_spatial = function(coords=NULL, daily_temp=NULL, species=NULL, rate_fun=NULL, spatial=FALSE, rate=TRUE, np=1){
+#' Proportion of successful introductions
+#'
+#' Compute the proportion of "successful" introductions.
+#' @param coords bla
+#' @param daily_temp bla
+#' @param species bla
+#' @param rate_fun bla
+#' @param spatial bla
+#' @param rate bla
+#' @param np bla
+#' @return bla
+#' @author Matteo Marcantonio \email{marcantoniomatteo@gmail.com}, Daniele Da Re \email{daniele.dare@uclouvain.be}
+#' @export
+
+get_rates_spatial <- function(coords=NULL, daily_temp=NULL, species=NULL, rate_fun=NULL, spatial=FALSE, rate=TRUE, np=1){
 
 	rate_fun = match.fun(rate_fun)
 	rate.v <- mclapply(apply(daily_temp,2,list), function(x) {

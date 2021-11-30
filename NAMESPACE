@@ -10,7 +10,7 @@ importFrom("fields", "rdist")
 importFrom("slam", "as.simple_sparse_array")
 importFrom("drc", "drm")
 importFrom("insol", "JD", "daylength")
-importFrom("raster", "stack", "raster")
+importFrom("raster", "stack", "raster", "rasterFromXYZ")
 importFrom("sp", "gridded", "coordinates")
 
 #####################################

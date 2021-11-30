@@ -1,3 +1,7 @@
+# dynamAedes 2.0.1
+* All functions reshaped for publication
+* Physiological rates updateds
+
 # dynamAedes 2.0.0
 * Enhanced physiological rates for koreicus/japonicus
 * Proportion of diapausing eggs dependent on photoperiod

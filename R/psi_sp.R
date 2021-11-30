@@ -1,4 +1,15 @@
-psi_sp = function(coords=NULL, input_sim=NULL, eval_date=NULL, np=1) {
+#' Probability of successful introduction (spatial)
+#'
+#' Compute the proportion of successful introductions per each cell of the grid.
+#' @param input_sim (matrix) dynamAedes compressed output matrix. 
+#' @param coords (matrix) (matrix) a matrix reporting the spatial coordinates of temperature observations.
+#' @param eval_date (integer) define the day(s) to calculate the proportion of successful introductions which should match the column number of the temperature matrix used to inform the model.
+#' @param n.clusters (numeric) define the number of parallel processes.
+#' @return psi returns a raster with the proportion of model iterations that resulted in a viable mosquito population at a given date for a given life stage in each cell of the grid.
+#' @author Matteo Marcantonio \email{marcantoniomatteo@gmail.com}, Daniele Da Re \email{daniele.dare@uclouvain.be}
+#' @export
+
+psi_sp = function(input_sim=NULL,coords=NULL, eval_date=NULL, n.clusters=1) {
 	if( all(unlist(lapply(input_sim, function(x) { sapply(x,length) } ))==4) ) {
 		stop("Non-spatial data, set scale='lc' or scale='rg' in dynamAedes")
 	} else {
@@ -8,7 +19,7 @@ psi_sp = function(coords=NULL, input_sim=NULL, eval_date=NULL, np=1) {
 			mylist <- mclapply(input_sim, function(x){
 				mydf <- lapply(x, function(y) {data.frame(y); data.frame("tot_individuals"= colSums(y))});
 				mydf <- do.call(cbind, mydf)
-			}, mc.cores=np)
+			}, mc.cores=n.clusters)
 			maxl <- max(sapply(mylist,ncol))
 			mylist <- mclapply(mylist, function(x) {
 				if(length(x)<maxl) {
@@ -16,7 +27,7 @@ psi_sp = function(coords=NULL, input_sim=NULL, eval_date=NULL, np=1) {
 				} else {
 					x
 				}
-			},mc.cores=np)
+			},mc.cores=n.clusters)
   			#add days and convert to 1 all pixel having a number of individuals >1
 			col_names <- paste0( "d_", 1:maxl )
 			mylist <- lapply(mylist, setNames, col_names)

@@ -1,11 +1,10 @@
 Package: dynamAedes
-Version: 2.0.0
-Date: 2021-08-02
+Version: 2.0.1
+Date: 2021-11-30
 Title: Generalised model for the population dynamics of invasive Aedes
 Authors@R: c(person("Matteo", "Marcantonio", role = c("aut", "cre"), email = "marcantoniomatteo@gmail.com"),person("Daniele", "Da Re", role = c("aut"), email = "daniele.dare@uclouvain.be")) 
 Depends: R (>= 3.6.0), raster
 Imports: drc, fields, foreach, insol, slam, doParallel, sp
-Suggests: parallel, knitr, rmarkdown
 LazyData: FALSE
 BugReports: https://github.com/mattmar/dynamAedes
 Description: Generalised model for the population dynamics of four invasive Aedes.
@@ -13,3 +12,11 @@ VignetteBuilder: knitr
 Encoding: UTF-8
 Language: en-GB
 License: GPL(>=2)
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
+Suggests:
+	parallel,
+    rmarkdown,
+    knitr,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

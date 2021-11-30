@@ -1,3 +1,36 @@
+#' Life cycle simulation of \emph{Aedes} mosquitoes
+#'
+#' Function to simulate population dynamics of \emph{Aedes} mosquitoes
+#' @param species select what species to model: "aegypti", "albopictus", "japonicus", "koreicus". Default species = "aegypti". 
+#' @param intro.eggs (numeric) number of introduced propagules, default intro.eggs = 100.
+#' @param intro.adults (numeric) number of introduced propagules, default zero. 
+#' @param intro.juveniles (numeric) number of introduced propagules, default zero.
+#' @param scale define the spatial scale of the modelling exercise: punctual/weather station "ws", local "lc", or regional "rg". Active dispersal is enabled only for scale = "rg". Default scale = "ws".
+#' @param intro.cells bla.
+#' @param ihwv (numeric) larval-habitat water volume, define the volume (L) of water habitat presents in each spatial unit (parameterised from \href{https://doi.org/10.1111/1365-2664.12620}{Hancock et al. 2016}). Default lhwv = 1.
+#' @param startd (numeric) day of start of the simulations, referring to the column number of temps.matrix.
+#' @param endd (numeric) day of end of the simulation, referring to the column number of temps.matrix.
+#' @param intro.year (numeric) year of the beginning of iterations. 
+#' @param iter (numeric) define the number of model iteration. 
+#' @param temps.matrix (matrix) a matrix of daily average temperature (in Celsius degree /1000) used to fit the life cycle rates. This matrix must be organised with the daily temperature observations as columns and the geographic position of the i-grid cell as rows.
+#' @param cells.coords (matrix) a matrix reporting the spatial coordinates of the temperature observations.
+#' @param lat (numeric) latitude value of the area of interested used to inform the diapause eggs allocation function. 
+#' @param long (numeric) longitude value of the area of interested used to inform the diapause eggs allocation function.
+#' @param road.dist.matrix (matrix) when scale = "lc", define the matrix containing the coordinates of the grid cells of the landscape intersecting the road network for the mosquito passive dispersal process. 
+#' @param country when scale = "lc", define the average car trip distance for the mosquito passive dispersal process. The value can be provided by the users, or using the estimates made by \href{https://publications.jrc.ec.europa.eu/repository/handle/JRC77079}{Pasaoglu et al. 2012}). for the following Europeancountries: France "fra", Germany "deu", Italy "ita", Poland "pol", Spain "esp", and the United Kingdom "uk". 
+#' @param cellsize (numeric) when scale = "lc", define the minimal distance of the active dispersal kernel and should match the spatial resolution of temps.matrix to avoid inconsistencies. Default cellsize = 250
+#' @param maxadisp (numeric) when scale = "lc", define the maximum daily dispersal, default maxadisp = 600.
+#' @param dispbins (numeric) when scale = "lc", define the resoluzion of the dispersal kernel, default dispbins = 10.
+#' @param n.clusters (numeric) define the number of parallel processes.
+#' @param cluster.type define the type of cluster, default "PSOCK".
+#' @param sparse.output BHOOOOOOOOOOOO
+#' @param compressed.output (logical) default TRUE, if FALSE provide the individual estimates for each iterations and each model's subcompartiment.
+#' @param suffix (character) model output suffix. 
+#' @param verbose (logical)
+#' @return Matrix or a list of matrixes containing, for each iteration, the number of individuals in each life stage per day (and for each grid cell of the study area if scale="lc" or "rg"). If the argument compressed.output=FALSE (default TRUE), the model returns the daily number of individuals in each life stage sub-compartment.	
+#' @author Matteo Marcantonio \email{marcantoniomatteo@gmail.com}, Daniele Da Re \email{daniele.dare@uclouvain.be}
+#' @export
+
 dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.juveniles=0, 
 	scale="ws", intro.cells=NULL, ihwv=1, temps.matrix=NULL, startd=1, endd=10,
 	cells.coords=NULL, lat=0, long=0, road.dist.matrix=NULL, country=NA, intro.year=2020,
@@ -56,12 +89,12 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 			## Update progress bar
 				legind <- legind+n.clusters
 			## Vector of propagules to initiate the life cycle
-        	# If intro.cells is a vector of cells than sample a value for each iteration
+        	# If intro.cells is a vector of cells then sample a value for each iteration
 				if( scale=="lc" ) {
 					if( nrow(temps.matrix)<2 | !exists("road.dist.matrix") | !exists("cells.coords") ) {
 						stop("If scale='lc' then temps.matrix|road.dist.matrix|cells.coords) must exist and nrows must be > 1")
 					}
-					if( length(intro.cells)>1 ) {
+					if( length(intro.cells)>=1 ) {
 						intro.cell <- sample(intro.cells,1)
 					} else {intro.cell <- NA}
         		# if intro.cell is not NA than use intro.cell, else sample at random a cell along roads (column of road.dist.matrix)
