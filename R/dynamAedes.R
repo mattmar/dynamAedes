@@ -77,7 +77,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 			registerDoParallel(cl, cores=n.clusters)
 			if(seeding) clusterEvalQ(cl, set.seed(2021))
 		## Define space dimensionality into which simulations occour
-			space <- nrow(temps.matrix)
+				space <- nrow(temps.matrix)
 		    ## Set a progress bar
 			message("##########################################\n## Life cycle iterations have begun... ##\n##########################################")
 			pb <- txtProgressBar(char = "%", min = 0, max = iter, style = 3)
@@ -361,7 +361,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 						p.life.aout <- if( compressed.output ) {
 							apply(p.life.a, MARGIN=c(1, 2), sum)
 						} else { 
-							p.life.a							
+							p.life.a
 						}
                 	# If TRUE a sparse array is returned (save memory but complex to process)
 						if(sparse.output) return(list(as.simple_sparse_array(p.life.a))) else return(list(p.life.aout))
@@ -370,6 +370,9 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 					} #end of stopif condition
 			}
 		}
+		if( compressed.output ) {
+			attributes(rs) <- list(compressed=TRUE)
+		} else attributes(rs) <- list(compressed=FALSE)
 	### Complete final tasks, then return data and exit:
 		if( !is.na(suffix) ) {
 			message(paste("\n\n\nIterations concluded. Saving the output to: ",suffix,".RDS\n\n\n",sep=""))

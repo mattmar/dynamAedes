@@ -6,24 +6,38 @@
 #' @param stage (integer) 0 (all), 1 (egg), 2 (juvenile), 3 (adult), 4 (diapausing egg).
 #' @param n.clusters (numeric) define the number of parallel processes.
 #' @param breaks quantile breaks, default the first, the second and the third c(0.25,0.5,0.75)
-#' @return Returns a table with the summary of mosquito abundance at each life stage for each day. 
+#' @return Returns a table with the summary of mosquito abundance per life stage (or substage if compressed.output=FALSE in dynamAedes) for each day. 
 #' @author Matteo Marcantonio \email{marcantoniomatteo@gmail.com}, Daniele Da Re \email{daniele.dare@uclouvain.be}
 #' @export
 
 adci <- function(input_sim=NA, stage=1, n.clusters=1, eval_date=0, breaks=c(0.25,0.5,0.75)){
-	if(stage<1|stage>4) {
-		stop("stage can be 1 (egg), 2 (juvenile), 3 (adult), 4 (diapausing eggs) ...")
-	}
-	if( max(eval_date) > max(sapply(input_sim,length)) ) {
-		stop("eval_date > than number of simulated days...")
+	if(attributes(input_sim)$compressed) {
+		if(stage<1|stage>4) {
+			stop("stage can be 1 (egg), 2 (juvenile), 3 (adult), 4 (diapausing eggs) ...")
+		}
+		if( max(eval_date) > max(sapply(input_sim,length)) ) {
+			stop("eval_date > than number of simulated days...")
+		} else {
+			out <- apply(do.call(rbind.data.frame,mclapply(input_sim, function(x) {
+				lapply(eval_date, function(y) {
+					if(y<=length(x)) {sum(x[[y]][stage,],na.rm=T)} else {NA}})},mc.cores=n.clusters)),2,quantile,probs=breaks,na.rm=T)
+			colnames(out)<-NULL
+			outo <- rbind.data.frame(out,
+				stage=rep(stage,nrow(out)),
+				day=as.factor(1:ncol(out)))
+			return(t(outo))
+		}
 	} else {
-		out <- apply(do.call(rbind.data.frame,mclapply(input_sim, function(x) {
-			lapply(eval_date, function(y) {
-				if(y<=length(x)) {sum(x[[y]][stage,],na.rm=T)} else {NA}})},mc.cores=n.clusters)),2,quantile,probs=breaks,na.rm=T)
-		colnames(out)<-NULL
-		outo <- rbind.data.frame(out,
-			stage=rep(stage,nrow(out)),
-			day=as.factor(1:ncol(out)))
-		return(t(outo))
+		if( max(eval_date) > max(sapply(input_sim,length)) ) {
+			stop("stage can be 1 (egg), 2 (juvenile), 3 (adult), 4 (diapausing eggs) ...")
+		} else {
+			tmp <- mclapply(1:length(input_sim), function(x) {as.matrix(lapply(eval_date, function(dt) {input_sim[x][[1]][dt][[1]][stage,,]}))},mc.cores=n.clusters)
+			tmp1 <- lapply(eval_date, function(dt) cbind.data.frame(
+				apply(simplify2array(lapply(tmp,function(x) (x[[dt]]))),1,quantile,breaks),
+				day=dt,
+				stage=stage))
+			outo <- do.call(rbind.data.frame,lapply(tmp1, function(x) {x$q <- row.names(x);row.names(x)<-NULL;return(x)}))
+			return(outo)
+		}
 	}
 }
