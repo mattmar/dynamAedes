@@ -114,13 +114,13 @@
   ## Adult female daily mortality rate at different temperatures ##
   .a.surv_rate.f <- function(temp.new, sp) {
     if(sp=="aegypti") {
-     surv_d <- c(3,13.18,10.91,27.71,30.62,23.72,26.90,32.87,36.91,22.77,29.26,22.53,10.07,5)
+     surv_d <- c(3,13.18,10.91,27.71,30.62,23.72,26.90,32.87,36.91,22.77,29.26,22.53,10.07,0)
      temp_d <- c(5,10.54,10.76,15.30,16.52,20.05,21.79,25.64,27.64,31.33,31.65,32.55,33.41,36)
      model <- drm(surv_d ~ temp_d, fct = .DRC.beta())
      a.surv.rate <- predict(model,data.frame(temp.v=temp.new))
      a.surv.rate <- 1-1/ifelse(a.surv.rate<1,1,a.surv.rate)
    }else if(sp=="albopictus") {
-    a=0.677; b=20.9; c=-13.2
+    a=0.7; b=18.5; c=-11.0
     a.surv.rate <- sapply(temp.new, function(x) {
       if( x>0 ){
         a*exp(-0.5*((x-b)/c)^6)*(x^0.1)
@@ -129,8 +129,8 @@
       }
     })
   }else if(sp=="koreicus" | sp=="japonicus") {
-    surv_d <- 1-(1/c(1,2,52.33,46.77,66.33,5.87, 3, 1))
-    temp_d <- c(0,5, 18,23,28,33, 35, 38)
+    surv_d <- 1-(1/c(1,2,52.33,46.77,66.33,5.87, 1))
+    temp_d <- c(0,5, 18,23,28,33, 34)
     model <- drm(surv_d ~ temp_d, fct = .DRC.beta())
     a.surv.rate <- predict(model,data.frame(temp.v=temp.new))
       #koreicus adults longevity (Tab. 3, Marini et al 2019)
