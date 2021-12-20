@@ -7,12 +7,12 @@
 psi(input_sim = NULL, eval_date = NULL)
 }
 \arguments{
-\item{input_sim}{(matrix) dynamAedes compressed output matrix (compressed=TRUE).}
+\item{input_sim}{matrix. \code{dynamAedes} compressed output matrix (\code{compressed=TRUE}).}
 
-\item{eval_date}{(integer) define the day(s) to calculate the proportion of successful introductions which should match the column number of the temperature matrix used to inform the model.}
+\item{eval_date}{positive integer. define the day(s) to calculate the proportion of successful introductions which should match the column number of the temperature matrix used to inform the model.}
 }
 \value{
-psi returns the proportion of model iterations that resulted in a viable mosquito population (defined as: iterations with at least one individual alive in any life stage) at a given date.
+\code{psi} returns the proportion of model iterations that resulted in a viable mosquito population (defined as: iterations with at least one individual alive in any life stage) at a given date.
 }
 \description{
 Compute the proportion of "successful" introductions.

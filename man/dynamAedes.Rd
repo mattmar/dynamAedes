@@ -30,67 +30,73 @@ dynamAedes(
   cellsize = 250,
   maxadisp = 600,
   dispbins = 10,
-  verbose = FALSE
+  verbose = FALSE,
+  seeding = FALSE
 )
 }
 \arguments{
-\item{species}{select what species to model: "aegypti", "albopictus", "japonicus", "koreicus". Default species = "aegypti".}
+\item{species}{character. Select what species to model: \code{"aegypti"}, \code{"albopictus"}, \code{"japonicus"}, \code{"koreicus"}. Default \code{species = "aegypti"}.}
 
-\item{intro.eggs}{(numeric) number of introduced propagules, default intro.eggs = 100.}
+\item{intro.eggs}{positive integer. number of introduced propagules, default \code{intro.eggs = 100}.}
 
-\item{intro.adults}{(numeric) number of introduced propagules, default zero.}
+\item{intro.adults}{positive integer. number of introduced propagules, default zero.}
 
-\item{intro.juveniles}{(numeric) number of introduced propagules, default zero.}
+\item{intro.juveniles}{positive integer. number of introduced propagules, default zero.}
 
-\item{scale}{define the spatial scale of the modelling exercise: punctual/weather station "ws", local "lc", or regional "rg". Active dispersal is enabled only for scale = "rg". Default scale = "ws".}
+\item{scale}{character. Define the spatial scale of the modelling exercise: punctual/weather station "ws", local "lc", or regional "rg". Active and passive dispersal is enabled only for \code{scale = "lc"}. Default \code{scale = "ws"}.}
 
-\item{intro.cells}{bla.}
+\item{intro.cells}{positive integer. One or more id cells where to introduce the modeled population at local ("lc") scale.}
 
-\item{ihwv}{(numeric) larval-habitat water volume, define the volume (L) of water habitat presents in each spatial unit (parameterised from \href{https://doi.org/10.1111/1365-2664.12620}{Hancock et al. 2016}). Default lhwv = 1.}
+\item{ihwv}{positive integer. Larval-habitat water volume, define the volume (L) of water habitat presents in each spatial unit (parameterized from \href{https://doi.org/10.1111/1365-2664.12620}{Hancock et al. 2016}). Default \code{lhwv = 1}.}
 
-\item{temps.matrix}{(matrix) a matrix of daily average temperature (in Celsius degree /1000) used to fit the life cycle rates. This matrix must be organised with the daily temperature observations as columns and the geographic position of the i-grid cell as rows.}
+\item{temps.matrix}{matrix. A matrix of daily average temperature (in Celsius degree /1000) used to fit the life cycle rates. This matrix must be organised with the daily temperature observations as columns and the geographic position of the i-grid cell as rows.}
 
-\item{startd}{(numeric) day of start of the simulations, referring to the column number of temps.matrix.}
+\item{startd}{positive integer. Day of start of the simulations, referring to the column number of temps.matrix.}
 
-\item{endd}{(numeric) day of end of the simulation, referring to the column number of temps.matrix.}
+\item{endd}{positive integer. Day of end of the simulation, referring to the column number of temps.matrix.}
 
-\item{cells.coords}{(matrix) a matrix reporting the spatial coordinates of the temperature observations.}
+\item{cells.coords}{matrix. A matrix reporting the spatial coordinates of the temperature observations.}
 
-\item{lat}{(numeric) latitude value of the area of interested used to inform the diapause eggs allocation function.}
+\item{lat}{numeric. Latitude value of the area of interested used to inform the diapause eggs allocation function.}
 
-\item{long}{(numeric) longitude value of the area of interested used to inform the diapause eggs allocation function.}
+\item{long}{numeric. Longitude value of the area of interested used to inform the diapause eggs allocation function.}
 
-\item{road.dist.matrix}{(matrix) when scale = "lc", define the matrix containing the coordinates of the grid cells of the landscape intersecting the road network for the mosquito passive dispersal process.}
+\item{road.dist.matrix}{matrix. when \code{scale = "lc"}, define the matrix containing the coordinates of the grid cells of the landscape intersecting the road network for the mosquito passive dispersal process.}
 
-\item{country}{when scale = "lc", define the average car trip distance for the mosquito passive dispersal process. The value can be provided by the users, or using the estimates made by \href{https://publications.jrc.ec.europa.eu/repository/handle/JRC77079}{Pasaoglu et al. 2012}). for the following Europeancountries: France "fra", Germany "deu", Italy "ita", Poland "pol", Spain "esp", and the United Kingdom "uk".}
+\item{country}{optional. when \code{scale = "lc"}, define the average car trip distance for the mosquito passive dispersal process. The value can be provided by the users, or using the estimates made by \href{https://publications.jrc.ec.europa.eu/repository/handle/JRC77079}{Pasaoglu et al. 2012}). for the following European countries: France "fra", Germany "deu", Italy "ita", Poland "pol", Spain "esp", and the United Kingdom "uk".}
 
-\item{intro.year}{(numeric) year of the beginning of iterations.}
+\item{intro.year}{numeric. Year of the beginning of iterations.}
 
-\item{iter}{(numeric) define the number of model iteration.}
+\item{iter}{positive integer. Define the number of model iteration.}
 
-\item{n.clusters}{(numeric) define the number of parallel processes.}
+\item{n.clusters}{positive integer. Define the number of parallel processes.}
 
-\item{cluster.type}{define the type of cluster, default "PSOCK".}
+\item{cluster.type}{character. Define the type of cluster, default "PSOCK".}
 
-\item{sparse.output}{BHOOOOOOOOOOOO}
+\item{sparse.output}{logical. The output matrix is optimized for sparse-matrix algebra.}
 
-\item{compressed.output}{(logical) default TRUE, if FALSE provide the individual estimates for each iterations and each model's subcompartiment.}
+\item{compressed.output}{logical. Default TRUE, if FALSE provide the individual estimates for each iterations and each model's subcompartiment.}
 
-\item{suffix}{(character) model output suffix.}
+\item{suffix}{character.Model output suffix.}
 
-\item{cellsize}{(numeric) when scale = "lc", define the minimal distance of the active dispersal kernel and should match the spatial resolution of temps.matrix to avoid inconsistencies. Default cellsize = 250}
+\item{cellsize}{(positive integer. When \code{scale = "lc"}, define the minimal distance of the active dispersal kernel and should match the spatial resolution of temps.matrix to avoid inconsistencies. Default cellsize = 250}
 
-\item{maxadisp}{(numeric) when scale = "lc", define the maximum daily dispersal, default maxadisp = 600.}
+\item{maxadisp}{positive integer. When \code{scale = "lc"}, define the maximum daily dispersal, default maxadisp = 600.}
 
-\item{dispbins}{(numeric) when scale = "lc", define the resoluzion of the dispersal kernel, default dispbins = 10.}
+\item{dispbins}{positive integer.  When scale = "lc", define the resolution of the dispersal kernel, default dispbins = 10.}
 
-\item{verbose}{(logical)}
+\item{verbose}{logical.}
+
+\item{seeding}{logical, default \code{FALSE}, if \code{seeding=TRUE} a fixed seed is applied.}
 }
 \value{
 Matrix or a list of matrixes containing, for each iteration, the number of individuals in each life stage per day (and for each grid cell of the study area if scale="lc" or "rg"). If the argument compressed.output=FALSE (default TRUE), the model returns the daily number of individuals in each life stage sub-compartment.
 }
 \description{
 Function to simulate population dynamics of \emph{Aedes} mosquitoes
+}
+\seealso{
+Beta regression function were taken from the R package \code{aomisc}, which is available at \url{https://github.com/OnofriAndreaPG/aomisc}.
 }
 \author{
 Matteo Marcantonio \email{marcantoniomatteo@gmail.com}, Daniele Da Re \email{daniele.dare@uclouvain.be}

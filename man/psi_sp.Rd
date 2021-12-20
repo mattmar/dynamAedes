@@ -7,16 +7,16 @@
 psi_sp(input_sim = NULL, coords = NULL, eval_date = NULL, n.clusters = 1)
 }
 \arguments{
-\item{input_sim}{(matrix) dynamAedes compressed output matrix.}
+\item{input_sim}{matrix. \code{dynamAedes} compressed output matrix (\code{compressed=TRUE}).}
 
-\item{coords}{(matrix) (matrix) a matrix reporting the spatial coordinates of temperature observations.}
+\item{coords}{matrix. A matrix reporting the spatial coordinates of temperature observations.}
 
-\item{eval_date}{(integer) define the day(s) to calculate the proportion of successful introductions which should match the column number of the temperature matrix used to inform the model.}
+\item{eval_date}{positive integer. Define the day(s) to calculate the proportion of successful introductions which should match the column number of the temperature matrix used to inform the model.}
 
-\item{n.clusters}{(numeric) define the number of parallel processes.}
+\item{n.clusters}{positive integer. Define the number of parallel processes.}
 }
 \value{
-psi returns a raster with the proportion of model iterations that resulted in a viable mosquito population at a given date for a given life stage in each cell of the grid.
+\code{psi_sp} returns a raster with the proportion of model iterations that resulted in a viable mosquito population at a given date for a given life stage in each cell of the grid.
 }
 \description{
 Compute the proportion of successful introductions per each cell of the grid.

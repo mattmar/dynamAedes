@@ -2,7 +2,7 @@
 % Please edit documentation in R/adci.R
 \name{adci}
 \alias{adci}
-\title{Summaries of mosquito abundance}
+\title{Summaries of mosquito abundance.}
 \usage{
 adci(
   input_sim = NA,
@@ -13,21 +13,21 @@ adci(
 )
 }
 \arguments{
-\item{input_sim}{(matrix) dynamAedes compressed output matrix}
+\item{input_sim}{matrix. dynamAedes compressed output matrix.}
 
-\item{stage}{(integer) 0 (all), 1 (egg), 2 (juvenile), 3 (adult), 4 (diapausing egg).}
+\item{stage}{positive integer. 0 (all), 1 (egg), 2 (juvenile), 3 (adult), 4 (diapausing egg).}
 
-\item{n.clusters}{(numeric) define the number of parallel processes.}
+\item{n.clusters}{positive integer. Define the number of parallel processes.}
 
-\item{eval_date}{(integer) define the day of successful introduction evaluation, referring to the column number of the temperature matrix used to inform the model.}
+\item{eval_date}{positive integer. Define the day of successful introduction evaluation, referring to the column number of the temperature matrix used to inform the model.}
 
-\item{breaks}{quantile breaks, default the first, the second and the third c(0.25,0.5,0.75)}
+\item{breaks}{numeric vector. Quantile breaks, default the first, the second and the third quantile: \code{c(0.25,0.5,0.75)}.}
 }
 \value{
-Returns a table with the summary of mosquito abundance at each life stage for each day.
+Returns a table with the summary of mosquito abundance per life stage (or substage if \code{compressed.output=FALSE} in \code{dynamAedes} function) for each day.
 }
 \description{
-Summaries of mosquito abundance at each life stage for each day
+Summaries of mosquito abundance at each life stage for each day.
 }
 \author{
 Matteo Marcantonio \email{marcantoniomatteo@gmail.com}, Daniele Da Re \email{daniele.dare@uclouvain.be}

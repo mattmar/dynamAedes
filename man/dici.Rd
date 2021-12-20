@@ -13,13 +13,13 @@ dici(
 )
 }
 \arguments{
-\item{input_sim}{(matrix) dynamAedes compressed output matrix}
+\item{input_sim}{matrix. \code{dynamAedes} compressed output matrix (\code{compressed=TRUE}).}
 
-\item{coords}{(matrix) (matrix) a matrix reporting the spatial coordinates of the temperature observations.}
+\item{coords}{matrix. A matrix reporting the spatial coordinates of the temperature observations.}
 
-\item{eval_date}{(integer) define the day of successful introduction evaluation, referring to the column number of the temperature matrix used to inform the model.}
+\item{eval_date}{numeric. Define the day of successful introduction evaluation, referring to the column number of the temperature matrix used to inform the model.}
 
-\item{breaks}{quantile breaks, default the first, the second and the third c(0.25,0.5,0.75)}
+\item{breaks}{numeric vector. Quantile breaks, default the first, the second and the third quantile: \code{c(0.25,0.5,0.75)}.}
 
 \item{space}{is it spatial?}
 }
@@ -27,7 +27,7 @@ dici(
 TBW
 }
 \description{
-Estimates of mosquito dispersal spread (in km2 ) of the simulated mosquito populations when scale = "lc"
+Estimates of mosquito dispersal spread (in km2 ) of the simulated mosquito populations when \code{scale = "lc"}.
 }
 \author{
 Matteo Marcantonio \email{marcantoniomatteo@gmail.com}, Daniele Da Re \email{daniele.dare@uclouvain.be}
