@@ -3,8 +3,8 @@ title: "dynamAedes vignette"
 author: "Daniele Da Re, Sophie 0. Vanwambeke, Matteo Marcantonio"
 date: "15th December 2021"
 output:
-  pdf_document: default
-  html_document:
+  pdf_document: 
+  html_document: default
     number_sections: yes
 ---
 
