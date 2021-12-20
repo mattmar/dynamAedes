@@ -1,6 +1,6 @@
 # dynamAedes 2.0.1
 * All functions reshaped for publication
-* Physiological rates updateds
+* Physiological rates updates
 
 # dynamAedes 2.0.0
 * Enhanced physiological rates for koreicus/japonicus
