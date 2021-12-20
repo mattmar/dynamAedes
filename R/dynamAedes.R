@@ -1,33 +1,35 @@
 #' Life cycle simulation of \emph{Aedes} mosquitoes
 #'
 #' Function to simulate population dynamics of \emph{Aedes} mosquitoes
-#' @param species select what species to model: "aegypti", "albopictus", "japonicus", "koreicus". Default species = "aegypti". 
-#' @param intro.eggs (numeric) number of introduced propagules, default intro.eggs = 100.
-#' @param intro.adults (numeric) number of introduced propagules, default zero. 
-#' @param intro.juveniles (numeric) number of introduced propagules, default zero.
-#' @param scale define the spatial scale of the modelling exercise: punctual/weather station "ws", local "lc", or regional "rg". Active dispersal is enabled only for scale = "rg". Default scale = "ws".
-#' @param intro.cells bla.
-#' @param ihwv (numeric) larval-habitat water volume, define the volume (L) of water habitat presents in each spatial unit (parameterised from \href{https://doi.org/10.1111/1365-2664.12620}{Hancock et al. 2016}). Default lhwv = 1.
-#' @param startd (numeric) day of start of the simulations, referring to the column number of temps.matrix.
-#' @param endd (numeric) day of end of the simulation, referring to the column number of temps.matrix.
-#' @param intro.year (numeric) year of the beginning of iterations. 
-#' @param iter (numeric) define the number of model iteration. 
-#' @param temps.matrix (matrix) a matrix of daily average temperature (in Celsius degree /1000) used to fit the life cycle rates. This matrix must be organised with the daily temperature observations as columns and the geographic position of the i-grid cell as rows.
-#' @param cells.coords (matrix) a matrix reporting the spatial coordinates of the temperature observations.
-#' @param lat (numeric) latitude value of the area of interested used to inform the diapause eggs allocation function. 
-#' @param long (numeric) longitude value of the area of interested used to inform the diapause eggs allocation function.
-#' @param road.dist.matrix (matrix) when scale = "lc", define the matrix containing the coordinates of the grid cells of the landscape intersecting the road network for the mosquito passive dispersal process. 
-#' @param country when scale = "lc", define the average car trip distance for the mosquito passive dispersal process. The value can be provided by the users, or using the estimates made by \href{https://publications.jrc.ec.europa.eu/repository/handle/JRC77079}{Pasaoglu et al. 2012}). for the following Europeancountries: France "fra", Germany "deu", Italy "ita", Poland "pol", Spain "esp", and the United Kingdom "uk". 
-#' @param cellsize (numeric) when scale = "lc", define the minimal distance of the active dispersal kernel and should match the spatial resolution of temps.matrix to avoid inconsistencies. Default cellsize = 250
-#' @param maxadisp (numeric) when scale = "lc", define the maximum daily dispersal, default maxadisp = 600.
-#' @param dispbins (numeric) when scale = "lc", define the resoluzion of the dispersal kernel, default dispbins = 10.
-#' @param n.clusters (numeric) define the number of parallel processes.
-#' @param cluster.type define the type of cluster, default "PSOCK".
-#' @param sparse.output BHOOOOOOOOOOOO
-#' @param compressed.output (logical) default TRUE, if FALSE provide the individual estimates for each iterations and each model's subcompartiment.
-#' @param suffix (character) model output suffix. 
-#' @param verbose (logical)
+#' @param species character. Select what species to model: \code{"aegypti"}, \code{"albopictus"}, \code{"japonicus"}, \code{"koreicus"}. Default \code{species = "aegypti"}. 
+#' @param intro.eggs positive integer. number of introduced propagules, default \code{intro.eggs = 100}.
+#' @param intro.adults positive integer. number of introduced propagules, default zero. 
+#' @param intro.juveniles positive integer. number of introduced propagules, default zero.
+#' @param scale character. Define the spatial scale of the modelling exercise: punctual/weather station "ws", local "lc", or regional "rg". Active and passive dispersal is enabled only for \code{scale = "lc"}. Default \code{scale = "ws"}.
+#' @param intro.cells positive integer. One or more id cells where to introduce the modeled population at local ("lc") scale. 
+#' @param ihwv positive integer. Larval-habitat water volume, define the volume (L) of water habitat presents in each spatial unit (parameterized from \href{https://doi.org/10.1111/1365-2664.12620}{Hancock et al. 2016}). Default \code{lhwv = 1}.
+#' @param startd positive integer. Day of start of the simulations, referring to the column number of temps.matrix.
+#' @param endd positive integer. Day of end of the simulation, referring to the column number of temps.matrix.
+#' @param intro.year numeric. Year of the beginning of iterations. 
+#' @param iter positive integer. Define the number of model iteration. 
+#' @param temps.matrix matrix. A matrix of daily average temperature (in Celsius degree /1000) used to fit the life cycle rates. This matrix must be organised with the daily temperature observations as columns and the geographic position of the i-grid cell as rows.
+#' @param cells.coords matrix. A matrix reporting the spatial coordinates of the temperature observations.
+#' @param lat numeric. Latitude value of the area of interested used to inform the diapause eggs allocation function. 
+#' @param long numeric. Longitude value of the area of interested used to inform the diapause eggs allocation function.
+#' @param road.dist.matrix matrix. when \code{scale = "lc"}, define the matrix containing the coordinates of the grid cells of the landscape intersecting the road network for the mosquito passive dispersal process. 
+#' @param country optional. when \code{scale = "lc"}, define the average car trip distance for the mosquito passive dispersal process. The value can be provided by the users, or using the estimates made by \href{https://publications.jrc.ec.europa.eu/repository/handle/JRC77079}{Pasaoglu et al. 2012}). for the following European countries: France "fra", Germany "deu", Italy "ita", Poland "pol", Spain "esp", and the United Kingdom "uk". 
+#' @param cellsize (positive integer. When \code{scale = "lc"}, define the minimal distance of the active dispersal kernel and should match the spatial resolution of temps.matrix to avoid inconsistencies. Default cellsize = 250
+#' @param maxadisp positive integer. When \code{scale = "lc"}, define the maximum daily dispersal, default maxadisp = 600.
+#' @param dispbins positive integer.  When scale = "lc", define the resolution of the dispersal kernel, default dispbins = 10.
+#' @param n.clusters positive integer. Define the number of parallel processes.
+#' @param cluster.type character. Define the type of cluster, default "PSOCK".
+#' @param sparse.output logical. The output matrix is optimized for sparse-matrix algebra.
+#' @param compressed.output logical. Default TRUE, if FALSE provide the individual estimates for each iterations and each model's subcompartiment.
+#' @param suffix character.Model output suffix. 
+#' @param verbose logical.
+#' @param seeding logical, default \code{FALSE}, if \code{seeding=TRUE} a fixed seed is applied.  
 #' @return Matrix or a list of matrixes containing, for each iteration, the number of individuals in each life stage per day (and for each grid cell of the study area if scale="lc" or "rg"). If the argument compressed.output=FALSE (default TRUE), the model returns the daily number of individuals in each life stage sub-compartment.	
+#' @seealso Beta regression function were taken from the R package \code{aomisc}, which is available at \url{https://github.com/OnofriAndreaPG/aomisc}.
 #' @author Matteo Marcantonio \email{marcantoniomatteo@gmail.com}, Daniele Da Re \email{daniele.dare@uclouvain.be}
 #' @export
 
@@ -75,7 +77,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 			} else(message("The only supported cluster.type is SOCK"))
 		## Register the environment 
 			registerDoParallel(cl, cores=n.clusters)
-			if(seeding) clusterEvalQ(cl, set.seed(2021))
+			if(seeding) parallel::clusterEvalQ(cl, set.seed(2021))
 		## Define space dimensionality into which simulations occour
 				space <- nrow(temps.matrix)
 		    ## Set a progress bar

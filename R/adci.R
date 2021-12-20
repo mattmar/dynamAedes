@@ -1,12 +1,12 @@
-#' Summaries of mosquito abundance
+#' Summaries of mosquito abundance.
 #'
-#' Summaries of mosquito abundance at each life stage for each day 
-#' @param input_sim (matrix) dynamAedes compressed output matrix 
-#' @param eval_date (integer) define the day of successful introduction evaluation, referring to the column number of the temperature matrix used to inform the model. 
-#' @param stage (integer) 0 (all), 1 (egg), 2 (juvenile), 3 (adult), 4 (diapausing egg).
-#' @param n.clusters (numeric) define the number of parallel processes.
-#' @param breaks quantile breaks, default the first, the second and the third c(0.25,0.5,0.75)
-#' @return Returns a table with the summary of mosquito abundance per life stage (or substage if compressed.output=FALSE in dynamAedes) for each day. 
+#' Summaries of mosquito abundance at each life stage for each day.
+#' @param input_sim matrix. dynamAedes compressed output matrix.
+#' @param eval_date positive integer. Define the day of successful introduction evaluation, referring to the column number of the temperature matrix used to inform the model. 
+#' @param stage positive integer. 0 (all), 1 (egg), 2 (juvenile), 3 (adult), 4 (diapausing egg).
+#' @param n.clusters positive integer. Define the number of parallel processes.
+#' @param breaks numeric vector. Quantile breaks, default the first, the second and the third quantile: \code{c(0.25,0.5,0.75)}.
+#' @return Returns a table with the summary of mosquito abundance per life stage (or substage if \code{compressed.output=FALSE} in \code{dynamAedes} function) for each day. 
 #' @author Matteo Marcantonio \email{marcantoniomatteo@gmail.com}, Daniele Da Re \email{daniele.dare@uclouvain.be}
 #' @export
 

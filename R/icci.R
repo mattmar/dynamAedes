@@ -1,10 +1,10 @@
 #' Number of invaded cells
 #'
 #' Compute a summary of the number of invaded cells over model iterations
-#' @param input_sim (matrix) dynamAedes compressed output matrix 
-#' @param eval_date (integer) define the day of successful introduction evaluation, referring to the column number of the temperature matrix used to inform the model. 
-#' @param breaks quantile breaks, default the first, the second and the third c(0.25,0.5,0.75)
-#' @return icci returns the Interquartile range of the number of invaded cells for the specified day over model all iterations. The output should be interpreted according to dynamAedes spatial scale (i.e. scale='rg' or 'lc').
+#' @param input_sim matrix. \code{dynamAedes} compressed output matrix (\code{compressed=TRUE}).
+#' @param eval_date positive integer. Define the day of successful introduction evaluation, referring to the column number of the temperature matrix used to inform the model. 
+#' @param breaks numeric vector. Quantile breaks, default the first, the second and the third quantile: \code{c(0.25,0.5,0.75)}.
+#' @return \code{icci} returns the Interquartile range of the number of invaded cells for the specified day over model all iterations. The output should be interpreted according to dynamAedes spatial scale (i.e. \code{scale='rg'} or  \code{scale='lc'}).
 #' @author Matteo Marcantonio \email{marcantoniomatteo@gmail.com}, Daniele Da Re \email{daniele.dare@uclouvain.be}
 #' @export
 

@@ -1,10 +1,10 @@
 #' Estimate of of mosquito dispersal spread 
 #'
-#' Estimates of mosquito dispersal spread (in km2 ) of the simulated mosquito populations when scale = "lc"
-#' @param input_sim (matrix) dynamAedes compressed output matrix 
-#' @param coords (matrix) (matrix) a matrix reporting the spatial coordinates of the temperature observations.
-#' @param eval_date (integer) define the day of successful introduction evaluation, referring to the column number of the temperature matrix used to inform the model. 
-#' @param breaks quantile breaks, default the first, the second and the third c(0.25,0.5,0.75)
+#' Estimates of mosquito dispersal spread (in km2 ) of the simulated mosquito populations when \code{scale = "lc"}.
+#' @param input_sim matrix. \code{dynamAedes} compressed output matrix (\code{compressed=TRUE}).
+#' @param coords matrix. A matrix reporting the spatial coordinates of the temperature observations.
+#' @param eval_date numeric. Define the day of successful introduction evaluation, referring to the column number of the temperature matrix used to inform the model. 
+#' @param breaks numeric vector. Quantile breaks, default the first, the second and the third quantile: \code{c(0.25,0.5,0.75)}.
 #' @param space is it spatial?
 #' @return TBW
 #' @author Matteo Marcantonio \email{marcantoniomatteo@gmail.com}, Daniele Da Re \email{daniele.dare@uclouvain.be}
@@ -45,6 +45,7 @@ dici <- function(input_sim=NULL, coords=NULL, eval_date=NULL, breaks=c(0.25,0.5,
 		}
 	}
 }
+
 # Ad-hoc functions
 .returndis <- function(distl=NA, days=NA, breaks=breaks) {
 	out <- do.call(rbind.data.frame, 
