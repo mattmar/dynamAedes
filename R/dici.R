@@ -1,12 +1,12 @@
-#' Estimate of of mosquito dispersal spread 
+#' Estimate of of mosquito dispersal
 #'
-#' Estimates of mosquito dispersal spread (in km2 ) of the simulated mosquito populations when \code{scale = "lc"}.
+#' Estimates of dispersal (in km^2) for the simulated mosquito population when \code{scale = "lc"}.
 #' @param input_sim matrix. \code{dynamAedes} compressed output matrix (\code{compressed=TRUE}).
 #' @param coords matrix. A matrix reporting the spatial coordinates of the temperature observations.
-#' @param eval_date numeric. Define the day of successful introduction evaluation, referring to the column number of the temperature matrix used to inform the model. 
-#' @param breaks numeric vector. Quantile breaks, default the first, the second and the third quantile: \code{c(0.25,0.5,0.75)}.
-#' @param space is it spatial?
-#' @return TBW
+#' @param eval_date numeric. Define the day of evaluation; it refers to the column number of the input temperature matrix. 
+#' @param breaks numeric vector. Quantile breaks, default interquartile range: \code{c(0.25,0.5,0.75)}.
+#' @param space See below for more details.
+#' @return if space=FALE then it returns a dataframe with quantiles of the distribution of dispersal distances; if space=TRUE (experimental) then it returns the invaded cells on the last day of model simulations for each of the iterations.
 #' @author Matteo Marcantonio \email{marcantoniomatteo@gmail.com}, Daniele Da Re \email{daniele.dare@uclouvain.be}
 #' @export
 
@@ -28,7 +28,7 @@ dici <- function(input_sim=NULL, coords=NULL, eval_date=NULL, breaks=c(0.25,0.5,
 		# Distance from intro to each invaded cell per day
 		if(!space){
 			cdist <- lapply(1:length(inv_cells), function(x) {
-				.meuc(c1=inv_cells[[x]],c2=inv_cells[[x]], coords=coords)
+				.meuc(c1=inv_cells[[x]], c2=inv_cells[[x]], coords=coords)
 			})
 			return(cbind.data.frame(.returndis(distl=cdist,days=eval_date, breaks=breaks),day=eval_date))
 		}else{
@@ -38,7 +38,7 @@ dici <- function(input_sim=NULL, coords=NULL, eval_date=NULL, breaks=c(0.25,0.5,
 				coords1$inv <- 0
 				coords1$inv[x[[maxdate]]] <- 1
 				names(coords1)=c("X", "Y", paste0("day",maxdate,"_inv_cells_Iteration"))
-				coords1<-rasterFromXYZ(coords1)
+				coords1 <- rasterFromXYZ(coords1)
 				return(coords1)
 			})
 			return(stack(outs))
@@ -63,7 +63,7 @@ dici <- function(input_sim=NULL, coords=NULL, eval_date=NULL, breaks=c(0.25,0.5,
 	outd <- list(NA)
 	for ( rw in 1:length(c2) ) {
 		outd[[rw]] <- sapply(unlist(c2[rw]), function(x) {
-			.euc(c(c3[1], coords[x,1]), c(c3[2], coords[x,2]))
+			.euc(c(as.numeric(c3[1]), as.numeric(coords[x,1])), c(as.numeric(c3[2]), as.numeric(coords[x,2])))
 		})
 	}
 	return(outd)

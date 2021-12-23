@@ -2,9 +2,9 @@
 #'
 #' Compute a summary of the number of invaded cells over model iterations
 #' @param input_sim matrix. \code{dynamAedes} compressed output matrix (\code{compressed=TRUE}).
-#' @param eval_date positive integer. Define the day of successful introduction evaluation, referring to the column number of the temperature matrix used to inform the model. 
-#' @param breaks numeric vector. Quantile breaks, default the first, the second and the third quantile: \code{c(0.25,0.5,0.75)}.
-#' @return \code{icci} returns the Interquartile range of the number of invaded cells for the specified day over model all iterations. The output should be interpreted according to dynamAedes spatial scale (i.e. \code{scale='rg'} or  \code{scale='lc'}).
+#' @param eval_date numeric. Define the day of evaluation; it refers to the column number of the input temperature matrix. 
+#' @param breaks numeric vector. Quantile breaks, default interquartile range: \code{c(0.25,0.5,0.75)}.
+#' @return \code{icci} returns quantiles of the distribution of the invaded cell number for the specified. The output should be interpreted according to model spatial scale (i.e. \code{scale='rg'} or \code{scale='lc'} give different interpretation).
 #' @author Matteo Marcantonio \email{marcantoniomatteo@gmail.com}, Daniele Da Re \email{daniele.dare@uclouvain.be}
 #' @export
 
@@ -16,7 +16,7 @@ icci <- function(input_sim=NA, eval_date=0, breaks=c(0.25,0.5,0.75)){
 		stop("Non-spatial data, set scale='lc' or scale='rg' in dynamAedes()")
 	} else {
 		out <- apply(do.call(rbind.data.frame,lapply(input_sim, function(x) {
-			lapply(1:length(eval_date), function(y) {
+			lapply(eval_date, function(y) {
 				if( y<=length(x) ) {
 					length(which(colSums(x[[y]])>0))
 				} else {NA}})})),2,quantile,probs=breaks,na.rm=T)

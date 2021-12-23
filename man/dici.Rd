@@ -2,7 +2,7 @@
 % Please edit documentation in R/dici.R
 \name{dici}
 \alias{dici}
-\title{Estimate of of mosquito dispersal spread}
+\title{Estimate of of mosquito dispersal}
 \usage{
 dici(
   input_sim = NULL,
@@ -17,17 +17,17 @@ dici(
 
 \item{coords}{matrix. A matrix reporting the spatial coordinates of the temperature observations.}
 
-\item{eval_date}{numeric. Define the day of successful introduction evaluation, referring to the column number of the temperature matrix used to inform the model.}
+\item{eval_date}{numeric. Define the day of evaluation; it refers to the column number of the input temperature matrix.}
 
-\item{breaks}{numeric vector. Quantile breaks, default the first, the second and the third quantile: \code{c(0.25,0.5,0.75)}.}
+\item{breaks}{numeric vector. Quantile breaks, default interquartile range: \code{c(0.25,0.5,0.75)}.}
 
-\item{space}{is it spatial?}
+\item{space}{See below for more details.}
 }
 \value{
-TBW
+if space=FALE then it returns a dataframe with quantiles of the distribution of dispersal distances; if space=TRUE (experimental) then it returns the invaded cells on the last day of model simulations for each of the iterations.
 }
 \description{
-Estimates of mosquito dispersal spread (in km2 ) of the simulated mosquito populations when \code{scale = "lc"}.
+Estimates of dispersal (in km^2) for the simulated mosquito population when \code{scale = "lc"}.
 }
 \author{
 Matteo Marcantonio \email{marcantoniomatteo@gmail.com}, Daniele Da Re \email{daniele.dare@uclouvain.be}

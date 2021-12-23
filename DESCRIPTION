@@ -4,10 +4,10 @@ Date: 2021-11-30
 Title: Generalised model for the population dynamics of invasive \emph{Aedes} mosquitoes
 Authors@R: c(person("Matteo", "Marcantonio", role = c("aut", "cre"), email = "marcantoniomatteo@gmail.com"),person("Daniele", "Da Re", role = c("aut"), email = "daniele.dare@uclouvain.be")) 
 Depends: R (>= 3.6.0), raster
-Imports: drc, fields, foreach, insol, slam, doParallel, sp, qpdf
+Imports: drc, fields, foreach, insol, slam, doParallel, sp
 LazyData: TRUE
 BugReports: https://github.com/mattmar/dynamAedes
-Description: Generalised model for the population dynamics of four invasive \emph{Aedes} mosquitoes.
+Description: Generalised model for population dynamics of invasive \emph{Aedes} mosquitoes; rationale and model structure are described here: <https://doi.org/10.1016/j.ecoinf.2020.101180> and <https://www.biorxiv.org/content/10.1101/2021.12.21.473628v1>.
 VignetteBuilder: R.rsp
 Encoding: UTF-8
 Language: en-GB

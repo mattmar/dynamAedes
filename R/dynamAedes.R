@@ -2,33 +2,33 @@
 #'
 #' Function to simulate population dynamics of \emph{Aedes} mosquitoes
 #' @param species character. Select what species to model: \code{"aegypti"}, \code{"albopictus"}, \code{"japonicus"}, \code{"koreicus"}. Default \code{species = "aegypti"}. 
-#' @param intro.eggs positive integer. number of introduced propagules, default \code{intro.eggs = 100}.
-#' @param intro.adults positive integer. number of introduced propagules, default zero. 
-#' @param intro.juveniles positive integer. number of introduced propagules, default zero.
-#' @param scale character. Define the spatial scale of the modelling exercise: punctual/weather station "ws", local "lc", or regional "rg". Active and passive dispersal is enabled only for \code{scale = "lc"}. Default \code{scale = "ws"}.
-#' @param intro.cells positive integer. One or more id cells where to introduce the modeled population at local ("lc") scale. 
-#' @param ihwv positive integer. Larval-habitat water volume, define the volume (L) of water habitat presents in each spatial unit (parameterized from \href{https://doi.org/10.1111/1365-2664.12620}{Hancock et al. 2016}). Default \code{lhwv = 1}.
+#' @param intro.eggs positive integer. number of introduced eggs, default \code{intro.eggs = 100}.
+#' @param intro.adults positive integer. number of introduced adults, default zero. 
+#' @param intro.juveniles positive integer. number of introduced juveniles, default zero.
+#' @param scale character. Define the model spatial scale: punctual/weather station "ws", local "lc", or regional "rg". Active and passive dispersal is enabled only for \code{scale = "lc"}. Default \code{scale = "ws"}.
+#' @param intro.cells positive integer. One or more cells (id) where to introduce the population at local ("lc") scale. If intro.cells=NULL, then a random cell is used for introduction; If intro.cells is a vector of cell ids then a cell is drawn at random from the vector (with repetition) for introduction in each model iteration. 
+#' @param ihwv positive integer. Larval-habitat water volume, define the volume (L) of water habitat presents in each spatial unit (parameterised from \href{https://doi.org/10.1111/1365-2664.12620}{Hancock et al. 2016}). Default \code{lhwv = 1}.
 #' @param startd positive integer. Day of start of the simulations, referring to the column number of temps.matrix.
 #' @param endd positive integer. Day of end of the simulation, referring to the column number of temps.matrix.
-#' @param intro.year numeric. Year of the beginning of iterations. 
-#' @param iter positive integer. Define the number of model iteration. 
-#' @param temps.matrix matrix. A matrix of daily average temperature (in Celsius degree /1000) used to fit the life cycle rates. This matrix must be organised with the daily temperature observations as columns and the geographic position of the i-grid cell as rows.
+#' @param intro.year numeric. Year of the beginning of iterations (for photoperiod calculation). 
+#' @param iter positive integer. Define the number of model iterations. 
+#' @param temps.matrix matrix. A matrix of daily (average) temperatures (in degrees **Celsius degreex1000**) used to fit the life cycle rates. This matrix must be organised with the daily temperature observations as columns and the geographic position of the i-grid cell as rows.
 #' @param cells.coords matrix. A matrix reporting the spatial coordinates of the temperature observations.
-#' @param lat numeric. Latitude value of the area of interested used to inform the diapause eggs allocation function. 
-#' @param long numeric. Longitude value of the area of interested used to inform the diapause eggs allocation function.
-#' @param road.dist.matrix matrix. when \code{scale = "lc"}, define the matrix containing the coordinates of the grid cells of the landscape intersecting the road network for the mosquito passive dispersal process. 
-#' @param country optional. when \code{scale = "lc"}, define the average car trip distance for the mosquito passive dispersal process. The value can be provided by the users, or using the estimates made by \href{https://publications.jrc.ec.europa.eu/repository/handle/JRC77079}{Pasaoglu et al. 2012}). for the following European countries: France "fra", Germany "deu", Italy "ita", Poland "pol", Spain "esp", and the United Kingdom "uk". 
-#' @param cellsize (positive integer. When \code{scale = "lc"}, define the minimal distance of the active dispersal kernel and should match the spatial resolution of temps.matrix to avoid inconsistencies. Default cellsize = 250
-#' @param maxadisp positive integer. When \code{scale = "lc"}, define the maximum daily dispersal, default maxadisp = 600.
-#' @param dispbins positive integer.  When scale = "lc", define the resolution of the dispersal kernel, default dispbins = 10.
-#' @param n.clusters positive integer. Define the number of parallel processes.
-#' @param cluster.type character. Define the type of cluster, default "PSOCK".
-#' @param sparse.output logical. The output matrix is optimized for sparse-matrix algebra.
-#' @param compressed.output logical. Default TRUE, if FALSE provide the individual estimates for each iterations and each model's subcompartiment.
-#' @param suffix character.Model output suffix. 
-#' @param verbose logical.
-#' @param seeding logical, default \code{FALSE}, if \code{seeding=TRUE} a fixed seed is applied.  
-#' @return Matrix or a list of matrixes containing, for each iteration, the number of individuals in each life stage per day (and for each grid cell of the study area if scale="lc" or "rg"). If the argument compressed.output=FALSE (default TRUE), the model returns the daily number of individuals in each life stage sub-compartment.	
+#' @param lat numeric. Latitude value of the area of interested used to derive the photoperiod (and thus the diapause eggs allocation function). 
+#' @param long numeric. Longitude value of the area of interested used to derive the photoperiod (and thus the diapause eggs allocation function)
+#' @param road.dist.matrix matrix. when \code{scale = "lc"}, defines the matrix containing the distances (in meters) between grid cells intersecting the road network for the mosquito passive dispersal process.
+#' @param country optional. when \code{scale = "lc"}, define the average car trip distance for the mosquito passive dispersal process. The value can be set by the users (positive numeric), or the estimates made by \href{https://publications.jrc.ec.europa.eu/repository/handle/JRC77079}{Pasaoglu et al. 2012}) for the following European countries: France "fra", Germany "deu", Italy "ita", Poland "pol", Spain "esp" and the United Kingdom "uk". 
+#' @param cellsize (positive integer. When \code{scale = "lc"}, defines the minimal distance for the active dispersal kernel and should match the spatial resolution of temps.matrix to avoid inconsistencies. Default cellsize = 250
+#' @param maxadisp positive integer. When \code{scale = "lc"}, defines the maximum daily dispersal, default maxadisp = 600.
+#' @param dispbins positive integer. When scale = "lc", defines the resolution of the dispersal kernel, default dispbins = 10.
+#' @param n.clusters positive integer. Defines the number of parallel processes.
+#' @param cluster.type character. Defines the type of cluster, default "PSOCK".
+#' @param sparse.output logical. The output matrix is optimised for sparse-matrix algebra (e.g. zeros are indexed).
+#' @param compressed.output logical. Default TRUE, if FALSE provide abundanced for each model's subcompartiment; if FALSE abundances are summed per compartment.
+#' @param suffix character. Model output suffix for output RDS. 
+#' @param verbose logical. if TRUE then an overview of population dynamics is printed in the console.
+#' @param seeding logical, default \code{FALSE}, if \code{seeding=TRUE} a fixed seed is applied for result reproducibility.  
+#' @return Matrix or a list of matrices containing, for each iteration, the number of individuals in each life stage per day (and for each grid cell of the study area if scale="lc" or "rg"). If the argument compressed.output=FALSE (default TRUE), the model returns the daily number of individuals in each life stage sub-compartment.	
 #' @seealso Beta regression function were taken from the R package \code{aomisc}, which is available at \url{https://github.com/OnofriAndreaPG/aomisc}.
 #' @author Matteo Marcantonio \email{marcantoniomatteo@gmail.com}, Daniele Da Re \email{daniele.dare@uclouvain.be}
 #' @export
