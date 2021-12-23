@@ -1,0 +1,10 @@
+bibentry(bibtype = "article",
+         title = "Will the yellow fever mosquito colonise Europe? Assessing the re-introduction of Aedes aegypti using a process-based population dynamical model",
+         author = c(person("Daniele", "Da Re"),
+                    person("Diego", "Montecino"),
+                    person("Sophie", "Vanwambeke"),
+                    person("Matteo", "Marcantonio")),
+         year = 2021,
+         journal = "Ecological Informatics",
+         url = "https://www.sciencedirect.com/science/article/abs/pii/S1574954120301308?via%3Dihub",
+	     doi = "doi:10.1016/j.ecoinf.2020.101180")
