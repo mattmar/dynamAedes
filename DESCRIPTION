@@ -1,24 +1,17 @@
 Package: dynamAedes
-Version: 2.0.1
-Date: 2021-11-30
-Title: Generalised model for the population dynamics of invasive \emph{Aedes} mosquitoes
+Version: 2.0.2
+Date: 2021-12-26
+Title: A Unified Mechanistic Model For The Population Dynamics Of Invasive *aedes* Mosquitoes
 Authors@R: c(person("Matteo", "Marcantonio", role = c("aut", "cre"), email = "marcantoniomatteo@gmail.com"),person("Daniele", "Da Re", role = c("aut"), email = "daniele.dare@uclouvain.be")) 
 Depends: R (>= 3.6.0), raster
 Imports: drc, fields, foreach, insol, slam, doParallel, sp
-LazyData: TRUE
 BugReports: https://github.com/mattmar/dynamAedes
-Description: Generalised model for population dynamics of invasive \emph{Aedes} mosquitoes; rationale and model structure are described here: <https://doi.org/10.1016/j.ecoinf.2020.101180> and <https://www.biorxiv.org/content/10.1101/2021.12.21.473628v1>.
-VignetteBuilder: R.rsp
+Description: Generalised model for population dynamics of invasive *Aedes* mosquitoes; rationale and model structure are described here: <doi:10.1016/j.ecoinf.2020.101180> and <doi:10.1101/2021.12.21.473628>
+VignetteBuilder: knitr
 Encoding: UTF-8
 Language: en-GB
 License: GPL(>=2)
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
-Suggests:
-	parallel,
-    rmarkdown,
-    R.rsp,
-    knitr,
-    qpdf,
-    testthat (>= 3.0.0)
+Suggests: parallel, rmarkdown, knitr, eesim, geosphere, ggplot2, gstat, maptools, rgeos, spatstat, tidyverse
 Config/testthat/edition: 3

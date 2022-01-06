@@ -7,24 +7,24 @@
 #' @param intro.juveniles positive integer. number of introduced juveniles, default zero.
 #' @param scale character. Define the model spatial scale: punctual/weather station "ws", local "lc", or regional "rg". Active and passive dispersal is enabled only for \code{scale = "lc"}. Default \code{scale = "ws"}.
 #' @param intro.cells positive integer. One or more cells (id) where to introduce the population at local ("lc") scale. If intro.cells=NULL, then a random cell is used for introduction; If intro.cells is a vector of cell ids then a cell is drawn at random from the vector (with repetition) for introduction in each model iteration. 
-#' @param ihwv positive integer. Larval-habitat water volume, define the volume (L) of water habitat presents in each spatial unit (parameterised from \href{https://doi.org/10.1111/1365-2664.12620}{Hancock et al. 2016}). Default \code{lhwv = 1}.
+#' @param ihwv positive integer. Larval-habitat water volume, define the volume (L) of water habitat presents in each spatial unit (parametrised from \href{https://doi.org/10.1111/1365-2664.12620}{Hancock et al. 2016}). Default \code{lhwv = 1}.
 #' @param startd positive integer. Day of start of the simulations, referring to the column number of temps.matrix.
 #' @param endd positive integer. Day of end of the simulation, referring to the column number of temps.matrix.
 #' @param intro.year numeric. Year of the beginning of iterations (for photoperiod calculation). 
 #' @param iter positive integer. Define the number of model iterations. 
-#' @param temps.matrix matrix. A matrix of daily (average) temperatures (in degrees **Celsius degreex1000**) used to fit the life cycle rates. This matrix must be organised with the daily temperature observations as columns and the geographic position of the i-grid cell as rows.
+#' @param temps.matrix matrix. A matrix of daily (average) temperatures (in degrees **Celsius degree x 1000**) used to fit the life cycle rates. This matrix must be organised with the daily temperature observations as columns and the geographic position of the i-grid cell as rows.
 #' @param cells.coords matrix. A matrix reporting the spatial coordinates of the temperature observations.
 #' @param lat numeric. Latitude value of the area of interested used to derive the photoperiod (and thus the diapause eggs allocation function). 
 #' @param long numeric. Longitude value of the area of interested used to derive the photoperiod (and thus the diapause eggs allocation function)
 #' @param road.dist.matrix matrix. when \code{scale = "lc"}, defines the matrix containing the distances (in meters) between grid cells intersecting the road network for the mosquito passive dispersal process.
-#' @param country optional. when \code{scale = "lc"}, define the average car trip distance for the mosquito passive dispersal process. The value can be set by the users (positive numeric), or the estimates made by \href{https://publications.jrc.ec.europa.eu/repository/handle/JRC77079}{Pasaoglu et al. 2012}) for the following European countries: France "fra", Germany "deu", Italy "ita", Poland "pol", Spain "esp" and the United Kingdom "uk". 
+#' @param avgpdisp optional. when \code{scale = "lc"}, define the average car trip distance for the mosquito passive dispersal process. The value can be set by the users (positive numeric), or the estimates made by \href{https://publications.jrc.ec.europa.eu/repository/handle/JRC77079}{Pasaoglu et al. 2012}) for the following European countries: France "fra", Germany "deu", Italy "ita", Poland "pol", Spain "esp" and the United Kingdom "uk". The average passive dispersal distance must be smaller than the maximum distance in **road.dist.matrix**.
 #' @param cellsize (positive integer. When \code{scale = "lc"}, defines the minimal distance for the active dispersal kernel and should match the spatial resolution of temps.matrix to avoid inconsistencies. Default cellsize = 250
 #' @param maxadisp positive integer. When \code{scale = "lc"}, defines the maximum daily dispersal, default maxadisp = 600.
 #' @param dispbins positive integer. When scale = "lc", defines the resolution of the dispersal kernel, default dispbins = 10.
 #' @param n.clusters positive integer. Defines the number of parallel processes.
 #' @param cluster.type character. Defines the type of cluster, default "PSOCK".
 #' @param sparse.output logical. The output matrix is optimised for sparse-matrix algebra (e.g. zeros are indexed).
-#' @param compressed.output logical. Default TRUE, if FALSE provide abundanced for each model's subcompartiment; if FALSE abundances are summed per compartment.
+#' @param compressed.output logical. Default TRUE, if FALSE provide abundance for each model's subcompartiment; if FALSE abundances are summed per compartment.
 #' @param suffix character. Model output suffix for output RDS. 
 #' @param verbose logical. if TRUE then an overview of population dynamics is printed in the console.
 #' @param seeding logical, default \code{FALSE}, if \code{seeding=TRUE} a fixed seed is applied for result reproducibility.  
@@ -35,7 +35,7 @@
 
 dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.juveniles=0, 
 	scale="ws", intro.cells=NULL, ihwv=1, temps.matrix=NULL, startd=1, endd=10,
-	cells.coords=NULL, lat=0, long=0, road.dist.matrix=NULL, country=NA, intro.year=2020,
+	cells.coords=NULL, lat=0, long=0, road.dist.matrix=NULL, avgpdisp=NA, intro.year=2020,
 	iter=1, n.clusters=1, cluster.type="PSOCK", sparse.output=FALSE, compressed.output=TRUE,
 	suffix=NA, cellsize=250, maxadisp=600, dispbins=10, verbose=FALSE, seeding=FALSE) {
     #%%%%%%%%%%%%%%%%%%%#
@@ -46,21 +46,23 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 			.resample <- function(x, ...) x[sample.int(length(x), ...)]
 		legind <- 0
 	## Define globally the average distance of a trip by car (km)
-		if( is.na(country) ) {
+		if( is.na(avgpdisp) ) {
 			car.avg.trip <- 22.04
-		}else if( country=="ita" ) {
+		} else if( avgpdisp=="ita" ) {
 			car.avg.trip <- 18.99
-		} else if( country=="deu" ) {
+		} else if( avgpdisp=="deu" ) {
 			car.avg.trip <- 23.31
-		} else if( country=="esp" ) {
+		} else if( avgpdisp=="esp" ) {
 			car.avg.trip <- 28.97
-		} else if( country=="fra" ) {
+		} else if( avgpdisp=="fra" ) {
 			car.avg.trip <- 19.29
-		} else if( country=="pol" ) {
+		} else if( avgpdisp=="pol" ) {
 			car.avg.trip <- 22.65
-		} else if( country=="uk" ) {
+		} else if( avgpdisp=="uk" ) {
 			car.avg.trip <- 19.03
-		} else (stop("Country not supported yet..."))
+		} else if ( is.numeric(avgpdisp) ) {
+		car.avg.trip <- avgpdisp
+	    } else (stop("avgpdisp not supported yet..."))
 	## Derive daylength for laying of diapausing eggs in albopictus/koreicus/japonicu
 		if(species!="aegypti"){
 			jd <- JD(seq(as.POSIXct(paste(intro.year,"/01/01",sep="")),as.POSIXct(as.Date(paste(intro.year,"/01/01",sep=""))+endd),by='day'))
@@ -98,7 +100,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 						stop("If scale='lc' then temps.matrix|road.dist.matrix|cells.coords) must exist and nrows must be > 1")
 					}
 					if( length(intro.cells)>=1 ) {
-						intro.cell <- sample(intro.cells,1)
+						intro.cell <- intro.cells[sample(1:length(intro.cells),1)]
 					} else {intro.cell <- NA}
         		# if intro.cell is not NA than use intro.cell, else sample at random a cell along roads (column of road.dist.matrix)
 				# Eggs

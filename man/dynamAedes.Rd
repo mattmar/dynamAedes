@@ -19,7 +19,7 @@ dynamAedes(
   lat = 0,
   long = 0,
   road.dist.matrix = NULL,
-  country = NA,
+  avgpdisp = NA,
   intro.year = 2020,
   iter = 1,
   n.clusters = 1,
@@ -47,9 +47,9 @@ dynamAedes(
 
 \item{intro.cells}{positive integer. One or more cells (id) where to introduce the population at local ("lc") scale. If intro.cells=NULL, then a random cell is used for introduction; If intro.cells is a vector of cell ids then a cell is drawn at random from the vector (with repetition) for introduction in each model iteration.}
 
-\item{ihwv}{positive integer. Larval-habitat water volume, define the volume (L) of water habitat presents in each spatial unit (parameterised from \href{https://doi.org/10.1111/1365-2664.12620}{Hancock et al. 2016}). Default \code{lhwv = 1}.}
+\item{ihwv}{positive integer. Larval-habitat water volume, define the volume (L) of water habitat presents in each spatial unit (parametrised from \href{https://doi.org/10.1111/1365-2664.12620}{Hancock et al. 2016}). Default \code{lhwv = 1}.}
 
-\item{temps.matrix}{matrix. A matrix of daily (average) temperatures (in degrees \strong{Celsius degreex1000}) used to fit the life cycle rates. This matrix must be organised with the daily temperature observations as columns and the geographic position of the i-grid cell as rows.}
+\item{temps.matrix}{matrix. A matrix of daily (average) temperatures (in degrees \strong{Celsius degree x 1000}) used to fit the life cycle rates. This matrix must be organised with the daily temperature observations as columns and the geographic position of the i-grid cell as rows.}
 
 \item{startd}{positive integer. Day of start of the simulations, referring to the column number of temps.matrix.}
 
@@ -63,7 +63,7 @@ dynamAedes(
 
 \item{road.dist.matrix}{matrix. when \code{scale = "lc"}, defines the matrix containing the distances (in meters) between grid cells intersecting the road network for the mosquito passive dispersal process.}
 
-\item{country}{optional. when \code{scale = "lc"}, define the average car trip distance for the mosquito passive dispersal process. The value can be set by the users (positive numeric), or the estimates made by \href{https://publications.jrc.ec.europa.eu/repository/handle/JRC77079}{Pasaoglu et al. 2012}) for the following European countries: France "fra", Germany "deu", Italy "ita", Poland "pol", Spain "esp" and the United Kingdom "uk".}
+\item{avgpdisp}{optional. when \code{scale = "lc"}, define the average car trip distance for the mosquito passive dispersal process. The value can be set by the users (positive numeric), or the estimates made by \href{https://publications.jrc.ec.europa.eu/repository/handle/JRC77079}{Pasaoglu et al. 2012}) for the following European countries: France "fra", Germany "deu", Italy "ita", Poland "pol", Spain "esp" and the United Kingdom "uk". The average passive dispersal distance must be smaller than the maximum distance in \strong{road.dist.matrix}.}
 
 \item{intro.year}{numeric. Year of the beginning of iterations (for photoperiod calculation).}
 
@@ -75,7 +75,7 @@ dynamAedes(
 
 \item{sparse.output}{logical. The output matrix is optimised for sparse-matrix algebra (e.g. zeros are indexed).}
 
-\item{compressed.output}{logical. Default TRUE, if FALSE provide abundanced for each model's subcompartiment; if FALSE abundances are summed per compartment.}
+\item{compressed.output}{logical. Default TRUE, if FALSE provide abundance for each model's subcompartiment; if FALSE abundances are summed per compartment.}
 
 \item{suffix}{character. Model output suffix for output RDS.}
 

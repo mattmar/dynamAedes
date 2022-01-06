@@ -6,7 +6,7 @@
 #' @param eval_date numeric. Define the day of evaluation; it refers to the column number of the input temperature matrix. 
 #' @param breaks numeric vector. Quantile breaks, default interquartile range: \code{c(0.25,0.5,0.75)}.
 #' @param space See below for more details.
-#' @return if space=FALE then it returns a dataframe with quantiles of the distribution of dispersal distances; if space=TRUE (experimental) then it returns the invaded cells on the last day of model simulations for each of the iterations.
+#' @return if space=FALSE then it returns a dataframe with quantiles of the distribution of dispersal distances; if space=TRUE (experimental) then it returns the invaded cells on the last day of model simulations for each of the iterations.
 #' @author Matteo Marcantonio \email{marcantoniomatteo@gmail.com}, Daniele Da Re \email{daniele.dare@uclouvain.be}
 #' @export
 

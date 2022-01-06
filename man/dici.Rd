@@ -24,7 +24,7 @@ dici(
 \item{space}{See below for more details.}
 }
 \value{
-if space=FALE then it returns a dataframe with quantiles of the distribution of dispersal distances; if space=TRUE (experimental) then it returns the invaded cells on the last day of model simulations for each of the iterations.
+if space=FALSE then it returns a dataframe with quantiles of the distribution of dispersal distances; if space=TRUE (experimental) then it returns the invaded cells on the last day of model simulations for each of the iterations.
 }
 \description{
 Estimates of dispersal (in km^2) for the simulated mosquito population when \code{scale = "lc"}.

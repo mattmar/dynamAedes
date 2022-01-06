@@ -1,6 +1,14 @@
+# dynamAedes 2.0.2
+* Minor bug fix for idci and icci functions
+* Change option name for passive dispersal; option to use a numeric vector for average passive dispersal
+* Reshape vignette (simplified) for packaging
+* Change vignette builder to knitr
+* Add an initial test for reproducibility
+
 # dynamAedes 2.0.1
 * All functions reshaped for publication
 * Physiological rates updates
+* Vignette updated
 
 # dynamAedes 2.0.0
 * Enhanced physiological rates for koreicus/japonicus
