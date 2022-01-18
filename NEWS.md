@@ -4,6 +4,7 @@
 * Reshape vignette (simplified) for packaging
 * Change vignette builder to knitr
 * Add an initial test for reproducibility
+* Add code example for dynamAedes
 
 # dynamAedes 2.0.1
 * All functions reshaped for publication

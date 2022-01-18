@@ -47,7 +47,7 @@ dynamAedes(
 
 \item{intro.cells}{positive integer. One or more cells (id) where to introduce the population at local ("lc") scale. If intro.cells=NULL, then a random cell is used for introduction; If intro.cells is a vector of cell ids then a cell is drawn at random from the vector (with repetition) for introduction in each model iteration.}
 
-\item{ihwv}{positive integer. Larval-habitat water volume, define the volume (L) of water habitat presents in each spatial unit (parametrised from \href{https://doi.org/10.1111/1365-2664.12620}{Hancock et al. 2016}). Default \code{lhwv = 1}.}
+\item{ihwv}{positive integer. Larval-habitat water volume, define the volume (L) of water habitat presents in each spatial unit (parametrised with data retrieved from \doi{10.1111/1365-2664.12620}). Default \code{lhwv = 1}.}
 
 \item{temps.matrix}{matrix. A matrix of daily (average) temperatures (in degrees \strong{Celsius degree x 1000}) used to fit the life cycle rates. This matrix must be organised with the daily temperature observations as columns and the geographic position of the i-grid cell as rows.}
 
@@ -95,8 +95,29 @@ Matrix or a list of matrices containing, for each iteration, the number of indiv
 \description{
 Function to simulate population dynamics of \emph{Aedes} mosquitoes
 }
+\examples{
+## Run dynmAedes at local scale for 5 days
+# Make a toy temperature time series
+\dontrun{
+w <- matrix(seq(20,25,length.out=5),ncol=5)*1000
+# Run the model
+	dynamAedes(
+	species="koreicus", 
+	scale="ws",
+	intro.eggs=10, 
+	ihwv=2, 
+	temps.matrix=w, 
+	startd=2, 
+	endd=5,
+	lat=42,
+	long=8,
+	n.clusters=1, 
+	iter=1,
+	compressed.output=TRUE)
+}
+}
 \seealso{
-Beta regression function were taken from the R package \code{aomisc}, which is available at \url{https://github.com/OnofriAndreaPG/aomisc}.
+Beta regression functions were taken from the R package \code{aomisc}, which is available at \url{https://github.com/OnofriAndreaPG/aomisc}.
 }
 \author{
 Matteo Marcantonio \email{marcantoniomatteo@gmail.com}, Daniele Da Re \email{daniele.dare@uclouvain.be}
