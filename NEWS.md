@@ -1,3 +1,8 @@
+# dynamAedes 2.1
+* At regional scale now diapause derived pixel by pixel using the photoperiod of input coordinates.
+* You can now introduce diapause eggs using dynamAedes argument
+ "intro.degg"
+
 # dynamAedes 2.0.2
 * Minor bug fix for idci and icci functions
 * Change option name for passive dispersal; option to use a numeric vector for average passive dispersal

@@ -2,9 +2,10 @@
 #'
 #' Function to simulate population dynamics of \emph{Aedes} mosquitoes
 #' @param species character. Select what species to model: \code{"aegypti"}, \code{"albopictus"}, \code{"japonicus"}, \code{"koreicus"}. Default \code{species = "aegypti"}. 
-#' @param intro.eggs positive integer. number of introduced eggs, default \code{intro.eggs = 100}.
-#' @param intro.adults positive integer. number of introduced adults, default zero. 
-#' @param intro.juveniles positive integer. number of introduced juveniles, default zero.
+#' @param intro.eggs positive integer. number of introduced eggs, default \code{intro.eggs = 0}.
+#' @param intro.deggs positive integer. number of introduced diapause eggs, default \code{intro.deggs = 100}.
+#' @param intro.adults positive integer. number of introduced adults, default \code{intro.adults = 0}. 
+#' @param intro.juveniles positive integer. number of introduced juveniles, default \code{intro.juveniles = 0}.
 #' @param scale character. Define the model spatial scale: punctual/weather station "ws", local "lc", or regional "rg". Active and passive dispersal is enabled only for \code{scale = "lc"}. Default \code{scale = "ws"}.
 #' @param intro.cells positive integer. One or more cells (id) where to introduce the population at local ("lc") scale. If intro.cells=NULL, then a random cell is used for introduction; If intro.cells is a vector of cell ids then a cell is drawn at random from the vector (with repetition) for introduction in each model iteration. 
 #' @param ihwv positive integer. Larval-habitat water volume, define the volume (L) of water habitat presents in each spatial unit (parametrised with data retrieved from \doi{10.1111/1365-2664.12620}). Default \code{lhwv = 1}.
@@ -30,11 +31,11 @@
 #' @param seeding logical, default \code{FALSE}, if \code{seeding=TRUE} a fixed seed is applied for result reproducibility.  
 #' @return Matrix or a list of matrices containing, for each iteration, the number of individuals in each life stage per day (and for each grid cell of the study area if scale="lc" or "rg"). If the argument compressed.output=FALSE (default TRUE), the model returns the daily number of individuals in each life stage sub-compartment.	
 #' @example inst/examples/dynamAedes.R
-#' @seealso Beta regression functions were taken from the R package \code{aomisc}, which is available at \url{https://github.com/OnofriAndreaPG/aomisc}.
+#' @seealso Beta regression functions were taken from the R package \code{aomisc}, which may be available at \url{https://github.com/OnofriAndreaPG/aomisc}.
 #' @author Matteo Marcantonio \email{marcantoniomatteo@gmail.com}, Daniele Da Re \email{daniele.dare@uclouvain.be}
 #' @export
 
-dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.juveniles=0, 
+dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adults=0, intro.juveniles=0, 
 	scale="ws", intro.cells=NULL, ihwv=1, temps.matrix=NULL, startd=1, endd=10,
 	cells.coords=NULL, lat=0, long=0, road.dist.matrix=NULL, avgpdisp=NA, intro.year=2020,
 	iter=1, n.clusters=1, cluster.type="PSOCK", sparse.output=FALSE, compressed.output=TRUE,
@@ -62,13 +63,20 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 		} else if( avgpdisp=="uk" ) {
 			car.avg.trip <- 19.03
 		} else if ( is.numeric(avgpdisp) ) {
-		car.avg.trip <- avgpdisp
-	    } else (stop("avgpdisp not supported yet..."))
+			car.avg.trip <- avgpdisp
+		} else (stop("avgpdisp not supported yet..."))
 	## Derive daylength for laying of diapausing eggs in albopictus/koreicus/japonicu
-		if(species!="aegypti"){
+		if( species!="aegypti" ){
 			jd <- JD(seq(as.POSIXct(paste(intro.year,"/01/01",sep="")),as.POSIXct(as.Date(paste(intro.year,"/01/01",sep=""))+endd),by='day'))
-			dl <- daylength(lat,long,jd,1)[,3]
-		} else{dl <- rep(24,(endd))}
+			if( scale=="rg" ) {
+				photo.matrix <- lapply(jd, function(x){daylength(lat=cc$y, long = cc$x, jd=x, 1)[,3]})
+				photo.matrix <- do.call(cbind,photo.matrix)
+			} else if( !is.null(lat)&!is.null(long) ) {
+				dl <- daylength(lat,long,jd,1)[,3]
+			} else (stop("Something's wrong with scale or lat and long"))
+		} else{
+			dl <- rep(24,(endd))
+		}
 	## Set dispersal according to scale
 		dispersal <- if(scale=="lc"){TRUE}else if(scale=="rg"|scale=="ws"){FALSE}else{stop("Wrong scale. Exiting...")}
 	## Define `margin` for apply
@@ -113,6 +121,15 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 							e.intro.n[sample(as.integer(colnames(road.dist.matrix)),1)] <- intro.eggs
 						}
 					} else e.intro.n <- intro.eggs
+					if( intro.deggs!=0 ) {
+				# Diapause eggs
+						d.intro.n <- rep(0,space)
+						if( !is.na(intro.cell) ) {
+							d.intro.n[intro.cell] <- intro.deggs
+						} else {
+							d.intro.n[sample(as.integer(colnames(road.dist.matrix)),1)] <- intro.deggs
+						}
+					} else d.intro.n <- intro.deggs
         		# Immatures
 					if( intro.juveniles!=0 ) {
 						i.intro.n <- rep(0,space)
@@ -135,13 +152,13 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 					if( nrow(temps.matrix)>1 ) {
 						stop( "if sscale='lc' then nrow(temps.matrix) must be 1" )
 					} else {
-						e.intro.n <- intro.eggs; i.intro.n <- intro.juveniles; a.intro.n <- intro.adults; road.dist.matrix <- as.data.frame(c(0,0)); names(road.dist.matrix) <- 1
+						e.intro.n <- intro.eggs; d.intro.n <- intro.deggs; i.intro.n <- intro.juveniles; a.intro.n <- intro.adults; road.dist.matrix <- as.data.frame(c(0,0)); names(road.dist.matrix) <- 1
 					}
 				} else if( scale=="rg" ) {
 					if( nrow(temps.matrix)<1 ) {
 						stop( "if scale='rg' then nrow(temps.matrix) must be > 1" )
 					} else {
-						e.intro.n <- intro.eggs; i.intro.n <- intro.juveniles; a.intro.n <- intro.adults; road.dist.matrix <- as.data.frame(c(0,0)); names(road.dist.matrix) <- 1
+						e.intro.n <- intro.eggs; d.intro.n <- intro.deggs; i.intro.n <- intro.juveniles; a.intro.n <- intro.adults; road.dist.matrix <- as.data.frame(c(0,0)); names(road.dist.matrix) <- 1
 					}
 				} else stop("Wrong scale.")
         	### Day cycle: Start sequential "day" life cycle into the "iteration" loop ###
@@ -178,8 +195,10 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
                 	## Immature survival
                 	## Derive daily immature survival rate
 						i.mort_rate.v <- -log(.i.surv_rate.f(temps.matrix[,day]/1000, species))
-                	# Set diapause allocation
-						e.diap.p <- if( dl[day-1]>dl[day] ) .e.dia_rate.f(dl[length(counter)], species) else 1
+                	# Set allocation of diapause/non-diapause eggs
+						if(scale=="rg" & species!="aegypti") {
+							e.diap.p <- if( photo.matrix[,day-1]>photo.matrix[,day] ) .e.dia_rate.f(photo.matrix[,length(counter)], species) else rep(1, ncol(photo.matrix))
+						} else { e.diap.p <- if( dl[day-1]>dl[day] ) .e.dia_rate.f(dl[length(counter)], species) else 1 }
                 	## Derive daily egg hatching rate
 						e.hatc.p <- .e.hatch_rate.f(temps.matrix[,day]/1000, species)
                 	## Derive daily egg survival rate
@@ -198,23 +217,29 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 						p.life.a[1,,(4*de)] <- if( length(counter)==1 ) {
 							e.intro.n
 						} else p.life.a[1,,(4*de)]
+					# Diapausde eggs
+						p.life.a[4,,(4*de)] <- if( length(counter)==1 ) {
+							d.intro.n
+						} else p.life.a[4,,(4*de)]
                     # Add eggs laid by females the day before (t-1) stored in a.egg.n (end of the day)
 						p.life.a[1,,1] <- a.egg.n
 						if(species!="aegypti") {p.life.a[4,,c(1*de)] <- a.degg.n}
                 	# Add eggs that did not hatch yesterday to egg that today are ready to hatch
 						p.life.a[1,,c(4*de)] <- p.life.a[1,,c(4*de)] + e.temp.v
 						if(species!="aegypti") {p.life.a[4,,c(4*de)] <- p.life.a[4,,c(4*de)] + d.temp.v}
-                	# Binomial draw to find numbers of eggs 8-d+ old that hatch today
+                	# Binomial draw to find numbers of eggs 8-d+ old that hatch today (per cell)
 						e.hatc.n <- rbinom(length(1:space), p.life.a[1,,c(4*de)], prob=e.hatc.p)
-							#message(e.hatc.p)
-							#message(temps.matrix[,day])
 						if( species=="albopictus" ) {
-							if( dl[day]>11.44 & dl[day]>dl[day-1] ) {
-								d.hatc.n <- rbinom(length(1:space), p.life.a[4,,c(4*de)], prob=e.hatc.p)
+							if( photo.matrix[,day]>photo.matrix[,day-1] & any(photo.matrix[,day]>11.44) ) {
+								d.hatc.n <- rep(0,space)
+								ddays <- which(photo.matrix[,day]>11.44)
+								d.hatc.n[ddays] <- rbinom(length(ddays), p.life.a[4,,c(4*de)], prob=e.hatc.p)
 							} else d.hatc.n <- 0			
 						}else if( species=="koreicus"|species=="japonicus" ) {
-							if( dl[day]>10.71 & dl[day]>dl[day-1] ) {
-								d.hatc.n <- rbinom(length(1:space), p.life.a[4,,c(4*de)], prob=e.hatc.p)
+							if( photo.matrix[,day]>photo.matrix[,day-1] & any(photo.matrix[,day]>10.71) ) {
+								d.hatc.n <- rep(0,space)
+								ddays <- which(photo.matrix[,day]>10.71)
+								d.hatc.n[ddays] <- rbinom(length(ddays), p.life.a[4,,c(4*de)], prob=e.hatc.p)
 							} else d.hatc.n <- 0
 						} else d.hatc.n <- 0
                 	# Remove hatched eggs from eggs 8d+ old
@@ -263,14 +288,16 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.adults=0, intro.ju
 						p.life.a[3,,1] <- p.life.a[3,,1] - n.ovir.a
                 			## Find number of eggs laid today by ovipositing females
 							#message(length(counter))
-							#message(1-e.diap.p)
+							message(range(1-e.diap.p))
 							#message(d.surv.p)
-						if( species!="aegypti" & e.diap.p!=1 ) {
+						if( species!="aegypti" & any(e.diap.p!=1) ) {
 							if(verbose) print("Laying diapausing eggs")
 								## Total number of eggs laid per cell
 								a.tegg.n <- sapply(1:space, function(x) sum(rpois(sum(p.life.a[3,x,2:3]), a.batc.n[x])))
 								## Proportion of diapausing and normal eggs
-							a.degg.n <- sapply(1:space, function(x){rbinom(1,a.tegg.n[x],prob=(1-e.diap.p))})
+							if(scale=="rg") {
+								a.degg.n <- sapply(1:space, function(x){rbinom(1,a.tegg.n[x],prob=(1-e.diap.p[x]))})
+							} else {a.degg.n <- sapply(1:space, function(x){rbinom(1,a.tegg.n[x],prob=(1-e.diap.p))})}
 							a.egg.n <- a.tegg.n-a.degg.n
 						} else {
 							a.egg.n <- sapply(1:space, function(x) sum(rpois(sum(p.life.a[3,x,2:3]), a.batc.n[x])))

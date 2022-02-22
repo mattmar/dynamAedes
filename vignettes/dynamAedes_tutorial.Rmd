@@ -226,7 +226,8 @@ xyz <- predict(zDummy, newdata=xy, nsim=1)
 We generate a spatially autocorrelated raster adding the SA variable (*xyz$sim1*) to the RasterLayer object. The autocorrelated surface could for example represent the distribution of vegetation cover in a urban landscape.
 ```{r}
 utm32N <- "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
-r <- raster(nrow=gridDim, ncol=gridDim, crs=utm32N, ext=extent(0,5000, 0,5000))
+r <- raster(nrow=gridDim, ncol=gridDim, crs=utm32N, ext=extent(1220000,1225000, 5700000,5705000))
+
 values(r)=xyz$sim1
 plot(r)
 
@@ -259,6 +260,7 @@ names(mat) <- paste0("d_", 1:ndays)
 df_temp <- cbind(df, mat)
 ```
 ## Simulate an arbitrary road segment for medium-range dispersal 
+
 In the model we have considered the possiblity of medium-range passive dispersal. Thus, we will simulate an arbitrary road segment along which adult mosquitoes can disperse passively (i.e., through car traffic). 
 ```{r}
 set.seed(123)
