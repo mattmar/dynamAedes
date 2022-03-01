@@ -73,6 +73,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 				photo.matrix <- do.call(cbind,photo.matrix)
 			} else if( !is.null(lat)&!is.null(long) ) {
 				dl <- daylength(lat,long,jd,1)[,3]
+				photo.matrix <- matrix(dl, nrow=1)
 			} else (stop("Something's wrong with scale or lat and long"))
 		} else{
 			dl <- rep(24,(endd))
@@ -288,7 +289,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 						p.life.a[3,,1] <- p.life.a[3,,1] - n.ovir.a
                 			## Find number of eggs laid today by ovipositing females
 							#message(length(counter))
-							message(range(1-e.diap.p))
+							#message(range(1-e.diap.p))
 							#message(d.surv.p)
 						if( species!="aegypti" & any(e.diap.p!=1) ) {
 							if(verbose) print("Laying diapausing eggs")
