@@ -42,10 +42,10 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 	suffix=NA, cellsize=250, maxadisp=600, dispbins=10, verbose=FALSE, seeding=FALSE) {
     #%%%%%%%%%%%%%%%%%%%#
     ### Initial checks
-	if(!species%in%c("aegypti","albopictus","koreicus","japonicus")) stop("Species not supported, exiting...")
-		if(endd>ncol(temps.matrix)) stop("You're trying to run the model for more days than columns in 'temps.matrix', exiting...")
+	if( !species%in%c("aegypti","albopictus","koreicus","japonicus")) stop("Species not supported, exiting..." )
+		if( endd>ncol(temps.matrix)) stop("You're trying to run the model for more days than columns in 'temps.matrix', exiting..." )
     ### Preamble: declare variables and prepare the parallel environment for the life cycle ###
-			.resample <- function(x, ...) x[sample.int(length(x), ...)]
+		.resample <- function(x, ...) x[sample.int(length(x), ...)]
 		legind <- 0
 	## Define globally the average distance of a trip by car (km)
 		if( is.na(avgpdisp) ) {
@@ -67,7 +67,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 		} else (stop("avgpdisp not supported yet..."))
 	## Derive daylength for laying of diapausing eggs in albopictus/koreicus/japonicu
 		if( species!="aegypti" ){
-			jd <- JD(seq(as.POSIXct(paste(intro.year,"/01/01",sep="")),as.POSIXct(as.Date(paste(intro.year,"/01/01",sep=""))+endd),by='day'))
+			jd <- JD(seq(as.POSIXct(paste(intro.year,"/01/01",sep="")),as.POSIXct(as.Date(paste(intro.year,"/01/01",sep=""))+endd), by='day'))
 			if( scale=="rg" ) {
 				photo.matrix <- lapply(jd, function(x){daylength(lat=cc$y, long = cc$x, jd=x, 1)[,3]})
 				photo.matrix <- do.call(cbind,photo.matrix)
@@ -198,8 +198,9 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 						i.mort_rate.v <- -log(.i.surv_rate.f(temps.matrix[,day]/1000, species))
                 	# Set allocation of diapause/non-diapause eggs
 						if(scale=="rg" & species!="aegypti") {
-							e.diap.p <- if( photo.matrix[,day-1]>photo.matrix[,day] ) .e.dia_rate.f(photo.matrix[,length(counter)], species) else rep(1, ncol(photo.matrix))
-						} else { e.diap.p <- if( dl[day-1]>dl[day] ) .e.dia_rate.f(dl[length(counter)], species) else 1 }
+							e.diap.p <- if( photo.matrix[,day-1]>photo.matrix[,day] ) .e.dia_rate.f(photo.matrix[,day], species) else rep(0, ncol(photo.matrix))
+						} else { e.diap.p <- if( dl[day-1]>dl[day] ) .e.dia_rate.f(dl[day], species) else 0 }
+						message(e.diap.p)
                 	## Derive daily egg hatching rate
 						e.hatc.p <- .e.hatch_rate.f(temps.matrix[,day]/1000, species)
                 	## Derive daily egg survival rate
@@ -218,7 +219,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 						p.life.a[1,,(4*de)] <- if( length(counter)==1 ) {
 							e.intro.n
 						} else p.life.a[1,,(4*de)]
-					# Diapausde eggs
+					# Diapause eggs
 						p.life.a[4,,(4*de)] <- if( length(counter)==1 ) {
 							d.intro.n
 						} else p.life.a[4,,(4*de)]
@@ -291,14 +292,14 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 							#message(length(counter))
 							#message(range(1-e.diap.p))
 							#message(d.surv.p)
-						if( species!="aegypti" & any(e.diap.p!=1) ) {
+						if( species!="aegypti" & any(e.diap.p!=0) ) {
 							if(verbose) print("Laying diapausing eggs")
 								## Total number of eggs laid per cell
 								a.tegg.n <- sapply(1:space, function(x) sum(rpois(sum(p.life.a[3,x,2:3]), a.batc.n[x])))
 								## Proportion of diapausing and normal eggs
 							if(scale=="rg") {
-								a.degg.n <- sapply(1:space, function(x){rbinom(1,a.tegg.n[x],prob=(1-e.diap.p[x]))})
-							} else {a.degg.n <- sapply(1:space, function(x){rbinom(1,a.tegg.n[x],prob=(1-e.diap.p))})}
+								a.degg.n <- sapply(1:space, function(x){rbinom(1,a.tegg.n[x],prob=(e.diap.p[x]))})
+							} else {a.degg.n <- sapply(1:space, function(x){rbinom(1,a.tegg.n[x],prob=(e.diap.p))})}
 							a.egg.n <- a.tegg.n-a.degg.n
 						} else {
 							a.egg.n <- sapply(1:space, function(x) sum(rpois(sum(p.life.a[3,x,2:3]), a.batc.n[x])))
