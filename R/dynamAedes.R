@@ -9,11 +9,10 @@
 #' @param scale character. Define the model spatial scale: punctual/weather station "ws", local "lc", or regional "rg". Active and passive dispersal is enabled only for \code{scale = "lc"}. Default \code{scale = "ws"}.
 #' @param intro.cells positive integer. One or more cells (id) where to introduce the population at local ("lc") scale. If intro.cells=NULL, then a random cell is used for introduction; If intro.cells is a vector of cell ids then a cell is drawn at random from the vector (with repetition) for introduction in each model iteration. 
 #' @param ihwv positive integer. Larval-habitat water volume, define the volume (L) of water habitat presents in each spatial unit (parametrised with data retrieved from \doi{10.1111/1365-2664.12620}). Default \code{lhwv = 1}.
-#' @param startd positive integer. Day of start of the simulations, referring to the column number of temps.matrix.
-#' @param endd positive integer. Day of end of the simulation, referring to the column number of temps.matrix.
-#' @param intro.year numeric. Year of the beginning of iterations (for photoperiod calculation). 
+#' @param startd Character  date (ISO format "%Y-%m-%d"). Date of start of simulations.
+#' @param endd Character  date (ISO format "%Y-%m-%d"). Date of end of simulation.
 #' @param iter positive integer. Define the number of model iterations. 
-#' @param temps.matrix matrix. A matrix of daily (average) temperatures (in degrees **Celsius degree x 1000**) used to fit the life cycle rates. This matrix must be organised with the daily temperature observations as columns and the geographic position of the i-grid cell as rows.
+#' @param temps.matrix matrix. A matrix of daily (average) temperatures (in degrees **Celsius degree x 1000**) used to fit the life cycle rates. This matrix must be organised with the daily temperature observations as columns and the geographic position of the i-grid cell as rows. Importantly, the first column must match \code{startd} date.
 #' @param cells.coords matrix. A matrix reporting the spatial coordinates of the temperature observations.
 #' @param lat numeric. Latitude value of the area of interested used to derive the photoperiod (and thus the diapause eggs allocation function). 
 #' @param long numeric. Longitude value of the area of interested used to derive the photoperiod (and thus the diapause eggs allocation function)
@@ -43,7 +42,9 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
     #%%%%%%%%%%%%%%%%%%%#
     ### Initial checks
 	if( !species%in%c("aegypti","albopictus","koreicus","japonicus")) stop("Species not supported, exiting..." )
-		if( endd>ncol(temps.matrix)) stop("You're trying to run the model for more days than columns in 'temps.matrix', exiting..." )
+		dayspan <- as.integer(as.Date(endd)-as.Date(startd))
+		if( dayspan>ncol(temps.matrix)) stop("You're trying to run the model for more days than columns in 'temps.matrix', exiting..." )
+	if( nchar(strsplit(as.character(startd),"-")[[1]][1])<4|nchar(strsplit(as.character(endd),"-")[[1]][1])<4 ) stop("Dates in the wrong format: change them to %Y-%m-%d")
     ### Preamble: declare variables and prepare the parallel environment for the life cycle ###
 		.resample <- function(x, ...) x[sample.int(length(x), ...)]
 		legind <- 0
@@ -67,7 +68,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 		} else (stop("avgpdisp not supported yet..."))
 	## Derive daylength for laying of diapausing eggs in albopictus/koreicus/japonicu
 		if( species!="aegypti" ){
-			jd <- JD(seq(as.POSIXct(paste(intro.year,"/01/01",sep="")),as.POSIXct(as.Date(paste(intro.year,"/01/01",sep=""))+endd), by='day'))
+			jd <- JD(seq(as.POSIXct(startd), as.POSIXct(as.Date(startd)+dayspan), by='day'))
 			if( scale=="rg" ) {
 				photo.matrix <- lapply(jd, function(x){daylength(lat=cc$y, long = cc$x, jd=x, 1)[,3]})
 				photo.matrix <- do.call(cbind,photo.matrix)
@@ -76,7 +77,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 				photo.matrix <- matrix(dl, nrow=1)
 			} else (stop("Something's wrong with scale or lat and long"))
 		} else{
-			dl <- rep(24,(endd))
+			dl <- rep(24,(dayspan))
 		}
 	## Set dispersal according to scale
 		dispersal <- if(scale=="lc"){TRUE}else if(scale=="rg"|scale=="ws"){FALSE}else{stop("Wrong scale. Exiting...")}
@@ -168,7 +169,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 					rm(counter)
 				}
 				setTxtProgressBar(pb, legind)
-				foreach(day = startd:endd, .combine=c, .export = ls(globalenv())) %do% {
+				foreach(day = 2:dayspan, .combine=c, .export = ls(globalenv())) %do% {
 					if( !stopit ) {
 						if( !exists("counter") ) {
                     	# Index for dynamic array eggs
@@ -178,7 +179,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 			            # Index for dynamic array adults
 							da <- if(species=="koreicus"|species=="japonicus") 2.25 else 1
 					    # Define objects required to store data during a day
-							counter <- 0; i.temp.v <- 0; d.temp.v <- 0; e.temp.v <- 0; a.egg.n <- 0; a.degg.n <- 0; p.life.a <- array(0,c(4,nrow(temps.matrix),6*de), dimnames = list(c("egg", "juvenile", "adult", "diapause_egg"), NULL, paste0("sc",1:(6*de)))); storage.mode(p.life.a) <- "integer"; outl <- list()
+							counter <- 0; i.temp.v <- 0; d.temp.v <- 0; e.temp.v <- 0; a.egg.n <- 0; a.new.n <- 0; a.degg.n <- 0; p.life.a <- array(0,c(4,nrow(temps.matrix),6*de), dimnames = list(c("egg", "juvenile", "adult", "diapause_egg"), NULL, paste0("sc",1:(6*de)))); storage.mode(p.life.a) <- "integer"; outl <- list()
 						} else counter <- append(counter,day)
                 	### Header:
                 	## Gonotrophic cycle
@@ -200,7 +201,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 						if(scale=="rg" & species!="aegypti") {
 							e.diap.p <- if( photo.matrix[,day-1]>photo.matrix[,day] ) .e.dia_rate.f(photo.matrix[,day], species) else rep(0, ncol(photo.matrix))
 						} else { e.diap.p <- if( dl[day-1]>dl[day] ) .e.dia_rate.f(dl[day], species) else 0 }
-						message(e.diap.p)
+						#message(e.diap.p)
                 	## Derive daily egg hatching rate
 						e.hatc.p <- .e.hatch_rate.f(temps.matrix[,day]/1000, species)
                 	## Derive daily egg survival rate
@@ -281,8 +282,8 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 						p.life.a[3,,1] <- if( length(counter)==1 ) {
 							a.intro.n
 						} else p.life.a[3,,1]
-                			## Binomial random draw to remove males adult from newly emerged adults
-						p.life.a[3,,5] <- rbinom(space,i.emer.n, prob=0.5)
+                			## Binomial random draw to find newly emerged females (removing males adult from newly emerged adults)
+						a.new.n <- rbinom(space,i.emer.n, prob=0.5)
                 			## Add blood-fed females which today matured eggs to females with matured eggs from yesterday 
 						n.ovir.a <- rbinom(space, p.life.a[3,,1], prob=a.gono.p)
 						p.life.a[3,,2] <- n.ovir.a
@@ -379,12 +380,6 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 								} else if(verbose) print("No medium-dispersing females today...")
 							}
 						}
-                	## End-of-day housekeeping
-                	# Make a new host-seeking compartment and slide blood-fed and ovipositing female status to prepare the life cycle for tomorrow (t+1)
-						p.life.a[3,,1] <- p.life.a[3,,4]
-						p.life.a[3,,4] <- p.life.a[3,,3] + p.life.a[3,,5]
-						p.life.a[3,,3] <- p.life.a[3,,2]
-						p.life.a[3,,2] <- 0
     				## Print information on population structure today
 						if( verbose ) message("\nday ",length(counter),"-- of iteration ",iteration," has ended. Population is e: ",sum(p.life.a[1,,])," i: ",sum(p.life.a[2,,])," a: " ,sum(p.life.a[3,,]), " d: ",sum(p.life.a[4,,]), " eh: ", sum(e.hatc.n+if(species!="aegypti") {d.hatc.n} else {0}), " el: ",sum(a.egg.n), " \n")
                 		# Condition for exinction
@@ -392,17 +387,29 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
                 	# Some (unnecessary?) garbage cleaning
 						gc()
                 	# if TRUE arrays are compressed (by summing) in matrices so that information on sub-compartements is irreparably lost.
+						## Pre-end-of-day housekeeping
+						p.life.a[1,,(4*de)] <- p.life.a[1,,(4*de)] - e.hatc.n # Remove new hatched eggs from matrix
+						# Compress or not? Anyway, make day output
 						p.life.aout <- if( compressed.output ) {
-							apply(p.life.a, MARGIN=c(1, 2), sum)
+							p.life.a_out <- apply(p.life.a, MARGIN=c(1, 2), sum)
 						} else { 
-							p.life.a
+							p.life.a_out <- p.life.a
 						}
+				    ## End-of-day housekeeping to prepare next day
+                	# Make a new host-seeking compartment and slide blood-fed and ovipositing female status to prepare the life cycle for tomorrow (t+1); remove hatached eggs from embryonated eggs
+						p.life.a[3,,1] <- p.life.a[3,,4] # Host-seeking to blood-fed
+						p.life.a[3,,4] <- p.life.a[3,,3] + p.life.a[3,,5] # end gono + new to host seeking
+						p.life.a[3,,5] <- a.new.n # new vector into matrix
+						p.life.a[3,,3] <- p.life.a[3,,2] # ovi d1 to ovi d2
+						p.life.a[3,,2] <- 0 # clean ovi d1 (d1 can only last for one day)
                 	# If TRUE a sparse array is returned (save memory but complex to process)
 						if(sparse.output) return(list(as.simple_sparse_array(p.life.a))) else return(list(p.life.aout))
 					}else{
 						if(verbose) message("Extinct")
 					} #end of stopif condition
-			}
+			# Return day output
+			p.life.a_out
+		}
 		}
 		if( compressed.output ) {
 			attributes(rs) <- list(compressed=TRUE)

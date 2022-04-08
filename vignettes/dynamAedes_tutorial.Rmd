@@ -77,19 +77,14 @@ plot(sim_temp[[1]]$date,
 ### Model settings
 Float numbers in the temperature matrix would slow the computational speed, they must be multiplied by 1000 and then transformed in integer numbers. We also transpose the matrix from long to wide format, since we conceptualised the model structure considering the rows as the spatial component (e.g. observations; here = 1) and the columns as the temporal one (e.g. variables).
 
-```{r}
-df_temp <- data.frame("Date" = sim_temp[[1]]$date, "temp" = sim_temp[[1]]$x)
-w <- t(as.integer(df_temp$temp*1000))
-```
-
 We are now left with a few model parameters which need to be defined by the user.
 ```{r}
 ## Define the day of introduction (August 1st is day 1)
-str = 213
+str = "2000-07-05"
 ## Define the end-day of life cycle (September 1st is the last day)
-endr = 213+31
+endr = "2000-08-05"
 ## Define the number of eggs to be introduced
-ie = 100
+ie = 1000
 ## Define the number of model iterations
 it = 1 # The higher the number of simulations the better
 ## Define the number of liters for the larval density-dependent mortality
@@ -103,6 +98,10 @@ cl = 1
 #outname= paste0("dynamAedes_albo_ws_dayintro_",str,"_end",endr,"_niters",it,"_neggs",ie)
 ```
 
+```{r}
+df_temp <- data.frame("Date" = sim_temp[[1]]$date, "temp" = sim_temp[[1]]$x)
+w <- t(as.integer(df_temp$temp*1000)[format(as.Date(str)+1,"%j"):format(as.Date(endr)+1,"%j")])
+```
 
 ### Run the model
 Running the model with the settings specified in this example takes about 2 minutes.
@@ -119,7 +118,7 @@ simout <- dynamAedes(species="albopictus",
                      compressed.output=TRUE, 
                      lat=myLat, 
                      long=myLon,
-                     verbose=FALSE,
+                     verbose=TRUE,
                      seeding=TRUE)
 ```
 ## Analyse the results
@@ -164,13 +163,16 @@ ad <- as.data.frame(adci(simout, eval_date=1:dd, breaks=c(0.25,0.50,0.75), st=3)
 eggd <- as.data.frame(adci(simout, eval_date=1:dd, breaks=c(0.25,0.50,0.75), st=4))
 
 egg$myStage="Egg"
-egg$Date=seq.Date(sim_temp[[1]]$date[str], sim_temp[[1]]$date[endr], by="day")
+sta <- as.integer(format(as.Date(str),"%j"))
+end <- as.integer(format(as.Date(endr),"%j"))
+
+egg$Date=seq.Date(sim_temp[[1]]$date[sta+1], sim_temp[[1]]$date[end-1], by="day")
 juv$myStage="Juvenile"
-juv$Date=seq.Date(sim_temp[[1]]$date[str], sim_temp[[1]]$date[endr], by="day")
+juv$Date=seq.Date(sim_temp[[1]]$date[sta+1], sim_temp[[1]]$date[end-1], by="day")
 ad$myStage="Adult"
-ad$Date=seq.Date(sim_temp[[1]]$date[str], sim_temp[[1]]$date[endr], by="day")
+ad$Date=seq.Date(sim_temp[[1]]$date[sta+1], sim_temp[[1]]$date[end-1], by="day")
 eggd$myStage="Diapausing egg"
-eggd$Date=seq.Date(sim_temp[[1]]$date[str], sim_temp[[1]]$date[endr], by="day")
+eggd$Date=seq.Date(sim_temp[[1]]$date[sta+1], sim_temp[[1]]$date[end-1], by="day")
 
 outdf=bind_rows(egg, juv, ad, eggd) %>% 
   as_tibble()
