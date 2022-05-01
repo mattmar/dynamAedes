@@ -43,10 +43,10 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
     ### Initial checks
 	if( !species%in%c("aegypti","albopictus","koreicus","japonicus")) stop("Species not supported, exiting..." )
 		dayspan <- as.integer(as.Date(endd)-as.Date(startd))
-		if( dayspan>ncol(temps.matrix)) stop("You're trying to run the model for more days than columns in 'temps.matrix', exiting..." )
-	if( nchar(strsplit(as.character(startd),"-")[[1]][1])<4|nchar(strsplit(as.character(endd),"-")[[1]][1])<4 ) stop("Dates in the wrong format: change them to %Y-%m-%d")
+	if( dayspan>ncol(temps.matrix)) stop("You're trying to run the model for more days than columns in 'temps.matrix', exiting..." )
+		if( nchar(strsplit(as.character(startd),"-")[[1]][1])<4|nchar(strsplit(as.character(endd),"-")[[1]][1])<4 ) stop("Dates in the wrong format: change them to %Y-%m-%d")
     ### Preamble: declare variables and prepare the parallel environment for the life cycle ###
-		.resample <- function(x, ...) x[sample.int(length(x), ...)]
+			.resample <- function(x, ...) x[sample.int(length(x), ...)]
 		legind <- 0
 	## Define globally the average distance of a trip by car (km)
 		if( is.na(avgpdisp) ) {
@@ -66,11 +66,11 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 		} else if ( is.numeric(avgpdisp) ) {
 			car.avg.trip <- avgpdisp
 		} else (stop("avgpdisp not supported yet..."))
-	## Derive daylength for laying of diapausing eggs in albopictus/koreicus/japonicu
+	## Derive daylength for laying of diapausing eggs in albopictus/koreicus/japonicus
 		if( species!="aegypti" ){
 			jd <- JD(seq(as.POSIXct(startd), as.POSIXct(as.Date(startd)+dayspan), by='day'))
 			if( scale=="rg" ) {
-				photo.matrix <- lapply(jd, function(x){daylength(lat=cc$y, long = cc$x, jd=x, 1)[,3]})
+				photo.matrix <- lapply(jd, function(x){insol::daylength(lat=cells.coords$y, long = cells.coords$x, jd=x, 1)[,3]})
 				photo.matrix <- do.call(cbind,photo.matrix)
 			} else if( !is.null(lat)&!is.null(long) ) {
 				dl <- daylength(lat,long,jd,1)[,3]
@@ -199,9 +199,12 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 						i.mort_rate.v <- -log(.i.surv_rate.f(temps.matrix[,day]/1000, species))
                 	# Set allocation of diapause/non-diapause eggs
 						if(scale=="rg" & species!="aegypti") {
-							e.diap.p <- if( photo.matrix[,day-1]>photo.matrix[,day] ) .e.dia_rate.f(photo.matrix[,day], species) else rep(0, ncol(photo.matrix))
-						} else { e.diap.p <- if( dl[day-1]>dl[day] ) .e.dia_rate.f(dl[day], species) else 0 }
-						#message(e.diap.p)
+							e.diap.p <- if( any(photo.matrix[,day-1]>photo.matrix[,day]) ) .e.dia_rate.f(photo.matrix[,day], species) else rep(0, ncol(photo.matrix))
+						} else { 
+							e.diap.p <- if( dl[day-1]>dl[day] ) {
+								.e.dia_rate.f(dl[day], species)
+							} else{0} 
+						}
                 	## Derive daily egg hatching rate
 						e.hatc.p <- .e.hatch_rate.f(temps.matrix[,day]/1000, species)
                 	## Derive daily egg survival rate
@@ -233,18 +236,18 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
                 	# Binomial draw to find numbers of eggs 8-d+ old that hatch today (per cell)
 						e.hatc.n <- rbinom(length(1:space), p.life.a[1,,c(4*de)], prob=e.hatc.p)
 						if( species=="albopictus" ) {
-							if( photo.matrix[,day]>photo.matrix[,day-1] & any(photo.matrix[,day]>11.44) ) {
+							if( any(photo.matrix[,day]>photo.matrix[,day-1]) & any(photo.matrix[,day]>11.44) ) {
 								d.hatc.n <- rep(0,space)
 								ddays <- which(photo.matrix[,day]>11.44)
 								d.hatc.n[ddays] <- rbinom(length(ddays), p.life.a[4,,c(4*de)], prob=e.hatc.p)
-							} else d.hatc.n <- 0			
+							} else {d.hatc.n <- 0}			
 						}else if( species=="koreicus"|species=="japonicus" ) {
 							if( photo.matrix[,day]>photo.matrix[,day-1] & any(photo.matrix[,day]>10.71) ) {
 								d.hatc.n <- rep(0,space)
 								ddays <- which(photo.matrix[,day]>10.71)
 								d.hatc.n[ddays] <- rbinom(length(ddays), p.life.a[4,,c(4*de)], prob=e.hatc.p)
-							} else d.hatc.n <- 0
-						} else d.hatc.n <- 0
+							} else {d.hatc.n <- 0}
+						} else {d.hatc.n <- 0}
                 	# Remove hatched eggs from eggs 8d+ old
 						e.temp.v <- p.life.a[1,,(4*de)] - e.hatc.n
 						if(species!="aegypti") {d.temp.v <- p.life.a[4,,c(4*de)] - if(species!="aegypti") {d.hatc.n} else {0}}
@@ -261,12 +264,13 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 						i.ddmort_rate.v <- exp(.i.ddmort_rate.f(list(i.dens.v=(imm.v*2)/ihwv)))
 						i.surv.p <- 1-(1-exp(-(i.mort_rate.v + i.ddmort_rate.v)))
                 	## Binomial draw to find numbers of immature that die or survive-and-move to the next compartment
-						p.life.a[2,,2:(6*dj)] <- apply(t(p.life.a[2,,1:(6*dj-1)]), MARGIN=mrg, FUN=function(x) rbinom(size=x, n=space, prob=i.surv.p)) 
+						p.life.a[2,,2:(6*dj)] <- apply(t(p.life.a[2,,1:(6*dj-1)]), MARGIN=mrg, FUN=function(x) rbinom(size=x, n=space, prob=i.surv.p))
                 	## Introduce `I` if day==1; introduction happens in `I` sub-compartment 6 
 						p.life.a[2,,(6*dj)] <- if( length(counter)==1 ) {
 							i.intro.n
 						} else p.life.a[2,,(6*dj)]
                 	## Add immatures hatched the same day
+						#message(length(e.hatc.n), "    ", length(d.hatc.n))
 						p.life.a[2,,1] <- e.hatc.n + if(species!="aegypti") {d.hatc.n} else {0}
                 	## Add immatures that did not emerge yesterday to immatures that today are ready to emerge
 						p.life.a[2,,(6*dj)] <- p.life.a[2,,(6*dj)] + i.temp.v
@@ -290,10 +294,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
                 			## Remove females which today matured eggs from the host-fed compartment
 						p.life.a[3,,1] <- p.life.a[3,,1] - n.ovir.a
                 			## Find number of eggs laid today by ovipositing females
-							#message(length(counter))
-							#message(range(1-e.diap.p))
-							#message(d.surv.p)
-						if( species!="aegypti" & any(e.diap.p!=0) ) {
+						if( species!="aegypti" & any(e.diap.p!=0) & sum(p.life.a[3,,])>0 ) {
 							if(verbose) print("Laying diapausing eggs")
 								## Total number of eggs laid per cell
 								a.tegg.n <- sapply(1:space, function(x) sum(rpois(sum(p.life.a[3,x,2:3]), a.batc.n[x])))
@@ -350,7 +351,6 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 									} else if(verbose) print("Actively dispersing females stay in the cell of origin. Jumping to the next cell of origin...")
 								}
 							} else {if(verbose) print("No active dispersing females today...")}
-
                 		## Medium-distance passive dispersal
                 		# It happens only if a cell with at least 1 female touches a road segement; thus  the order of colnames(road.dist.matrix)  must be the same of `p.life.a`
 							if( any(which(p.life.a[3,,]>0)%in%colnames(road.dist.matrix)) ) {
@@ -381,15 +381,15 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 							}
 						}
     				## Print information on population structure today
-						if( verbose ) message("\nday ",length(counter),"-- of iteration ",iteration," has ended. Population is e: ",sum(p.life.a[1,,])," i: ",sum(p.life.a[2,,])," a: " ,sum(p.life.a[3,,]), " d: ",sum(p.life.a[4,,]), " eh: ", sum(e.hatc.n+if(species!="aegypti") {d.hatc.n} else {0}), " el: ",sum(a.egg.n), " \n")
+						if( verbose ) message("\n", as.Date(startd)+day, ". Day ",length(counter),"-- of iteration ",iteration," has ended. Population is e: ",sum(p.life.a[1,,])," i: ",sum(p.life.a[2,,])," a: " ,sum(p.life.a[3,,]), " d: ",sum(p.life.a[4,,]), " eh: ", sum(e.hatc.n+if(species!="aegypti") {d.hatc.n} else {0}), " el: ",sum(a.egg.n), " \n")
                 		# Condition for exinction
-							stopit <- sum(p.life.a)==0
+							stopit <- sum(p.life.a,na.rm=TRUE)==0
                 	# Some (unnecessary?) garbage cleaning
 						gc()
                 	# if TRUE arrays are compressed (by summing) in matrices so that information on sub-compartements is irreparably lost.
 						## Pre-end-of-day housekeeping
 						p.life.a[1,,(4*de)] <- p.life.a[1,,(4*de)] - e.hatc.n # Remove new hatched eggs from matrix
-						# Compress or not? Anyway, make day output
+						# Compress or not? Anyway, make daily output
 						p.life.aout <- if( compressed.output ) {
 							p.life.a_out <- apply(p.life.a, MARGIN=c(1, 2), sum)
 						} else { 
@@ -403,13 +403,17 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 						p.life.a[3,,3] <- p.life.a[3,,2] # ovi d1 to ovi d2
 						p.life.a[3,,2] <- 0 # clean ovi d1 (d1 can only last for one day)
                 	# If TRUE a sparse array is returned (save memory but complex to process)
-						if(sparse.output) return(list(as.simple_sparse_array(p.life.a))) else return(list(p.life.aout))
+						#if(sparse.output) {
+						#	return(list(as.simple_sparse_array(p.life.a)))
+						#}else{
+						return(list(p.life.aout))
+						#}
 					}else{
 						if(verbose) message("Extinct")
 					} #end of stopif condition
-			# Return day output
-			p.life.a_out
-		}
+				# Return day output
+				return(p.life.a_out)
+			}
 		}
 		if( compressed.output ) {
 			attributes(rs) <- list(compressed=TRUE)

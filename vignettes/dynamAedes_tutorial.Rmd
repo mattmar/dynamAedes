@@ -346,9 +346,9 @@ We are now left with a few model variables which need to be defined.
 ## Define cells along roads into which introduce propagules on day 1
 intro.vector <- icellid
 ## Define the day of introduction (August 1st is day 1)
-str = 213
+str = "2018-04-01"
 ## Define the end-day of life cycle (October 1st is the last day)
-endr = 213+(61)
+endr = "2018-05-01"
 ## Define the number of adult females to be introduced
 ia = 5000
 ## Define the number of model iterations
@@ -381,8 +381,6 @@ simout=dynamAedes(species="albopictus",
             iter=it,  
             intro.adults=ia,  
             compressed.output=TRUE, 
-            lat=myLat, 
-            long=myLon, 
             cellsize=250,
             maxadisp=600,
             dispbins=10,
@@ -416,7 +414,7 @@ We can now use the auxiliary functions of the model to Analyse the results.
 First, we can retrieve the probability of successful introduction, computed as the proportion of model
 iterations that resulted in a viable mosquito population at a given date.
 ```{r}
-psi(input_sim = simout, eval_date = 61)
+psi(input_sim = simout, eval_date = 300)
 ```
 
 We can also get a spatial output, using the function *psi_sp*, which require as additional input only the matrix of centroid coordinates of pixels.
@@ -513,18 +511,15 @@ cc <- df_temp[,c("x","y")]
 We are now left with a few model variables which need to be defined.
 ```{r, evaluate=FALSE}
 ## Define the day of introduction (June 1st is day 1)
-str = 152
+str = "2018-05-01"
 ## Define the end-day of life cycle (October 1st is the last day)
-endr = 152+(61*2)
+endr = "2018-05-10"
 ## Define the number of eggs to be introduced
 ie = 100
 ## Define the number of model iterations
 it = 1 # The higher the number of simulations the better
 ## Define the number of liters for the larval density-dependent mortality
 habitat_liters=1
-#Define latitude and longitude for the diapause process
-myLat=42
-myLon=7
 ## Define the number of parallel processes (for sequential iterations set nc=1)
 cl = 1
 ```
@@ -543,9 +538,7 @@ simout=dynamAedes(species="albopictus",
             iter=it,  
             intro.eggs=ie,  
             compressed.output=TRUE, 
-            lat=myLat, 
-            long=myLon, 
-            verbose = FALSE)
+            verbose = TRUE)
 ```
 ## Analyse the results
 We first explore model output structure: the *simout* object is a nested list.
@@ -579,7 +572,7 @@ psi(input_sim = simout, eval_date = 123)
 We can also get a "spatial output", using the function *psi_sp*, which requires as additional input only the matrix of the pixels coordinates
 
 ```{r, evaluate=FALSE}
-plot(psi_sp(coords = cc, input_sim = simout, eval_date = 123,n.clusters=cl))
+
 ```
 ### Derive abundance 95% CI for each life stage and in each day
 We can now compute the interquantile range abundance of the simulated population using the function *adci* over the whole landscape. 
@@ -591,16 +584,14 @@ ad <- as.data.frame(adci(simout, eval_date=1:dd, breaks=c(0.25,0.50,0.75), st=3)
 eggd <- as.data.frame(adci(simout, eval_date=1:dd, breaks=c(0.25,0.50,0.75), st=4))
 
 egg$myStage="Egg"
-egg$Date=seq.Date(sim_temp[[1]]$date[str], sim_temp[[1]]$date[endr], by="day")
 juv$myStage="Juvenile"
-juv$Date=seq.Date(sim_temp[[1]]$date[str], sim_temp[[1]]$date[endr], by="day")
 ad$myStage="Adult"
-ad$Date=seq.Date(sim_temp[[1]]$date[str], sim_temp[[1]]$date[endr], by="day")
 eggd$myStage="Diapausing egg"
-eggd$Date=seq.Date(sim_temp[[1]]$date[str], sim_temp[[1]]$date[endr], by="day")
 
 outdf=bind_rows(egg, juv, ad, eggd) %>% 
   as_tibble()
+
+outdf$Date=rep(seq.Date(as.Date(str),as.Date(str)+dd-1, by="day"),4)
 
 outdf %>% 
   mutate(myStage=factor(myStage, levels= c("Egg", "Diapausing egg", "Juvenile", "Adult"))) %>% 
