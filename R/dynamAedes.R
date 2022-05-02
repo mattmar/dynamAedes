@@ -239,25 +239,25 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 							if( any(photo.matrix[,day]>photo.matrix[,day-1]) & any(photo.matrix[,day]>11.44) ) {
 								d.hatc.n <- rep(0,space)
 								ddays <- which(photo.matrix[,day]>11.44)
-								d.hatc.n[ddays] <- rbinom(length(ddays), p.life.a[4,,c(4*de)], prob=e.hatc.p)
-							} else {d.hatc.n <- 0}			
+								d.hatc.n[ddays] <- rbinom(length(ddays), p.life.a[4,ddays,c(4*de)], prob=e.hatc.p)
+							} else {d.hatc.n <- 0}
 						}else if( species=="koreicus"|species=="japonicus" ) {
 							if( photo.matrix[,day]>photo.matrix[,day-1] & any(photo.matrix[,day]>10.71) ) {
 								d.hatc.n <- rep(0,space)
 								ddays <- which(photo.matrix[,day]>10.71)
-								d.hatc.n[ddays] <- rbinom(length(ddays), p.life.a[4,,c(4*de)], prob=e.hatc.p)
+								d.hatc.n[ddays] <- rbinom(length(ddays), p.life.a[4,ddays,c(4*de)], prob=e.hatc.p)
 							} else {d.hatc.n <- 0}
 						} else {d.hatc.n <- 0}
                 	# Remove hatched eggs from eggs 8d+ old
 						e.temp.v <- p.life.a[1,,(4*de)] - e.hatc.n
-						if(species!="aegypti") {d.temp.v <- p.life.a[4,,c(4*de)] - if(species!="aegypti") {d.hatc.n} else {0}}
+						if( species!="aegypti" ) {d.temp.v <- p.life.a[4,,c(4*de)] - if(species!="aegypti") {d.hatc.n} else {0}}
                 	# Apply mortality to non hatched 8d+ old eggs
 						e.temp.v <- rbinom(length(1:space), e.temp.v, prob=0.99)
 						d.temp.v <- rbinom(length(1:space), d.temp.v, prob=0.99)
 	                ### Events in the (`I`) immature compartment
 	                ## `I` has 6 sub-compartments representing days from hatching; an immature can survive/die for the first 5 days after hatching, from the 5th day on, it can survive/die and `emerge`.
 	                ## Derive mortality rate due to density and add to mortality rate due to temperature sum and derive probability of survival in each cell.
-						imm.v <- if(scale=="ws") {
+						imm.v <- if( scale=="ws" ) {
 							sum(p.life.a[2,,2:(6*dj)])
 						} else rowSums(p.life.a[2,,2:(6*dj)])
 					## Derive density-dependent mortality,*2 is to report densities at 1L (original model is for a 2L water habitat.) / ihwv transform density to new liter/cell habitat volume
