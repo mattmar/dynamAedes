@@ -36,7 +36,7 @@
 
 dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adults=0, intro.juveniles=0, 
 	scale="ws", intro.cells=NULL, ihwv=1, temps.matrix=NULL, startd=1, endd=10,
-	cells.coords=NULL, lat=0, long=0, road.dist.matrix=NULL, avgpdisp=NA, intro.year=2020,
+	cells.coords=NULL, lat=NA, long=NA, road.dist.matrix=NULL, avgpdisp=NA, intro.year=2020,
 	iter=1, n.clusters=1, cluster.type="PSOCK", sparse.output=FALSE, compressed.output=TRUE,
 	suffix=NA, cellsize=250, maxadisp=600, dispbins=10, verbose=FALSE, seeding=FALSE) {
     #%%%%%%%%%%%%%%%%%%%#
@@ -46,7 +46,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 	if( dayspan>ncol(temps.matrix)) stop("You're trying to run the model for more days than columns in 'temps.matrix', exiting..." )
 		if( nchar(strsplit(as.character(startd),"-")[[1]][1])<4|nchar(strsplit(as.character(endd),"-")[[1]][1])<4 ) stop("Dates in the wrong format: change them to %Y-%m-%d")
     ### Preamble: declare variables and prepare the parallel environment for the life cycle ###
-			.resample <- function(x, ...) x[sample.int(length(x), ...)]
+		.resample <- function(x, ...) x[sample.int(length(x), ...)]
 		legind <- 0
 	## Define globally the average distance of a trip by car (km)
 		if( is.na(avgpdisp) ) {
@@ -81,7 +81,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 		}
 	## Set dispersal according to scale
 		dispersal <- if(scale=="lc"){TRUE}else if(scale=="rg"|scale=="ws"){FALSE}else{stop("Wrong scale. Exiting...")}
-	## Define `margin` for apply
+	## Define the `margin` for apply
 		mrg <- if(scale=="ws"){2}else if(scale=="lc"|scale=="rg"){1}
 		if(!dispersal) message("\n ### Model without dispersal ### \n") 
 		## Define the type of cluster computing environment 
@@ -301,7 +301,9 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 								## Proportion of diapausing and normal eggs
 							if(scale=="rg") {
 								a.degg.n <- sapply(1:space, function(x){rbinom(1,a.tegg.n[x],prob=(e.diap.p[x]))})
-							} else {a.degg.n <- sapply(1:space, function(x){rbinom(1,a.tegg.n[x],prob=(e.diap.p))})}
+							} else {
+								a.degg.n <- sapply(1:space, function(x){rbinom(1,a.tegg.n[x],prob=(e.diap.p))})
+							}
 							a.egg.n <- a.tegg.n-a.degg.n
 						} else {
 							a.egg.n <- sapply(1:space, function(x) sum(rpois(sum(p.life.a[3,x,2:3]), a.batc.n[x])))
@@ -381,7 +383,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 							}
 						}
     				## Print information on population structure today
-						if( verbose ) message("\n", as.Date(startd)+day, ". Day ",length(counter),"-- of iteration ",iteration," has ended. Population is e: ",sum(p.life.a[1,,])," i: ",sum(p.life.a[2,,])," a: " ,sum(p.life.a[3,,]), " d: ",sum(p.life.a[4,,]), " eh: ", sum(e.hatc.n+if(species!="aegypti") {d.hatc.n} else {0}), " el: ",sum(a.egg.n), " \n")
+						if( verbose ) message("\n", as.Date(startd)+day, ". Day ",length(counter),"-- of iteration ",iteration," has ended. Population is e: ",sum(p.life.a[1,,])," i: ",sum(p.life.a[2,,])," a: " ,sum(p.life.a[3,,]), " d: ",sum(p.life.a[4,,]), " eh: ", sum(e.hatc.n+if(species!="aegypti") {d.hatc.n} else {0}), " el: ",sum(a.egg.n), " \n", "Max t: ",max(temps.matrix[,day]/1000), " \n")
                 		# Condition for exinction
 							stopit <- sum(p.life.a,na.rm=TRUE)==0
                 	# Some (unnecessary?) garbage cleaning

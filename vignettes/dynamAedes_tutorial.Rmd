@@ -138,7 +138,7 @@ length(simout[[1]])
 
 The **third** level corresponds to the amount of individuals for each stage (rows).
 So if we inspect the 1st and the 62th day within the first iteration, we obtain a matrix having
-```{r}
+```{r,eval=FALSE}
 dim(simout[[1]][[1]])
 simout[[1]][[1]]
 simout[[1]][[31]]
@@ -149,13 +149,13 @@ We can now use the auxiliary functions of the package to analyse the results.
 First, we can retrieve the "probability of successful introduction", computed as the proportion of model
 iterations that resulted in a viable mosquito population at a given date.
 
-```{r message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE, eval=FALSE}
 psi(input_sim = simout, eval_date = 31)
 ```
 
 ### Derive abundance 95% CI for each life stage and in each day
 We now compute the interquantile range abundance for all the stages of the simulated population using the function *adci*.
-```{r results='hide', message=FALSE, warning=FALSE}
+```{r results='hide', message=FALSE, warning=FALSE, eval=FALSE}
 dd <- max(sapply(simout, function(x) length(x)))#retrieve the maximum number of simulated days
 egg <- as.data.frame(adci(simout, eval_date=1:dd, breaks=c(0.25,0.50,0.75), st=1))
 juv <- as.data.frame(adci(simout, eval_date=1:dd, breaks=c(0.25,0.50,0.75), st=2))
@@ -203,7 +203,7 @@ The "local scale" means that the model accounts for both active and passive disp
 First, we define the physical space into which the introduction of our mosquitoes will happen. 
 We define a squared lattice arena having 5 km side and 250 m resolution (20 colums and 20 rows, 400 total cells).
 
-```{r}
+```{r, eval=FALSE}
 gridDim <- 20 # 5000m/250 m = 20 columns and rows
 xy <- expand.grid(x=1:gridDim, y=1:gridDim)
 ```
@@ -211,7 +211,7 @@ xy <- expand.grid(x=1:gridDim, y=1:gridDim)
 We then add a spatial pattern into the lattice area. This spatial pattern will be used later to add spatial correllation (SAC) to the temperature time series. 
 The spatial autocorrelated pattern will be obtained using a semivariogram model with defined sill (value that the semivarion attains at the range) and range (distance of 0 spatial correlation) and then predicting the semivariogram model over the lattice grid using unconditional Gaussian simulation.
  
-```{r, message=FALSE}
+```{r, message=FALSE, eval=FALSE}
 varioMod <- vgm(psill=0.005, range=100, model='Exp') # psill = partial sill = (sill-nugget)
 # Set up an additional variable from simple kriging
 zDummy <- gstat(formula=z~1, 
@@ -226,7 +226,7 @@ xyz <- predict(zDummy, newdata=xy, nsim=1)
 ```
 
 We generate a spatially autocorrelated raster adding the SA variable (*xyz$sim1*) to the RasterLayer object. The autocorrelated surface could for example represent the distribution of vegetation cover in a urban landscape.
-```{r}
+```{r, eval=FALSE}
 utm32N <- "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
 r <- raster(nrow=gridDim, ncol=gridDim, crs=utm32N, ext=extent(1220000,1225000, 5700000,5705000))
 
@@ -241,7 +241,7 @@ autocorr_factor <- values(r)
 ```
 ### Simulate temperature data with seasonal trend
 We take advantage of the temperature dataset simulated for the punctual scale modelling exercise. We can then "expand onto space" the temperature time series by multiplying it with the autocorrelated surface simulated above. 
-```{r}
+```{r, eval=FALSE}
 mat <- lapply(1:ncell(r), function(x) {
 	d_t <- sim_temp[[1]]$x*autocorr_factor[[x]]
 	return(d_t)
@@ -251,7 +251,7 @@ mat <- do.call(rbind,mat)
 ```
 
 A comparison between the distribution of the initial temperature time series and autocorrelated temperature surface
-```{r}
+```{r, eval=FALSE}
 par(mfrow=c(2,1))
 hist(mat, xlab="Temperature (°C)", main="Histogram of simulated spatial autocorreled temperature")
 hist(sim_temp[[1]]$x, xlab="Temperature (°C)", main="Histogram of simulated temperatures", col="red")
@@ -264,7 +264,7 @@ df_temp <- cbind(df, mat)
 ## Simulate an arbitrary road segment for medium-range dispersal 
 
 In the model we have considered the possiblity of medium-range passive dispersal. Thus, we will simulate an arbitrary road segment along which adult mosquitoes can disperse passively (i.e., through car traffic). 
-```{r}
+```{r, eval=FALSE}
 set.seed(123)
 pts <- spsample(bbox, 5, type="random")
 roads <- spLines(pts)
@@ -275,7 +275,7 @@ raster::plot(roads, add=T)
 ```
 
 After defining the road segment we add a "buffer" of 250 m around the road segment. Adult mosquitoes that reach or develop into cells comprised in the 250 m buffer around roads are thus able to undergo passive dispersal. 
-```{r}
+```{r, eval=FALSE}
 buff <- buffer(roads, width=250)
 crs(buff) <- crs(r)
 # Check grid, road segment and buffer
@@ -286,7 +286,7 @@ raster::plot(roads, add=T, col="red")
 
 Next, we derive a distance matrix between cells comprised in the spatial buffer along the road network.
 First, we select the cells.
-```{r,  message=FALSE}
+```{r,  message=FALSE, eval=FALSE}
 df_sp <- df
 coordinates(df_sp)=~x+y
 df_sp <- raster::intersect(df_sp,buff)
@@ -298,29 +298,29 @@ raster::plot(df_sp, add=T, col="red")
 ```
 
 Then, we compute the Euclidean distance between each selected cell.
-```{r}
+```{r, eval=FALSE}
 dist_matrix <- as.matrix(dist(coordinates(df_sp)))
 ```
 
 # Format the simulated input datasets and run the model
 ## Model settings
 Float numbers in the temperature matrix would slow the computational speed, thus we first multiply them by 1000 and then transform them in integer numbers.
-```{r}
+```{r, eval=FALSE}
 w <- sapply(df_temp[,-c(1:3)], function(x) as.integer(x*1000))
 ```
 
 We can now define a two-column matrix of coordinates to identify each cell in the lattice grid.
-```{r}
+```{r, eval=FALSE}
 cc <- df_temp[,c("x","y")]
 ```
 
 As for model requirement, the distance matrix must have column names equal to row names.
-```{r}
+```{r, eval=FALSE}
 colnames(dist_matrix) <- row.names(dist_matrix)
 ```
 
 Moreover, distances in the distance matrix must be rounded to the thousands.
-```{r}
+```{r, eval=FALSE}
 dist_matrix <- apply(dist_matrix,2,function(x) round(x/1000,1)*1000) 
 
 # An histogram showing the distribution of distances of cells along the road network
@@ -328,7 +328,7 @@ hist(dist_matrix, xlab="Distance (meters)")
 ```
 
 Select a cell that intersect roads for introduction: 
-```{r}
+```{r, eval=FALSE}
 set.seed(123)
 icellcoords <- df[sample(row.names(dist_matrix),1),c(2:3)]
 set.seed(123)
@@ -342,7 +342,7 @@ raster::plot(SpatialPoints(coords=matrix(coordinates(r)[icellid,],ncol=2)), add=
 ```
 
 We are now left with a few model variables which need to be defined.
-```{r}
+```{r, eval=FALSE}
 ## Define cells along roads into which introduce propagules on day 1
 intro.vector <- icellid
 ## Define the day of introduction (August 1st is day 1)
@@ -366,7 +366,7 @@ cl = 1
 
 ### Run the model
 Running the model with the settings specified in this example takes about 3 minutes.
-```{r results='hide', message=FALSE, warning=FALSE}
+```{r results='hide', message=FALSE, warning=FALSE, eval=FALSE}
 simout=dynamAedes(species="albopictus",
             scale="lc",  
             ihwv=habitat_liters,  
@@ -392,7 +392,7 @@ simout=dynamAedes(species="albopictus",
 We first explore the model output structure: the *simout* object is a nested list.
 
 The **first** level corresponds to the number of model iterations
-```{r}
+```{r, eval=FALSE}
 print(it)
 print(length(simout))
 ```
@@ -400,12 +400,12 @@ print(length(simout))
 The **second** level corresponds to the simulated days.
 So if we inspect the first iteration, we observe that the model has computed 123 days, as we had specified above in the object *endr*.
 
-```{r}
+```{r, eval=FALSE}
 length(simout[[1]])
 ```
 The **third** level corresponds to the amount of individuals for each stage (rows) within each grid cell of the landscape (columns).
 So if we inspect the first day within the first iteration, we obtain a matrix having:
-```{r}
+```{r, eval=FALSE}
 dim(simout[[1]][[1]])
 ```
 We can now use the auxiliary functions of the model to Analyse the results. 
@@ -413,13 +413,13 @@ We can now use the auxiliary functions of the model to Analyse the results.
 ### Derive probability of a successfull introduction at the end of the simulated period
 First, we can retrieve the probability of successful introduction, computed as the proportion of model
 iterations that resulted in a viable mosquito population at a given date.
-```{r}
+```{r, eval=FALSE}
 psi(input_sim = simout, eval_date = 300)
 ```
 
 We can also get a spatial output, using the function *psi_sp*, which require as additional input only the matrix of centroid coordinates of pixels.
 
-```{r}
+```{r, eval=FALSE}
 plot(psi_sp(coords = cc, input_sim = simout, eval_date = 61, n.clusters=cl))
 raster::plot(buff, add=T)
 raster::plot(df_sp, add=T, col="red")
@@ -430,7 +430,7 @@ At local scale, the interpretation of this output is more nuanced than for the o
 
 ### Derive abundance 95% CI for each life stage and in each day
 We can now compute the interquantile range abundance of the simulated population over the whole landscape using the function *adci*. 
-```{r message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE, eval=FALSE}
 dd <- max(sapply(simout, function(x) length(x)))#retrieve the maximum number of simulated days
 egg <- as.data.frame(adci(simout, eval_date=1:dd, breaks=c(0.25,0.50,0.75), st=1))
 juv <- as.data.frame(adci(simout, eval_date=1:dd, breaks=c(0.25,0.50,0.75), st=2))
@@ -466,7 +466,7 @@ outdf %>%
 
 We can also have a spatial output of quantiles of the abundance distribution of a given life stage and for a given simulated day by using the function *adci_sp* and specifiying pixel coordinates. For example for eggs: 
 
-```{r}
+```{r, eval=FALSE}
 r=adci_sp(simout, coords=cc, eval_date=61, breaks=c(0.5,0.975), stage=3)
 plot(r)
 
@@ -475,14 +475,14 @@ Note that if only a small number of mosquitoes are present in a pixel over many 
 
 ### Number of invaded cells
 Compute a summary of the number of invaded cells over model iterations
-```{r}
+```{r, eval=FALSE}
 x=icci(simout, eval_date=1:61, breaks=c(0.25,0.50,0.75))
 head(x)
 tail(x)
 ```
 ### Estimates of mosquito dispersal spread (in km2 ) 
 Derive estimates of mosquito dispersal (in km^2) of the simulated mosquito populations (only when scale = "lc") for any simulated day (in this case for 50 days from start and end of the simulate period).
-```{r}
+```{r, eval=FALSE}
 x=dici(simout, coords=cc, eval_date=seq(1,61,length.out=61), breaks=c(0.25,0.50,0.75), space=FALSE)
 plot(`75%`~day,x,type="l",ylab="Population dispersal (in meters) from cell of introduction",xlab="days from introduction")
 lines(`50%`~day,x,type="l", col="red")
@@ -499,17 +499,17 @@ The model at regional scale is the same as running the model at "punctual" scale
 We take advantage of the spatial temperature dataset simulated for the local scale example. 
 
 Float numbers in the temperature matrix would slow the computational speed, thus we first multiply them by 1000 and then transform them in integer numbers.
-```{r, evaluate=FALSE}
+```{r, eval=FALSE}
 w <- sapply(df_temp[,-c(1:3)], function(x) as.integer(x*1000))
 ```
 
 We can now define a two-column matrix of coordinates to identify each cell in the lattice grid.
-```{r, evaluate=FALSE}
+```{r, eval=FALSE}
 cc <- df_temp[,c("x","y")]
 ```
 
 We are now left with a few model variables which need to be defined.
-```{r, evaluate=FALSE}
+```{r, eval=FALSE}
 ## Define the day of introduction (June 1st is day 1)
 str = "2018-05-01"
 ## Define the end-day of life cycle (October 1st is the last day)
@@ -526,7 +526,7 @@ cl = 1
 
 ### Run the model
 Running the model with the settings specified in this example takes about 3 minutes.
-```{r results='hide', message=FALSE, warning=FALSE, evaluate=FALSE}
+```{r results='hide', message=FALSE, warning=FALSE, eval=FALSE}
 simout=dynamAedes(species="albopictus", 
             scale="rg",  
             ihwv=habitat_liters,  
@@ -544,7 +544,7 @@ simout=dynamAedes(species="albopictus",
 We first explore model output structure: the *simout* object is a nested list.
 
 The **first** level corresponds to the number of model iterations
-```{r, evaluate=FALSE}
+```{r, eval=FALSE}
 print(it)
 print(length(simout))
 ```
@@ -552,12 +552,12 @@ print(length(simout))
 The **second** level corresponds to the simulated days.
 If we inspect the first iteration, we observe that the model run for 123 days, as we had specified above in the object *endr*.
 
-```{r, evaluate=FALSE}
+```{r, eval=FALSE}
 length(simout[[1]])
 ```
 The **third** level of the output list object corresponds to the amount of individuals for each stage (rows) within each grid cell of the landscape (columns).
 If we inspect the first day within the first iteration, we obtain a matrix having
-```{r, evaluate=FALSE}
+```{r, eval=FALSE}
 dim(simout[[1]][[1]])
 ```
 We can now use the auxiliary functions of the package to Analyse the results. 
@@ -565,18 +565,18 @@ We can now use the auxiliary functions of the package to Analyse the results.
 ### Derive probability of a successfull introduction at the end of the simulated period
 First, we can retrieve the "probability of a successful introduction", computed as the proportion of model
 iterations that resulted in a viable mosquito population (in any cells of the grid) at a given date.
-```{r, evaluate=FALSE}
+```{r, eval=FALSE}
 psi(input_sim = simout, eval_date = 123)
 ```
 
 We can also get a "spatial output", using the function *psi_sp*, which requires as additional input only the matrix of the pixels coordinates
 
-```{r, evaluate=FALSE}
+```{r, eval=FALSE}
 
 ```
 ### Derive abundance 95% CI for each life stage and in each day
 We can now compute the interquantile range abundance of the simulated population using the function *adci* over the whole landscape. 
-```{r message=FALSE, warning=FALSE, evaluate=FALSE}
+```{r message=FALSE, warning=FALSE}
 dd <- max(sapply(simout, function(x) length(x)))#retrieve the maximum number of simulated days
 egg <- as.data.frame(adci(simout, eval_date=1:dd, breaks=c(0.25,0.50,0.75), st=1))
 juv <- as.data.frame(adci(simout, eval_date=1:dd, breaks=c(0.25,0.50,0.75), st=2))

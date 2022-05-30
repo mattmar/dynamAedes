@@ -20,7 +20,7 @@ adci <- function(input_sim=NA, stage=1, n.clusters=1, eval_date=0, breaks=c(0.25
 		} else {
 			out <- apply(do.call(rbind.data.frame,mclapply(input_sim, function(x) {
 				lapply(eval_date, function(y) {
-					if(y<=length(x)) {sum(x[[y]][stage,],na.rm=T)} else {NA}})},mc.cores=n.clusters)),2,quantile,probs=breaks,na.rm=T)
+					if(y<=length(x)) {sum(as.data.frame(x[[y]])[stage,],na.rm=T)} else {NA}})},mc.cores=n.clusters)),2,quantile,probs=breaks,na.rm=T)
 			colnames(out)<-NULL
 			outo <- rbind.data.frame(out,
 				stage=rep(stage,nrow(out)),
