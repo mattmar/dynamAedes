@@ -10,9 +10,9 @@
 #' @param intro.cells positive integer. One or more cells (id) where to introduce the population at local ("lc") scale. If intro.cells=NULL, then a random cell is used for introduction; If intro.cells is a vector of cell ids then a cell is drawn at random from the vector (with repetition) for introduction in each model iteration. 
 #' @param ihwv positive integer. Larval-habitat water volume, define the volume (L) of water habitat presents in each spatial unit (parametrised with data retrieved from \doi{10.1111/1365-2664.12620}). Default \code{lhwv = 1}.
 #' @param startd Character  date (ISO format "%Y-%m-%d"). Date of start of simulations.
-#' @param endd Character  date (ISO format "%Y-%m-%d"). Date of end of simulation.
+#' @param endd Character  date (ISO format "%Y-%m-%d"). Date of end of simulation. It can be \code{NA}; then it will be derived using the number of columns in \code{temps.matrix}.
 #' @param iter positive integer. Define the number of model iterations. 
-#' @param temps.matrix matrix. A matrix of daily (average) temperatures (in degrees **Celsius degree x 1000**) used to fit the life cycle rates. This matrix must be organised with the daily temperature observations as columns and the geographic position of the i-grid cell as rows. Importantly, the first column must match \code{startd} date.
+#' @param temps.matrix matrix. A matrix of daily (average) temperatures (in degrees **Celsius degree x 1000**) used to fit the life cycle rates. This matrix must be organised with the daily temperature observations as columns and the geographic position of the i-grid cell as rows. \bold{Importantly}, the first column must match \code{startd} date.
 #' @param cells.coords matrix. A matrix reporting the spatial coordinates of the temperature observations.
 #' @param lat numeric. Latitude value of the area of interested used to derive the photoperiod (and thus the diapause eggs allocation function). 
 #' @param long numeric. Longitude value of the area of interested used to derive the photoperiod (and thus the diapause eggs allocation function)
@@ -41,10 +41,20 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 	suffix=NA, cellsize=250, maxadisp=600, dispbins=10, verbose=FALSE, seeding=FALSE) {
     #%%%%%%%%%%%%%%%%%%%#
     ### Initial checks
-	if( !species%in%c("aegypti","albopictus","koreicus","japonicus")) stop("Species not supported, exiting..." )
-		dayspan <- as.integer(as.Date(endd)-as.Date(startd))
-	if( dayspan>ncol(temps.matrix)) stop("You're trying to run the model for more days than columns in 'temps.matrix', exiting..." )
-		if( nchar(strsplit(as.character(startd),"-")[[1]][1])<4|nchar(strsplit(as.character(endd),"-")[[1]][1])<4 ) stop("Dates in the wrong format: change them to %Y-%m-%d")
+	if( !species%in%c("aegypti","albopictus","koreicus","japonicus")) {
+		stop("Species not supported, exiting..." )
+	}
+	dayspan <- as.integer(as.Date(endd)-as.Date(startd))
+	if( dayspan>ncol(temps.matrix)) {
+		stop("You're trying to run the model for more days than columns in 'temps.matrix', exiting..." ) 
+	}
+	if(is.na(endd)) {
+		endd <- startd+dayspan
+	}
+	if( nchar(strsplit(as.character(startd),"-")[[1]][1])<4|nchar(strsplit(as.character(endd),"-")[[1]][1])<4 ) {
+			stop("Dates in the wrong format: change them to %Y-%m-%d")
+	}
+
     ### Preamble: declare variables and prepare the parallel environment for the life cycle ###
 		.resample <- function(x, ...) x[sample.int(length(x), ...)]
 		legind <- 0
