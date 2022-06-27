@@ -315,7 +315,7 @@ psi(input_sim = simout, eval_date = 60)
 
 We can also get a spatial output, using the function *psi_sp*, which require as additional input only the matrix of centroid coordinates of pixels.
 
-```{r, eval=FALSE}
+```{r}
 plot(psi_sp(coords = cc, input_sim = simout, eval_date = 60, n.clusters=cl))
 raster::plot(buff, add=T)
 raster::plot(df_sp, add=T, col="red")
