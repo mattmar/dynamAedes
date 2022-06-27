@@ -380,7 +380,7 @@ head(x)
 tail(x)
 ```
 ### Estimates of mosquito dispersal spread (in km2 ) 
-Derive estimates of mosquito dispersal (in km^2) of the simulated mosquito populations (only when scale = "lc") for any simulated day (in this case for 50 days from start and end of the simulate period).
+Derive estimates of mosquito dispersal (in km^2) of the simulated mosquito populations (only when scale = "lc") for any simulated day (in this case for 60 days from start and end of the simulate period).
 ```{r}
 x=dici(simout, coords=cc, eval_date=seq(1,60,length.out=60), breaks=c(0.25,0.50,0.75), space=FALSE)
 plot(`75%`~day,x,type="l",ylab="Population dispersal (in meters) from cell of introduction",xlab="days from introduction")
