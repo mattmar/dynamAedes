@@ -163,21 +163,21 @@ dd <- max(sapply(simout, function(x) length(x)))
 # Compute the abundance
 outdf <- rbind(data.frame(cbind(
                     data.frame(adci(simout, eval_date=1:dd, breaks=c(0.25,0.50,0.75), st=1)), 
-                    myStage = "Egg")),
+                    myStage = 'Egg')),
                data.frame(cbind(
                     adci(simout, eval_date=1:dd, breaks=c(0.25,0.50,0.75), st=2), 
-                    myStage="Juvenile")),
+                    myStage='Juvenile')),
                data.frame(cbind(
                     adci(simout, eval_date=1:dd, breaks=c(0.25,0.50,0.75), st=3), 
-                    myStage="Adult")),
+                    myStage='Adult')),
                data.frame(cbind(
                     adci(simout, eval_date=1:dd, breaks=c(0.25,0.50,0.75), st=4), 
-                    myStage="Diapausing egg"))
+                    myStage='Diapausing egg'))
                )
 
 # Plot
 outdf %>% 
-  mutate(myStage=factor(myStage, levels= c("Egg", "Diapausing egg", "Juvenile", "Adult")), 
+  mutate(myStage=factor(myStage, levels= c('Egg', 'Diapausing egg', 'Juvenile', 'Adult')), 
          X25.=as.numeric(X25.), 
          X50.=as.numeric(X50.),
          X75.=as.numeric(X75.), 

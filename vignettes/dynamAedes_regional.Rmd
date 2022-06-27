@@ -249,7 +249,7 @@ outdf=bind_rows(egg, juv, ad, eggd) %>%
 outdf$Date=rep(seq.Date(as.Date(str),as.Date(str)+dd-1, by="day"),4)
 
 outdf %>% 
-  mutate(myStage=factor(myStage, levels= c("Egg", "Diapausing egg", "Juvenile", "Adult"))) %>% 
+  mutate(myStage=factor(myStage, levels= c('Egg', 'Diapausing egg', 'Juvenile', 'Adult'))) %>% 
   ggplot( aes(y=(`50%`),x=Date, group=factor(myStage),col=factor(myStage))) +
   ggtitle("Ae. albopictus Interquantile range abundance")+
   geom_line(size=1.2)+
