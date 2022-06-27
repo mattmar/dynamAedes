@@ -238,10 +238,10 @@ juv <- as.data.frame(adci(simout, eval_date=1:dd, breaks=c(0.25,0.50,0.75), st=2
 ad <- as.data.frame(adci(simout, eval_date=1:dd, breaks=c(0.25,0.50,0.75), st=3))
 eggd <- as.data.frame(adci(simout, eval_date=1:dd, breaks=c(0.25,0.50,0.75), st=4))
 
-egg$myStage="Egg"
-juv$myStage="Juvenile"
-ad$myStage="Adult"
-eggd$myStage="Diapausing egg"
+egg$myStage='Egg'
+juv$myStage='Juvenile'
+ad$myStage='Adult'
+eggd$myStage='Diapausing egg'
 
 outdf=bind_rows(egg, juv, ad, eggd) %>% 
   as_tibble()

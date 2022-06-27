@@ -335,14 +335,14 @@ eggd <- as.data.frame(adci(simout, eval_date=1:dd, breaks=c(0.25,0.50,0.75), st=
 strj <- as.numeric(format(as.Date(str),"%j"))
 endrj <- as.numeric(format(as.Date(endr),"%j"))-2
 
-egg$myStage="Egg"
-egg$Date=seq.Date(sim_temp[[1]]$date[strj], sim_temp[[1]]$date[endrj], by="day")
-juv$myStage="Juvenile"
-juv$Date=seq.Date(sim_temp[[1]]$date[strj], sim_temp[[1]]$date[endrj], by="day")
-ad$myStage="Adult"
-ad$Date=seq.Date(sim_temp[[1]]$date[strj], sim_temp[[1]]$date[endrj], by="day")
-eggd$myStage="Diapausing egg"
-eggd$Date=seq.Date(sim_temp[[1]]$date[strj], sim_temp[[1]]$date[endrj], by="day")
+egg$myStage='Egg'
+egg$Date=seq.Date(sim_temp[[1]]$date[strj], sim_temp[[1]]$date[endrj], by='day')
+juv$myStage='Juvenile'
+juv$Date=seq.Date(sim_temp[[1]]$date[strj], sim_temp[[1]]$date[endrj], by='day')
+ad$myStage='Adult'
+ad$Date=seq.Date(sim_temp[[1]]$date[strj], sim_temp[[1]]$date[endrj], by='day')
+eggd$myStage='Diapausing egg'
+eggd$Date=seq.Date(sim_temp[[1]]$date[strj], sim_temp[[1]]$date[endrj], by='day')
 
 outdf=bind_rows(egg, juv, ad, eggd) %>% 
   as_tibble()
