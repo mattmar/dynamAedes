@@ -14,6 +14,7 @@
 #' @param iter positive integer. Define the number of model iterations. 
 #' @param temps.matrix matrix. A matrix of daily (average) temperatures (in degrees **Celsius degree x 1000**) used to fit the life cycle rates. This matrix must be organised with the daily temperature observations as columns and the geographic position of the i-grid cell as rows. \bold{Importantly}, the first column must match \code{startd} date.
 #' @param cells.coords matrix. A matrix reporting the spatial coordinates of the temperature observations.
+#' @param coords.proj4 string. Proj4 string of cell coordinates used for the calculation of photoperiod.
 #' @param lat numeric. Latitude value of the area of interested used to derive the photoperiod (and thus the diapause eggs allocation function). 
 #' @param long numeric. Longitude value of the area of interested used to derive the photoperiod (and thus the diapause eggs allocation function)
 #' @param road.dist.matrix matrix. when \code{scale = "lc"}, defines the matrix containing the distances (in meters) between grid cells intersecting the road network for the mosquito passive dispersal process.
@@ -36,7 +37,7 @@
 
 dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adults=0, intro.juveniles=0, 
 	scale="ws", intro.cells=NULL, ihwv=1, temps.matrix=NULL, startd=1, endd=10,
-	cells.coords=NULL, lat=NA, long=NA, road.dist.matrix=NULL, avgpdisp=NA, intro.year=2020,
+	cells.coords=NULL, coords.proj4=NA, lat=NA, long=NA, road.dist.matrix=NULL, avgpdisp=NA, intro.year=2020,
 	iter=1, n.clusters=1, cluster.type="PSOCK", sparse.output=FALSE, compressed.output=TRUE,
 	suffix=NA, cellsize=250, maxadisp=600, dispbins=10, verbose=FALSE, seeding=FALSE) {
     #%%%%%%%%%%%%%%%%%%%#
@@ -54,7 +55,13 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 	if( nchar(strsplit(as.character(startd),"-")[[1]][1])<4|nchar(strsplit(as.character(endd),"-")[[1]][1])<4 ) {
 			stop("Dates in the wrong format: change them to %Y-%m-%d")
 	}
-
+	if( species!="aegypti" & scale=="lc" & abs(max(cells.coords[,2]))>90 ) {
+		if( is.na(coords.proj4) ) {
+			stop("No proj4 string for input coordinates. Please set 'coords.proj4' option.")
+		} else {
+			cells.coords.photo <- coordinates(spTransform(SpatialPoints(cells.coords, proj4string=CRS(coords.proj4)), CRS=CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")))
+		}
+	}
     ### Preamble: declare variables and prepare the parallel environment for the life cycle ###
 		.resample <- function(x, ...) x[sample.int(length(x), ...)]
 		legind <- 0
@@ -80,7 +87,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 		if( species!="aegypti" ){
 			jd <- JD(seq(as.POSIXct(startd), as.POSIXct(as.Date(startd)+dayspan), by='day'))
 			if( scale=="rg" ) {
-				photo.matrix <- lapply(jd, function(x){insol::daylength(lat=cells.coords$y, long = cells.coords$x, jd=x, 1)[,3]})
+				photo.matrix <- lapply(jd, function(x){insol::daylength(lat=cells.coords.photo$y, long = cells.coords.photo$x, jd=x, 1)[,3]})
 				photo.matrix <- do.call(cbind,photo.matrix)
 			} else if( !is.null(lat)&!is.null(long) ) {
 				dl <- daylength(lat,long,jd,1)[,3]
