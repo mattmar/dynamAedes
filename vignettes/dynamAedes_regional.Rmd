@@ -1,12 +1,13 @@
 ---
-title: "The regional scale model"
+title: "Describing the main features of *dynamAedes*: the regional scale model."
+subtitle: "dynamAedes: A Unified Mechanistic Model For The Population Dynamics Of Invasive *Aedes* Mosquitoes."
 author: "Daniele Da Re, Sophie 0. Vanwambeke, Matteo Marcantonio"
 output: 
   rmarkdown::html_vignette:
   toc: true
   toc_depth: 3
 vignette: >
-  %\VignetteIndexEntry{The regional scale model}
+  %\VignetteIndexEntry{Describing the main features of *dynamAedes*: the regional scale model.}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 date: "`r Sys.Date()`"
@@ -14,7 +15,6 @@ date: "`r Sys.Date()`"
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(fig.width=10, fig.height=10, fig.asp = 0.618, out.width = "95%", fig.align = "center", fig.dpi = 150, collapse = FALSE, comment = "#") 
-options(mc.cores=2)
 ```
 
 This tutorial explains step-by-step the main features of **dynamAedes** package, a unified modelling framework for invasive *Aedes* mosquitoes. Users can apply the stochastic, time-discrete and spatially-explicit population dynamical model initially developed in [Da Re et al., (2021)](https://doi.org/10.1016/j.ecoinf.2020.101180) for *Aedes aegypti* and then expanded for other three species: *Ae. albopictus*, *Ae. japonicus* and *Ae. koreicus* [Da Re et al., (*under review*)](http://dx.doi.org/10.1101/2021.12.21.473628).
@@ -65,7 +65,7 @@ We then add a spatial pattern into the lattice area. This spatial pattern will b
 The spatial autocorrelated pattern will be obtained using a semivariogram model with defined sill (value that the semivarion attains at the range) and range (distance of 0 spatial correlation) and then predicting the semivariogram model over the lattice grid using unconditional Gaussian simulation.
  
 ```{r, message=FALSE}
-varioMod <- vgm(psill=0.005, range=100, model='Exp') # psill = partial sill = (sill-nugget)
+varioMod <- vgm(psill=0.5, range=100, model='Exp') # psill = partial sill = (sill-nugget)
 # Set up an additional variable from simple kriging
 zDummy <- gstat(formula=z~1, 
                 locations = ~x+y, 
@@ -138,7 +138,7 @@ mat <- do.call(rbind,mat)
 A comparison between the distribution of the initial temperature time series and autocorrelated temperature surface
 ```{r}
 par(mfrow=c(2,1))
-hist(mat, xlab="Temperature (°C)", main="Histogram of simulated spatial autocorreled temperature")
+hist(mat, xlab="Temperature (°C)", main="Histogram of simulated spatial autocorreled temperatures")
 hist(sim_temp[[1]]$x, xlab="Temperature (°C)", main="Histogram of simulated temperatures", col="red")
 par(mfrow=c(1,1))
 
@@ -148,7 +148,7 @@ df_temp <- cbind(df, mat)
 ```
 
 ## Model settings
-Float numbers in the temperature matrix would slow the computational speed, thus we first multiply them by 1000 and then transform them in integer numbers.
+Float numbers in the temperature matrix would slow the computational speed, thus we first multiply them by 1000 and then transform them in integer numbers. **w** will be subset to match the simulated time period below.
 ```{r, evaluate=FALSE}
 w <- sapply(df_temp[,-c(1:3)], function(x) as.integer(x*1000))
 ```
@@ -160,16 +160,18 @@ cc <- df_temp[,c("x","y")]
 
 We are now left with a few model variables which need to be defined.
 ```{r, evaluate=FALSE}
-## Define the day of introduction (July 1st is day 1)
-str = "2000-05-01"
-## Define the end-day of life cycle (August 1st is the last day)
-endr = "2000-06-01"
+## Define the day of introduction (May 1st is day 1)
+str = "2000-06-01"
+## Define the end-day of life cycle (July 2nd is the last day)
+endr = "2000-07-02"
 ## Define the number of eggs to be introduced
 ie = 100
 ## Define the number of model iterations
 it = 1 # The higher the number of simulations the better
 ## Define the number of liters for the larval density-dependent mortality
 habitat_liters=1
+## Define proj4 string for input coordinates
+utm32N = "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs" 
 ## Define the number of parallel processes (for sequential iterations set nc=1)
 cl = 1
 ```
@@ -180,15 +182,17 @@ Running the model with the settings specified in this example takes about 3 minu
 simout=dynamAedes(species="albopictus", 
             scale="rg",  
             ihwv=habitat_liters,  
-            temps.matrix=w,  
+            temps.matrix=w[,as.numeric(format(as.Date(str),"%j")):as.numeric(format(as.Date(endr),"%j"))],
+            coords.proj4=utm32N, 
             cells.coords=cc,
             startd=str, 
             endd=endr,  
             n.clusters=cl, 
             iter=it,  
             intro.eggs=ie,  
-            compressed.output=TRUE, 
-            verbose = FALSE)
+            compressed.output=TRUE,
+            seeding=TRUE,
+            verbose=FALSE)
 ```
 ## Analyse the results
 We first explore model output structure: the *simout* object is a nested list.
@@ -200,11 +204,11 @@ print(length(simout))
 ```
 
 The **second** level corresponds to the simulated days.
-So if we inspect the first iteration, we observe that the model has computed `rlength(simout[[1]])}` days, since we have started the simulation on the 1st of July and ended on the 1st of August.
-
+So if we inspect the first iteration, we observe that the model has computed `rlength(simout[[1]])` days, since we have started the simulation on the 1st of July and ended on the 1st of August.
 ```{r, evaluate=FALSE}
 length(simout[[1]])
 ```
+
 The **third** level of the output list object corresponds to the amount of individuals for each stage (rows) within each grid cell of the landscape (columns).
 If we inspect the first day within the first iteration, we obtain a matrix having
 ```{r, evaluate=FALSE}

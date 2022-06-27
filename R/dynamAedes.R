@@ -37,7 +37,7 @@
 
 dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adults=0, intro.juveniles=0, 
 	scale="ws", intro.cells=NULL, ihwv=1, temps.matrix=NULL, startd=1, endd=10,
-	cells.coords=NULL, coords.proj4=NA, lat=NA, long=NA, road.dist.matrix=NULL, avgpdisp=NA, intro.year=2020,
+	cells.coords=NULL, coords.proj4=NA, lat=NA, long=NA, road.dist.matrix=NULL, avgpdisp=NA,
 	iter=1, n.clusters=1, cluster.type="PSOCK", sparse.output=FALSE, compressed.output=TRUE,
 	suffix=NA, cellsize=250, maxadisp=600, dispbins=10, verbose=FALSE, seeding=FALSE) {
     #%%%%%%%%%%%%%%%%%%%#
@@ -46,6 +46,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 		stop("Species not supported, exiting..." )
 	}
 	dayspan <- as.integer(as.Date(endd)-as.Date(startd))
+	cells.coords.photo <- cells.coords
 	if( dayspan>ncol(temps.matrix)) {
 		stop("You're trying to run the model for more days than columns in 'temps.matrix', exiting..." ) 
 	}
@@ -55,11 +56,11 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 	if( nchar(strsplit(as.character(startd),"-")[[1]][1])<4|nchar(strsplit(as.character(endd),"-")[[1]][1])<4 ) {
 			stop("Dates in the wrong format: change them to %Y-%m-%d")
 	}
-	if( species!="aegypti" & scale=="lc" & abs(max(cells.coords[,2]))>90 ) {
+	if( species!="aegypti" & scale=="rg" & abs(max(cells.coords[,2]))>90 ) {
 		if( is.na(coords.proj4) ) {
 			stop("No proj4 string for input coordinates. Please set 'coords.proj4' option.")
 		} else {
-			cells.coords.photo <- coordinates(spTransform(SpatialPoints(cells.coords, proj4string=CRS(coords.proj4)), CRS=CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")))
+			cells.coords.photo <- as.data.frame(coordinates(spTransform(SpatialPoints(cells.coords, proj4string=CRS(coords.proj4)), CRS=CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))))
 		}
 	}
     ### Preamble: declare variables and prepare the parallel environment for the life cycle ###
@@ -89,7 +90,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 			if( scale=="rg" ) {
 				photo.matrix <- lapply(jd, function(x){insol::daylength(lat=cells.coords.photo$y, long = cells.coords.photo$x, jd=x, 1)[,3]})
 				photo.matrix <- do.call(cbind,photo.matrix)
-			} else if( !is.null(lat)&!is.null(long) ) {
+			} else if( !is.na(lat)&!is.na(long) ) {
 				dl <- daylength(lat,long,jd,1)[,3]
 				photo.matrix <- matrix(dl, nrow=1)
 			} else (stop("Something's wrong with scale or lat and long"))
@@ -109,7 +110,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 			registerDoParallel(cl, cores=n.clusters)
 			if(seeding) parallel::clusterEvalQ(cl, set.seed(2021))
 		## Define space dimensionality into which simulations occour
-				space <- nrow(temps.matrix)
+			space <- nrow(temps.matrix)
 		    ## Set a progress bar
 			message("##########################################\n## Life cycle iterations have begun... ##\n##########################################")
 			pb <- txtProgressBar(char = "%", min = 0, max = iter, style = 3)
@@ -167,9 +168,9 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 							a.intro.n[sample(as.integer(colnames(road.dist.matrix)),1)] <- intro.adults
 						}
 					} else a.intro.n <- intro.adults
-				} else if(scale=="ws") {
+				} else if( scale=="ws" ) {
 					if( nrow(temps.matrix)>1 ) {
-						stop( "if sscale='lc' then nrow(temps.matrix) must be 1" )
+						stop( "if scale='lc' then nrow(temps.matrix) must be 1" )
 					} else {
 						e.intro.n <- intro.eggs; d.intro.n <- intro.deggs; i.intro.n <- intro.juveniles; a.intro.n <- intro.adults; road.dist.matrix <- as.data.frame(c(0,0)); names(road.dist.matrix) <- 1
 					}
@@ -228,9 +229,9 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 						e.surv.p <- .e.surv_rate.f(temps.matrix[,day]/1000, species)
 						d.surv.p <- if( species!="aegypti" ) {.d.surv_rate.f(temps.matrix[,day]/1000, species)} else {0}
 					# Binned (10m) (Log-normal) probability density for active dispersal up to 600m 
-						if(dispersal) {f.adis.p <- .a.a_disp.f(sp=species, max.a.disp=maxadisp, disp.bins=dispbins)}
+						if( dispersal ) {f.adis.p <- .a.a_disp.f(sp=species, max.a.disp=maxadisp, disp.bins=dispbins)}
 					## Gamma probability density of long passive dispersal (from DOI: 10.2790/7028); from 0 to maximum distance of road segments with 1000 m resolution.
-						if(dispersal) {f.pdis.p <- dgamma(seq(1,max(road.dist.matrix,na.rm=T),1000),shape=car.avg.trip/(10000/car.avg.trip), scale=10000/car.avg.trip)}
+						if( dispersal ) {f.pdis.p <- dgamma(seq(1,max(road.dist.matrix,na.rm=T),1000),shape=car.avg.trip/(10000/car.avg.trip), scale=10000/car.avg.trip)}
                 	### Events in the (`E`) egg compartment
                 	## `E` has eight sub-compartment: 1:7 for eggs 1-7 days old that can only die or survive, 8 for eggs older than 7 days that can die/survive/hatch
                 	## Binomial draw to find numbers of eggs that die or survive

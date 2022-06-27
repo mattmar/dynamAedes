@@ -4,4 +4,5 @@ pkgdown_sha: ~
 articles:
   dynamAedes_tutorial: dynamAedes_tutorial.html
 last_built: 2022-05-17T19:59Z
-
+template:
+  bootstrap: 5

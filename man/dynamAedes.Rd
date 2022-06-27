@@ -7,6 +7,7 @@
 dynamAedes(
   species = "aegypti",
   intro.eggs = 0,
+  intro.deggs = 0,
   intro.adults = 0,
   intro.juveniles = 0,
   scale = "ws",
@@ -16,11 +17,11 @@ dynamAedes(
   startd = 1,
   endd = 10,
   cells.coords = NULL,
-  lat = 0,
-  long = 0,
+  coords.proj4 = NA,
+  lat = NA,
+  long = NA,
   road.dist.matrix = NULL,
   avgpdisp = NA,
-  intro.year = 2020,
   iter = 1,
   n.clusters = 1,
   cluster.type = "PSOCK",
@@ -37,11 +38,13 @@ dynamAedes(
 \arguments{
 \item{species}{character. Select what species to model: \code{"aegypti"}, \code{"albopictus"}, \code{"japonicus"}, \code{"koreicus"}. Default \code{species = "aegypti"}.}
 
-\item{intro.eggs}{positive integer. number of introduced eggs, default \code{intro.eggs = 100}.}
+\item{intro.eggs}{positive integer. number of introduced eggs, default \code{intro.eggs = 0}.}
 
-\item{intro.adults}{positive integer. number of introduced adults, default zero.}
+\item{intro.deggs}{positive integer. number of introduced diapause eggs, default \code{intro.deggs = 100}.}
 
-\item{intro.juveniles}{positive integer. number of introduced juveniles, default zero.}
+\item{intro.adults}{positive integer. number of introduced adults, default \code{intro.adults = 0}.}
+
+\item{intro.juveniles}{positive integer. number of introduced juveniles, default \code{intro.juveniles = 0}.}
 
 \item{scale}{character. Define the model spatial scale: punctual/weather station "ws", local "lc", or regional "rg". Active and passive dispersal is enabled only for \code{scale = "lc"}. Default \code{scale = "ws"}.}
 
@@ -49,13 +52,15 @@ dynamAedes(
 
 \item{ihwv}{positive integer. Larval-habitat water volume, define the volume (L) of water habitat presents in each spatial unit (parametrised with data retrieved from \doi{10.1111/1365-2664.12620}). Default \code{lhwv = 1}.}
 
-\item{temps.matrix}{matrix. A matrix of daily (average) temperatures (in degrees \strong{Celsius degree x 1000}) used to fit the life cycle rates. This matrix must be organised with the daily temperature observations as columns and the geographic position of the i-grid cell as rows.}
+\item{temps.matrix}{matrix. A matrix of daily (average) temperatures (in degrees \strong{Celsius degree x 1000}) used to fit the life cycle rates. This matrix must be organised with the daily temperature observations as columns and the geographic position of the i-grid cell as rows. \bold{Importantly}, the first column must match \code{startd} date.}
 
-\item{startd}{positive integer. Day of start of the simulations, referring to the column number of temps.matrix.}
+\item{startd}{Character  date (ISO format "\%Y-\%m-\%d"). Date of start of simulations.}
 
-\item{endd}{positive integer. Day of end of the simulation, referring to the column number of temps.matrix.}
+\item{endd}{Character  date (ISO format "\%Y-\%m-\%d"). Date of end of simulation. It can be \code{NA}; then it will be derived using the number of columns in \code{temps.matrix}.}
 
 \item{cells.coords}{matrix. A matrix reporting the spatial coordinates of the temperature observations.}
+
+\item{coords.proj4}{string. Proj4 string of cell coordinates used for the calculation of photoperiod.}
 
 \item{lat}{numeric. Latitude value of the area of interested used to derive the photoperiod (and thus the diapause eggs allocation function).}
 
@@ -64,8 +69,6 @@ dynamAedes(
 \item{road.dist.matrix}{matrix. when \code{scale = "lc"}, defines the matrix containing the distances (in meters) between grid cells intersecting the road network for the mosquito passive dispersal process.}
 
 \item{avgpdisp}{optional. when \code{scale = "lc"}, define the average car trip distance for the mosquito passive dispersal process. The value can be set by the users (positive numeric), or the estimates made by \href{https://publications.jrc.ec.europa.eu/repository/handle/JRC77079}{Pasaoglu et al. 2012}) for the following European countries: France "fra", Germany "deu", Italy "ita", Poland "pol", Spain "esp" and the United Kingdom "uk". The average passive dispersal distance must be smaller than the maximum distance in \strong{road.dist.matrix}.}
-
-\item{intro.year}{numeric. Year of the beginning of iterations (for photoperiod calculation).}
 
 \item{iter}{positive integer. Define the number of model iterations.}
 
@@ -117,7 +120,7 @@ w <- matrix(seq(20,25,length.out=5),ncol=5)*1000
 }
 }
 \seealso{
-Beta regression functions were taken from the R package \code{aomisc}, which is available at \url{https://github.com/OnofriAndreaPG/aomisc}.
+Beta regression functions were taken from the R package \code{aomisc}, which may be available at \url{https://github.com/OnofriAndreaPG/aomisc}.
 }
 \author{
 Matteo Marcantonio \email{marcantoniomatteo@gmail.com}, Daniele Da Re \email{daniele.dare@uclouvain.be}

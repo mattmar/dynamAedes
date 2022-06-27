@@ -1,5 +1,6 @@
 ---
-title: "Describing the main features of *dynamAedes*: the local scale model"
+title: "Describing the main features of *dynamAedes*: the local scale model."
+subtitle: "dynamAedes: A Unified Mechanistic Model For The Population Dynamics Of Invasive *Aedes* Mosquitoes."
 author: "Daniele Da Re, Sophie 0. Vanwambeke, Matteo Marcantonio"
 output: 
   rmarkdown::html_vignette:
@@ -7,7 +8,7 @@ output:
   toc_depth: 3
 date: "`r Sys.Date()`"
 vignette: >
-  %\VignetteIndexEntry{dynamAedes: A Unified Mechanistic Model For The Population Dynamics Of Invasive *Aedes* Mosquitoes.}
+  %\VignetteIndexEntry{Describing the main features of *dynamAedes*: the local scale model.}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
   %\number_sections: yes
@@ -15,12 +16,11 @@ vignette: >
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(fig.width=10, fig.height=10, fig.asp = 0.618, out.width = "95%", fig.align = "center", fig.dpi = 150, collapse = FALSE, comment = "#") 
-options(mc.cores=2)
 ```
 
 This tutorial explains step-by-step the main features of **dynamAedes** package, a unified modelling framework for invasive *Aedes* mosquitoes. Users can apply the stochastic, time-discrete and spatially-explicit population dynamical model initially developed in [Da Re et al., (2021)](https://doi.org/10.1016/j.ecoinf.2020.101180) for *Aedes aegypti* and then expanded for other three species: *Ae. albopictus*, *Ae. japonicus* and *Ae. koreicus* [Da Re et al., (*under review*)](http://dx.doi.org/10.1101/2021.12.21.473628).
 
-The model is driven by temperature, photoperiod and intra-specific larval competition and can be applied to three different spatial scales: punctual, local and regional. These spatial scales consider different degrees of spatial complexity and data availability, by accounting for both active and passive dispersal of the modelled mosquito species as well as for the heterogeneity of input temperature data.
+The model is driven by temperature, photoperiod, dispersal and intra-specific larval competition and can be applied to three different spatial scales: punctual, local and regional. These spatial scales consider different degrees of spatial complexity and data availability by accounting for both active and passive dispersal of the modelled mosquito species as well as for the heterogeneity of input temperature data.
 
 We will describe the model applications for *Ae. albopictus* and for all spatial scales by using a simulated temperature dataset.
 
@@ -234,8 +234,8 @@ We are now left with a few model variables which need to be defined.
 ```{r}
 ## Define cells along roads into which introduce propagules on day 1
 intro.vector <- icellid
-## Define the day of introduction (July 1st is day 1)
-str = "2000-07-01"
+## Define the day of introduction (June 1st is day 1)
+str = "2000-06-01"
 ## Define the end-day of life cycle (August 1st is the last day)
 endr = "2000-08-01"
 ## Define the number of adult females to be introduced
@@ -244,8 +244,6 @@ ia = 5000
 it = 1 # The higher the number of simulations the better
 ## Define the number of liters for the larval density-dependent mortality
 habitat_liters=100
-## Define proj4 string for input coordinates
-utm32N = "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs" 
 ##Define average trip distance
 mypDist=1000
 ## Define the number of parallel processes (for sequential iterations set nc=1)
@@ -260,17 +258,18 @@ w <- sapply(df_temp[,as.POSIXlt(str)$yday:as.POSIXlt(endr)$yday], function(x) as
 ### Run the model
 Running the model with the settings specified in this example takes about 3 minutes.
 ```{r results='hide', message=FALSE, warning=FALSE}
-simout=dynamAedes(species="aegypti",
+simout=dynamAedes(species="albopictus",
             scale="lc",  
-            ihwv=habitat_liters,  
+            ihwv=habitat_liters,
             temps.matrix=w,
             cells.coords=cc,
-            coords.proj4=utm32N,
+            lat=50.80,
+            long=4.44,
             road.dist.matrix=dist_matrix,
             avgpdisp=mypDist,
             intro.cells=intro.vector,
-            startd=str, 
-            endd=endr,  
+            startd=str,
+            endd=endr,
             n.clusters=cl, 
             iter=it,
             intro.adults=ia,  
@@ -279,7 +278,7 @@ simout=dynamAedes(species="aegypti",
             maxadisp=mypDist,
             dispbins=10,
             seeding=TRUE,
-            verbose= TRUE
+            verbose=TRUE
             )
 ```
 
@@ -310,7 +309,7 @@ We can now use the auxiliary functions of the model to Analyse the results.
 First, we can retrieve the probability of successful introduction, computed as the proportion of model
 iterations that resulted in a viable mosquito population at a given date.
 ```{r}
-psi(input_sim = simout, eval_date = 12)
+psi(input_sim = simout, eval_date = 60)
 ```
 
 We can also get a spatial output, using the function *psi_sp*, which require as additional input only the matrix of centroid coordinates of pixels.
@@ -320,7 +319,6 @@ plot(psi_sp(coords = cc, input_sim = simout, eval_date = 30, n.clusters=cl))
 raster::plot(buff, add=T)
 raster::plot(df_sp, add=T, col="red")
 raster::plot(SpatialPoints(icellcoords), add=T, col="blue", pch=21)
-
 ```
 At local scale, the interpretation of this output is more nuanced than for the other scales: a pixel having psi=0 can be a pixel where all the simulations resulted in an extinction or where the species has not yet arrived through dispersal. 
 
@@ -367,7 +365,7 @@ outdf %>%
 We can also have a spatial output of quantiles of the abundance distribution of a given life stage and for a given simulated day by using the function *adci_sp* and specifiying pixel coordinates. For example for eggs: 
 
 ```{r}
-r=adci_sp(simout, coords=cc, eval_date=30, breaks=c(0.5,0.975), stage=3)
+r=adci_sp(simout, coords=cc, eval_date=30, breaks=c(0.025,0.975), stage=3)
 plot(r)
 
 ```

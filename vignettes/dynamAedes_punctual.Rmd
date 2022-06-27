@@ -1,12 +1,13 @@
 ---
-title: "The punctual scale model"
+title: "Describing the main features of *dynamAedes*: the punctual scale model"
+subtitle: "dynamAedes: A Unified Mechanistic Model For The Population Dynamics Of Invasive *Aedes* Mosquitoes."
 author: "Daniele Da Re, Sophie 0. Vanwambeke, Matteo Marcantonio"
 output: 
   rmarkdown::html_vignette:
   toc: true
   toc_depth: 3
 vignette: >
-  %\VignetteIndexEntry{The punctual scale model}
+  %\VignetteIndexEntry{Describing the main features of *dynamAedes*: the punctual scale model}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 date: "`r Sys.Date()`"
@@ -14,7 +15,6 @@ date: "`r Sys.Date()`"
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(fig.width=10, fig.height=10, fig.asp = 0.618, out.width = "95%", fig.align = "center", fig.dpi = 150, collapse = FALSE, comment = "#") 
-options(mc.cores=2)
 ```
 
 This tutorial explains step-by-step the main features of **dynamAedes** package, a unified modelling framework for invasive *Aedes* mosquitoes. Users can apply the stochastic, time-discrete and spatially-explicit population dynamical model initially developed in [Da Re et al., (2021)](https://doi.org/10.1016/j.ecoinf.2020.101180) for *Aedes aegypti* and then expanded for other three species: *Ae. albopictus*, *Ae. japonicus* and *Ae. koreicus* [Da Re et al., (*under review*)](http://dx.doi.org/10.1101/2021.12.21.473628).
@@ -131,7 +131,7 @@ print(it)
 print(length(simout))
 ```
 The **second** level corresponds to the simulated days.
-So if we inspect the first iteration, we observe that the model has computed `rlength(simout[[1]])}` days, since we have started the simulation on the 1st of July and ended on the 1st of August.
+So if we inspect the first iteration, we observe that the model has computed `rlength(simout[[1]])` days, since we have started the simulation on the 1st of July and ended on the 1st of August.
 
 ```{r}
 length(simout[[1]])
