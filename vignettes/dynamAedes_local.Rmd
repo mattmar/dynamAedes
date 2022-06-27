@@ -316,7 +316,7 @@ psi(input_sim = simout, eval_date = 60)
 We can also get a spatial output, using the function *psi_sp*, which require as additional input only the matrix of centroid coordinates of pixels.
 
 ```{r, eval=FALSE}
-plot(psi_sp(coords = cc, input_sim = simout, eval_date = 30, n.clusters=cl))
+plot(psi_sp(coords = cc, input_sim = simout, eval_date = 60, n.clusters=cl))
 raster::plot(buff, add=T)
 raster::plot(df_sp, add=T, col="red")
 raster::plot(SpatialPoints(icellcoords), add=T, col="blue", pch=21)
@@ -366,7 +366,7 @@ outdf %>%
 We can also have a spatial output of quantiles of the abundance distribution of a given life stage and for a given simulated day by using the function *adci_sp* and specifiying pixel coordinates. For example for eggs: 
 
 ```{r}
-r=adci_sp(simout, coords=cc, eval_date=30, breaks=c(0.025,0.975), stage=3)
+r=adci_sp(simout, coords=cc, eval_date=60, breaks=c(0.025,0.975), stage=3)
 plot(r)
 
 ```
@@ -375,14 +375,14 @@ Note that if only a small number of mosquitoes are present in a pixel over many 
 ### Number of invaded cells
 Compute a summary of the number of invaded cells over model iterations
 ```{r}
-x=icci(simout, eval_date=1:30, breaks=c(0.25,0.50,0.75))
+x=icci(simout, eval_date=1:60, breaks=c(0.25,0.50,0.75))
 head(x)
 tail(x)
 ```
 ### Estimates of mosquito dispersal spread (in km2 ) 
 Derive estimates of mosquito dispersal (in km^2) of the simulated mosquito populations (only when scale = "lc") for any simulated day (in this case for 50 days from start and end of the simulate period).
 ```{r}
-x=dici(simout, coords=cc, eval_date=seq(1,30,length.out=30), breaks=c(0.25,0.50,0.75), space=FALSE)
+x=dici(simout, coords=cc, eval_date=seq(1,60,length.out=60), breaks=c(0.25,0.50,0.75), space=FALSE)
 plot(`75%`~day,x,type="l",ylab="Population dispersal (in meters) from cell of introduction",xlab="days from introduction")
 lines(`50%`~day,x,type="l", col="red")
 lines(`25%`~day,x,type="l")
