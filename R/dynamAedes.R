@@ -60,6 +60,7 @@ dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adu
 		if( is.na(coords.proj4) ) {
 			stop("No proj4 string for input coordinates. Please set 'coords.proj4' option.")
 		} else {
+			message("inside")
 			cells.coords.photo <- as.data.frame(coordinates(spTransform(SpatialPoints(cells.coords, proj4string=CRS(coords.proj4)), CRS=CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))))
 		}
 	}

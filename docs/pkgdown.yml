@@ -2,11 +2,11 @@ pandoc: 2.9.2.1
 pkgdown: 2.0.3
 pkgdown_sha: ~
 articles:
-  dynamAedes_tutorial: dynamAedes_tutorial.html
-last_built: 2022-05-17T19:59Z
-template:
-  bootstrap: 5
-  bootswatch: flatly
-  ganalytics: UA-12345678-0
-deploy:
-  install_metadata: true
+  dynamAedes_local: dynamAedes_local.html
+  dynamAedes_punctual: dynamAedes_punctual.html
+  dynamAedes_regional: dynamAedes_regional.html
+last_built: 2022-07-14T12:15Z
+urls:
+  reference: https://mattmar.github.io/dynamAedes/reference
+  article: https://mattmar.github.io/dynamAedes/articles
+

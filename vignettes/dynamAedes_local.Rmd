@@ -249,6 +249,8 @@ habitat_liters=100
 mypDist=1000
 ## Define the number of parallel processes (for sequential iterations set nc=1)
 cl = 1
+## Define proj4 string
+utm32N = "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs" 
 ```
 
 Finally, let's prepare the temperature matrix. Float numbers in the temperature matrix would slow the computational speed, thus we first multiply them by 1000 and then transform them in integer numbers.
@@ -266,6 +268,7 @@ simout=dynamAedes(species="albopictus",
             cells.coords=cc,
             lat=50.80,
             long=4.44,
+            coords.proj4=utm32N,
             road.dist.matrix=dist_matrix,
             avgpdisp=mypDist,
             intro.cells=intro.vector,
