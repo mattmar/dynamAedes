@@ -2,11 +2,11 @@ pandoc: 2.9.2.1
 pkgdown: 2.0.3
 pkgdown_sha: ~
 articles:
-  dynamAedes_local: dynamAedes_local.html
-  dynamAedes_punctual: dynamAedes_punctual.html
-  dynamAedes_regional: dynamAedes_regional.html
-last_built: 2022-07-14T12:15Z
+  dynamAedes.m_local: dynamAedes.m_local.html
+  dynamAedes.m_punctual: dynamAedes.m_punctual.html
+  dynamAedes.m_regional: dynamAedes.m_regional.html
+last_built: 2022-07-14T14:08Z
 urls:
-  reference: https://mattmar.github.io/dynamAedes/reference
-  article: https://mattmar.github.io/dynamAedes/articles
+  reference: https://mattmar.github.io/dynamAedes.m/reference
+  article: https://mattmar.github.io/dynamAedes.m/articles
 

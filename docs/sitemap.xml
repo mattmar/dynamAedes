@@ -1,48 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>/404.html</loc>
+    <loc>https://mattmar.github.io/dynamAedes.m/404.html</loc>
   </url>
   <url>
-    <loc>/articles/dynamAedes_tutorial.html</loc>
+    <loc>https://mattmar.github.io/dynamAedes.m/articles/dynamAedes.m_local.html</loc>
   </url>
   <url>
-    <loc>/articles/index.html</loc>
+    <loc>https://mattmar.github.io/dynamAedes.m/articles/dynamAedes.m_punctual.html</loc>
   </url>
   <url>
-    <loc>/authors.html</loc>
+    <loc>https://mattmar.github.io/dynamAedes.m/articles/dynamAedes.m_regional.html</loc>
   </url>
   <url>
-    <loc>/index.html</loc>
+    <loc>https://mattmar.github.io/dynamAedes.m/articles/dynamAedes.m_tutorial.html</loc>
   </url>
   <url>
-    <loc>/news/index.html</loc>
+    <loc>https://mattmar.github.io/dynamAedes.m/articles/index.html</loc>
   </url>
   <url>
-    <loc>/reference/adci.html</loc>
+    <loc>https://mattmar.github.io/dynamAedes.m/authors.html</loc>
   </url>
   <url>
-    <loc>/reference/adci_sp.html</loc>
+    <loc>https://mattmar.github.io/dynamAedes.m/index.html</loc>
   </url>
   <url>
-    <loc>/reference/dici.html</loc>
+    <loc>https://mattmar.github.io/dynamAedes.m/news/index.html</loc>
   </url>
   <url>
-    <loc>/reference/dynamAedes.html</loc>
+    <loc>https://mattmar.github.io/dynamAedes.m/reference/adci.html</loc>
   </url>
   <url>
-    <loc>/reference/get_rates_spatial.html</loc>
+    <loc>https://mattmar.github.io/dynamAedes.m/reference/adci_sp.html</loc>
   </url>
   <url>
-    <loc>/reference/icci.html</loc>
+    <loc>https://mattmar.github.io/dynamAedes.m/reference/dici.html</loc>
   </url>
   <url>
-    <loc>/reference/index.html</loc>
+    <loc>https://mattmar.github.io/dynamAedes.m/reference/dynamAedes.m.html</loc>
   </url>
   <url>
-    <loc>/reference/psi.html</loc>
+    <loc>https://mattmar.github.io/dynamAedes.m/reference/get_rates_spatial.html</loc>
   </url>
   <url>
-    <loc>/reference/psi_sp.html</loc>
+    <loc>https://mattmar.github.io/dynamAedes.m/reference/icci.html</loc>
+  </url>
+  <url>
+    <loc>https://mattmar.github.io/dynamAedes.m/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>https://mattmar.github.io/dynamAedes.m/reference/psi.html</loc>
+  </url>
+  <url>
+    <loc>https://mattmar.github.io/dynamAedes.m/reference/psi_sp.html</loc>
   </url>
 </urlset>

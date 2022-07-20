@@ -1,7 +1,7 @@
 #' Proportion of successful introductions
 #'
 #' Compute the proportion of "successful" introductions.
-#' @param input_sim matrix. \code{dynamAedes} compressed output matrix (\code{compressed=TRUE}). 
+#' @param input_sim matrix. \code{dynamAedes.m} compressed output matrix (\code{compressed=TRUE}). 
 #' @param eval_date positive integer. define the day(s) to calculate the proportion of successful introductions which should match the column number of the temperature matrix used to inform the model.
 #' @return \code{psi} returns the proportion of model iterations that resulted in a viable mosquito population (defined as: iterations with at least one individual alive in any life stage) at a given date.
 #' @author Matteo Marcantonio \email{marcantoniomatteo@gmail.com}, Daniele Da Re \email{daniele.dare@uclouvain.be}

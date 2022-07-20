@@ -11,7 +11,7 @@ row.names(w) <- 1:25
 
 
 # Run the model (not workng)
-mod <- dynamAedes(
+mod <- dynamAedes.m(
 	species="albopictus", 
 	scale="lc",
 	intro.juveniles=100, 

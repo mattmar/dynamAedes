@@ -3,7 +3,7 @@
 \dontrun{
 w <- matrix(seq(20,25,length.out=5),ncol=5)*1000
 # Run the model
-	dynamAedes(
+	dynamAedes.m(
 	species="koreicus", 
 	scale="ws",
 	intro.eggs=10, 

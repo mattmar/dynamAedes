@@ -1,7 +1,7 @@
 #' Summaries of mosquito abundance (spatial)
 #'
 #' Summaries of mosquito abundance at each life stage for each day. 
-#' @param input_sim matrix. dynamAedes compressed output matrix 
+#' @param input_sim matrix. dynamAedes.m compressed output matrix 
 #' @param eval_date positive integer. Define the day of successful introduction evaluation, referring to the column number of the temperature matrix used to inform the model. 
 #' @param stage positive integer. 0 (all), 1 (egg), 2 (juvenile), 3 (adult), 4 (diapausing egg).
 #' @param coords matrix. A matrix reporting the spatial coordinates of the temperature observations.

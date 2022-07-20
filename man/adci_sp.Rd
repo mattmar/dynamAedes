@@ -13,7 +13,7 @@ adci_sp(
 )
 }
 \arguments{
-\item{input_sim}{matrix. dynamAedes compressed output matrix}
+\item{input_sim}{matrix. dynamAedes.m compressed output matrix}
 
 \item{coords}{matrix. A matrix reporting the spatial coordinates of the temperature observations.}
 

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="description" content="Generalised model for population dynamics of invasive Aedes mosquitoes. Rationale and model structure are described here: &lt;doi:10.1016/j.ecoinf.2020.101180&gt; and &lt;doi:10.1101/2021.12.21.473628&gt; .">
-<title>A Unified Mechanistic Model for the Population Dynamics of Invasive Aedes Mosquitoes • dynamAedes</title>
+<title>A Unified Mechanistic Model for the Population Dynamics of Invasive Aedes Mosquitoes • dynamAedes.m</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="apple-touch-icon.png">
@@ -19,7 +19,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="A Unified Mechanistic Model for the Population Dynamics of Invasive Aedes Mosquitoes">
 <meta property="og:description" content="Generalised model for population dynamics of invasive Aedes mosquitoes. Rationale and model structure are described here: &lt;doi:10.1016/j.ecoinf.2020.101180&gt; and &lt;doi:10.1101/2021.12.21.473628&gt; .">
-<meta property="og:image" content="https://mattmar.github.io/dynamAedes/logo.png">
+<meta property="og:image" content="https://mattmar.github.io/dynamAedes.m/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -31,9 +31,9 @@
 
     <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
     
-    <a class="navbar-brand me-2" href="index.html">dynamAedes</a>
+    <a class="navbar-brand me-2" href="index.html">dynamAedes.m</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,9 +48,9 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="articles/dynamAedes_local.html">Describing the main features of *dynamAedes*: the local scale model.</a>
-    <a class="dropdown-item" href="articles/dynamAedes_punctual.html">Describing the main features of *dynamAedes*: the punctual scale model.</a>
-    <a class="dropdown-item" href="articles/dynamAedes_regional.html">Describing the main features of *dynamAedes*: the regional scale model.</a>
+    <a class="dropdown-item" href="articles/dynamAedes.m_local.html">Describing the main features of *dynamAedes.m*: the local scale model.</a>
+    <a class="dropdown-item" href="articles/dynamAedes.m_punctual.html">Describing the main features of *dynamAedes.m*: the punctual scale model.</a>
+    <a class="dropdown-item" href="articles/dynamAedes.m_regional.html">Describing the main features of *dynamAedes.m*: the regional scale model.</a>
   </div>
 </li>
 <li class="nav-item">
@@ -63,7 +63,7 @@
 
       <ul class="navbar-nav">
 <li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/mattmar/dynamAedes/" aria-label="github">
+  <a class="external-link nav-link" href="https://github.com/mattmar/dynamAedes.m/" aria-label="github">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -77,21 +77,21 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header">
-<img src="logo.png" class="logo" alt=""><h1 id="dynamaedes-">dynamAedes <a class="anchor" aria-label="anchor" href="#dynamaedes-"></a>
+<img src="logo.png" class="logo" alt=""><h1 id="dynamaedes-">dynamAedes.m <a class="anchor" aria-label="anchor" href="#dynamaedes-"></a>
 </h1>
 </div>
 <!-- badges: start -->
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p><strong>dynamAedes</strong> is a unified modelling framework for invasive Aedes mosquitoes.</p>
+<p><strong>dynamAedes.m</strong> is a unified modelling framework for invasive Aedes mosquitoes.</p>
 <p>Users can apply the stochastic, time-discrete and spatially-explicit population dynamical model to four Aedes mosquitoes species: <em>Aedes aegypti</em>, <em>Ae. albopictus</em>, <em>Ae. japonicus</em> and <em>Ae. koreicus</em></p>
 <p>The model is driven by temperature, photoperiod and intra-specific larval competition and can be applied to three different spatial scales: punctual, local and regional. These spatial scales consider different degrees of spatial complexity and data availability, by accounting for both active and passive dispersal of the modelled mosquito species as well as for the heterogeneity of input temperature data.</p>
-<p>The main features of <strong>dynamAedes</strong>:</p>
+<p>The main features of <strong>dynamAedes.m</strong>:</p>
 <ul>
-<li><p><strong>dynamAedes</strong> is a stochastic model, which imply that the range of daily estimates depends on the number of iterations</p></li>
-<li><p><strong>dynamAedes</strong> estimate the mosquito population dynamics and extract both its spatial and temporal trend</p></li>
-<li><p>At local scale, <strong>dynamAedes</strong> allow to estimate the active and passive dispersal of adults mosquitoes, returning the the average distance covered in a given period or the total number of colonized cells.</p></li>
+<li><p><strong>dynamAedes.m</strong> is a stochastic model, which imply that the range of daily estimates depends on the number of iterations</p></li>
+<li><p><strong>dynamAedes.m</strong> estimate the mosquito population dynamics and extract both its spatial and temporal trend</p></li>
+<li><p>At local scale, <strong>dynamAedes.m</strong> allow to estimate the active and passive dispersal of adults mosquitoes, returning the the average distance covered in a given period or the total number of colonized cells.</p></li>
 </ul>
 </div>
 <div class="section level2">
@@ -109,7 +109,7 @@
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
 <li><a href="https://cloud.r-project.org/package=dynamAedes" class="external-link">View on CRAN</a></li>
-<li><a href="https://github.com/mattmar/dynamAedes/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/mattmar/dynamAedes.m/" class="external-link">Browse source code</a></li>
 <li><a href="https://github.com/mattmar/dynamAedes" class="external-link">Report a bug</a></li>
 </ul>
 </div>
@@ -125,7 +125,7 @@
 <div class="citation">
 <h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
-<li><a href="authors.html#citation">Citing dynamAedes</a></li>
+<li><a href="authors.html#citation">Citing dynamAedes.m</a></li>
 </ul>
 </div>
 

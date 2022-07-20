@@ -16,7 +16,7 @@ importFrom("sp", "gridded", "coordinates", "spTransform", "CRS", "SpatialPoints"
 #####################################
 ##               Export            ##
 #####################################
-export(dynamAedes, .beta.fun, .DRC.beta, .beta.init)
+export(dynamAedes.m, .beta.fun, .DRC.beta, .beta.init)
 export(.a.a_disp.f, .a.gono_rate.f, .a.ovi_rate.f, 
 .a.surv_rate.f, .i.emer_rate.f, .e.surv_rate.f,
 .i.surv_rate.f, .e.hatch_rate.f, .e.dia_rate.f, 

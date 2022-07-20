@@ -1,7 +1,7 @@
 #' Probability of successful introduction (spatial)
 #'
 #' Compute the proportion of successful introductions per each cell of the grid.
-#' @param input_sim matrix. \code{dynamAedes} compressed output matrix (\code{compressed=TRUE}).
+#' @param input_sim matrix. \code{dynamAedes.m} compressed output matrix (\code{compressed=TRUE}).
 #' @param coords matrix. A matrix reporting the spatial coordinates of temperature observations.
 #' @param eval_date positive integer. Define the day(s) to calculate the proportion of successful introductions which should match the column number of the temperature matrix used to inform the model.
 #' @param n.clusters positive integer. Define the number of parallel processes.

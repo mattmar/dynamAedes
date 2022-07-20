@@ -1,7 +1,7 @@
 #' Estimate of of mosquito dispersal
 #'
 #' Estimates of dispersal (in km^2) for the simulated mosquito population when \code{scale = "lc"}.
-#' @param input_sim matrix. \code{dynamAedes} compressed output matrix (\code{compressed=TRUE}).
+#' @param input_sim matrix. \code{dynamAedes.m} compressed output matrix (\code{compressed=TRUE}).
 #' @param coords matrix. A matrix reporting the spatial coordinates of the temperature observations.
 #' @param eval_date numeric. Define the day of evaluation; it refers to the column number of the input temperature matrix. 
 #' @param breaks numeric vector. Quantile breaks, default interquartile range: \code{c(0.25,0.5,0.75)}.
@@ -15,7 +15,7 @@ dici <- function(input_sim=NULL, coords=NULL, eval_date=NULL, breaks=c(0.25,0.5,
 		stop("eval_date > than number of simulated days...")
 	}
 	if( all(unlist(lapply(input_sim, function(x) { sapply(x,length) } ))==4) ) {
-		stop("Non-dispersal model, set scale='lc' in dynamAedes()")
+		stop("Non-dispersal model, set scale='lc' in dynamAedes.m()")
 	} else {
 		# Invaded cells
 		inv_cells <- lapply(input_sim, function(x) {

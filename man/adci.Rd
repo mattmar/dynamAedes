@@ -13,7 +13,7 @@ adci(
 )
 }
 \arguments{
-\item{input_sim}{matrix. dynamAedes compressed output matrix.}
+\item{input_sim}{matrix. dynamAedes.m compressed output matrix.}
 
 \item{stage}{positive integer. 0 (all), 1 (egg), 2 (juvenile), 3 (adult), 4 (diapausing egg).}
 
@@ -24,7 +24,7 @@ adci(
 \item{breaks}{numeric vector. Quantile breaks, default the first, the second and the third quantile: \code{c(0.25,0.5,0.75)}.}
 }
 \value{
-Returns a table with the summary of mosquito abundance per life stage (or substage if \code{compressed.output=FALSE} in \code{dynamAedes} function) for each day.
+Returns a table with the summary of mosquito abundance per life stage (or substage if \code{compressed.output=FALSE} in \code{dynamAedes.m} function) for each day.
 }
 \description{
 Summaries of mosquito abundance at each life stage for each day.

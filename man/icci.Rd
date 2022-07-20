@@ -7,7 +7,7 @@
 icci(input_sim = NA, eval_date = 0, breaks = c(0.25, 0.5, 0.75))
 }
 \arguments{
-\item{input_sim}{matrix. \code{dynamAedes} compressed output matrix (\code{compressed=TRUE}).}
+\item{input_sim}{matrix. \code{dynamAedes.m} compressed output matrix (\code{compressed=TRUE}).}
 
 \item{eval_date}{numeric. Define the day of evaluation; it refers to the column number of the input temperature matrix.}
 

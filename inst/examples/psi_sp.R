@@ -4,7 +4,7 @@ w <- matrix(as.integer(seq(25,35,length.out=250)*1000),ncol=10)
 cc <- matrix(c(rep(seq(1,5),5),rev(rep(seq(1,5),each=5))),ncol=2)
 
 # Run the model
-mod <- dynamAedes(
+mod <- dynamAedes.m(
 	species="albopictus", 
 	scale="rg",
 	intro.eggs=10, 

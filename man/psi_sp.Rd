@@ -7,7 +7,7 @@
 psi_sp(input_sim = NULL, coords = NULL, eval_date = NULL, n.clusters = 1)
 }
 \arguments{
-\item{input_sim}{matrix. \code{dynamAedes} compressed output matrix (\code{compressed=TRUE}).}
+\item{input_sim}{matrix. \code{dynamAedes.m} compressed output matrix (\code{compressed=TRUE}).}
 
 \item{coords}{matrix. A matrix reporting the spatial coordinates of temperature observations.}
 

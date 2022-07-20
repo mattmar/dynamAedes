@@ -1,5 +1,5 @@
 ---
-title: "Describing the main features of *dynamAedes*: the local scale model."
+title: "Describing the main features of dynamAedes: the local scale model."
 subtitle: "dynamAedes: A Unified Mechanistic Model For The Population Dynamics Of Invasive *Aedes* Mosquitoes."
 author: "Daniele Da Re, Sophie 0. Vanwambeke, Matteo Marcantonio"
 output: 
@@ -261,7 +261,7 @@ w <- sapply(df_temp[,as.POSIXlt(str)$yday:as.POSIXlt(endr)$yday], function(x) as
 ### Run the model
 Running the model with the settings specified in this example takes about 3 minutes.
 ```{r results='hide', message=FALSE, warning=FALSE}
-simout=dynamAedes(species="albopictus",
+simout=dynamAedes.m(species="albopictus",
             scale="lc",  
             ihwv=habitat_liters,
             temps.matrix=w,

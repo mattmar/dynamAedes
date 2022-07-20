@@ -30,12 +30,12 @@
 #' @param verbose logical. if TRUE then an overview of population dynamics is printed in the console.
 #' @param seeding logical, default \code{FALSE}, if \code{seeding=TRUE} a fixed seed is applied for result reproducibility.  
 #' @return Matrix or a list of matrices containing, for each iteration, the number of individuals in each life stage per day (and for each grid cell of the study area if scale="lc" or "rg"). If the argument compressed.output=FALSE (default TRUE), the model returns the daily number of individuals in each life stage sub-compartment.	
-#' @example inst/examples/dynamAedes.R
+#' @example inst/examples/dynamAedes.m.R
 #' @seealso Beta regression functions were taken from the R package \code{aomisc}, which may be available at \url{https://github.com/OnofriAndreaPG/aomisc}.
 #' @author Matteo Marcantonio \email{marcantoniomatteo@gmail.com}, Daniele Da Re \email{daniele.dare@uclouvain.be}
 #' @export
 
-dynamAedes <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adults=0, intro.juveniles=0, 
+dynamAedes.m <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adults=0, intro.juveniles=0, 
 	scale="ws", intro.cells=NULL, ihwv=1, temps.matrix=NULL, startd=1, endd=10,
 	cells.coords=NULL, coords.proj4=NA, lat=NA, long=NA, road.dist.matrix=NULL, avgpdisp=NA,
 	iter=1, n.clusters=1, cluster.type="PSOCK", sparse.output=FALSE, compressed.output=TRUE,

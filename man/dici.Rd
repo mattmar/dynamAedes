@@ -13,7 +13,7 @@ dici(
 )
 }
 \arguments{
-\item{input_sim}{matrix. \code{dynamAedes} compressed output matrix (\code{compressed=TRUE}).}
+\item{input_sim}{matrix. \code{dynamAedes.m} compressed output matrix (\code{compressed=TRUE}).}
 
 \item{coords}{matrix. A matrix reporting the spatial coordinates of the temperature observations.}
 
