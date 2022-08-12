@@ -8,7 +8,7 @@
 #' @param intro.juveniles positive integer. number of introduced juveniles, default \code{intro.juveniles = 0}.
 #' @param scale character. Define the model spatial scale: punctual/weather station "ws", local "lc", or regional "rg". Active and passive dispersal is enabled only for \code{scale = "lc"}. Default \code{scale = "ws"}.
 #' @param intro.cells positive integer. One or more cells (id) where to introduce the population at local ("lc") scale. If intro.cells=NULL, then a random cell is used for introduction; If intro.cells is a vector of cell ids then a cell is drawn at random from the vector (with repetition) for introduction in each model iteration. 
-#' @param ihwv positive integer. Larval-habitat water volume, define the volume (L) of water habitat presents in each spatial unit (parametrised with data retrieved from \doi{10.1111/1365-2664.12620}). Default \code{lhwv = 1}.
+#' @param jhwv positive integer. Juvenile-habitat water volume, define the volume (L) of water habitat presents in each spatial unit (parametrised with data retrieved from \doi{10.1111/1365-2664.12620}). Default \code{lhwv = 1}.
 #' @param startd Character  date (ISO format "%Y-%m-%d"). Date of start of simulations.
 #' @param endd Character  date (ISO format "%Y-%m-%d"). Date of end of simulation. It can be \code{NA}; then it will be derived using the number of columns in \code{temps.matrix}.
 #' @param iter positive integer. Define the number of model iterations. 
@@ -36,7 +36,7 @@
 #' @export
 
 dynamAedes.m <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adults=0, intro.juveniles=0, 
-	scale="ws", intro.cells=NULL, ihwv=1, temps.matrix=NULL, startd=1, endd=10,
+	scale="ws", intro.cells=NULL, jhwv=2, temps.matrix=NULL, startd=1, endd=10,
 	cells.coords=NULL, coords.proj4=NA, lat=NA, long=NA, road.dist.matrix=NULL, avgpdisp=NA,
 	iter=1, n.clusters=1, cluster.type="PSOCK", sparse.output=FALSE, compressed.output=TRUE,
 	suffix=NA, cellsize=250, maxadisp=600, dispbins=10, verbose=FALSE, seeding=FALSE) {
@@ -279,8 +279,8 @@ dynamAedes.m <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.a
 						imm.v <- if( scale=="ws" ) {
 							sum(p.life.a[2,,2:(6*dj)])
 						} else rowSums(p.life.a[2,,2:(6*dj)])
-					## Derive density-dependent mortality,*2 is to report densities at 1L (original model is for a 2L water habitat.) / ihwv transform density to new liter/cell habitat volume
-						i.ddmort_rate.v <- exp(.i.ddmort_rate.f(list(i.dens.v=(imm.v*2)/ihwv)))
+					## Derive density-dependent mortality,*2 is to report densities at 1L (original model is for a 2L water habitat.) / jhwv transform density to new liter/cell habitat volume
+						i.ddmort_rate.v <- exp(.i.ddmort_rate.f(list(i.dens.v=(imm.v*2)/jhwv)))
 						i.surv.p <- 1-(1-exp(-(i.mort_rate.v + i.ddmort_rate.v)))
                 	## Binomial draw to find numbers of immature that die or survive-and-move to the next compartment
 						p.life.a[2,,2:(6*dj)] <- apply(t(p.life.a[2,,1:(6*dj-1)]), MARGIN=mrg, FUN=function(x) rbinom(size=x, n=space, prob=i.surv.p))
