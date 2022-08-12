@@ -1,13 +1,12 @@
 ---
-title: "Describing the main features of dynamAedes: the regional scale model."
-subtitle: "dynamAedes: A Unified Mechanistic Model For The Population Dynamics Of Invasive *Aedes* Mosquitoes."
+title: "The regional scale model"
 author: "Daniele Da Re, Sophie 0. Vanwambeke, Matteo Marcantonio"
 output: 
   rmarkdown::html_vignette:
   toc: true
   toc_depth: 3
 vignette: >
-  %\VignetteIndexEntry{Describing the main features of *dynamAedes*: the regional scale model.}
+  %\VignetteIndexEntry{The regional scale model}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 date: "`r Sys.Date()`"
@@ -182,7 +181,7 @@ Running the model with the settings specified in this example takes about 3 minu
 ```{r results='hide', message=FALSE, warning=FALSE, evaluate=FALSE}
 simout=dynamAedes.m(species="albopictus", 
             scale="rg",  
-            ihwv=habitat_liters,  
+            jhwv=habitat_liters,  
             temps.matrix=w[,as.numeric(format(as.Date(str),"%j")):as.numeric(format(as.Date(endr),"%j"))],
             coords.proj4=utm32N,
             cells.coords=cc,
