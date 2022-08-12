@@ -7,7 +7,7 @@ output:
   toc_depth: 3
 date: "`r Sys.Date()`"
 vignette: >
-  %\VignetteIndexEntry{Describing the main features of *dynamAedes*: the local scale model.}
+  %\VignetteIndexEntry{The local scale model}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
   %\number_sections: yes
