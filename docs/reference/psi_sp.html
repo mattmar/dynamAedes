@@ -45,7 +45,7 @@
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
-  <a href="https://github.com/mattmar/dynamAedes.m/" class="external-link">
+  <a href="https://github.com/mattmar/dynamAedes/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -60,7 +60,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Probability of successful introduction (spatial)</h1>
-    <small class="dont-index">Source: <a href="https://github.com/mattmar/dynamAedes.m/blob/HEAD/R/psi_sp.R" class="external-link"><code>R/psi_sp.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/mattmar/dynamAedes/blob/HEAD/R/psi_sp.R" class="external-link"><code>R/psi_sp.R</code></a></small>
     <div class="hidden name"><code>psi_sp.Rd</code></div>
     </div>
 
@@ -69,32 +69,23 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">psi_sp</span><span class="op">(</span>input_sim <span class="op">=</span> <span class="cn">NULL</span>, coords <span class="op">=</span> <span class="cn">NULL</span>, eval_date <span class="op">=</span> <span class="cn">NULL</span>, n.clusters <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">psi_sp</span><span class="op">(</span>input_sim <span class="op">=</span> <span class="cn">NULL</span>, coords <span class="op">=</span> <span class="cn">NULL</span>, eval_date <span class="op">=</span> <span class="cn">NULL</span>, n.clusters <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>input_sim</dt>
 <dd><p>matrix. <code>dynamAedes.m</code> compressed output matrix (<code>compressed=TRUE</code>).</p></dd>
-
-
 <dt>coords</dt>
 <dd><p>matrix. A matrix reporting the spatial coordinates of temperature observations.</p></dd>
-
-
 <dt>eval_date</dt>
 <dd><p>positive integer. Define the day(s) to calculate the proportion of successful introductions which should match the column number of the temperature matrix used to inform the model.</p></dd>
-
-
 <dt>n.clusters</dt>
 <dd><p>positive integer. Define the number of parallel processes.</p></dd>
-
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p><code>psi_sp</code> returns a raster with the proportion of model iterations that resulted in a viable mosquito population at a given date for a given life stage in each cell of the grid.</p>
+    <p><code>psi_sp</code> returns a raster with the proportion of model iterations that resulted in a viable mosquito population at a given date for a given life stage in each cell of the grid.</p>
     </div>
     <div id="author">
     <h2>Author</h2>
@@ -113,7 +104,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
       </footer></div>

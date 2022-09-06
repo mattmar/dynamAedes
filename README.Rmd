@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# dynamAedes <img src="man/figures/logo.png" align="right" />
+# dynamAedes <img src="man/figures/logo.png" align="right" width="178" heigth="134" />
 
 <!-- badges: start -->
 [![CRAN status](https://www.r-pkg.org/badges/version/dynamAedes)](https://cran.r-project.org/package=dynamAedes)
@@ -22,9 +22,9 @@ knitr::opts_chunk$set(
 
 ## Overview
 
-__dynamAedes__ is a unified modelling framework for invasive Aedes mosquitoes. 
+__dynamAedes__ is a unified modelling framework for invasive *Aedes* mosquitoes. 
 
-Users can apply the stochastic, time-discrete and spatially-explicit population dynamical model to four Aedes mosquitoes species: *Aedes aegypti*, *Ae. albopictus*, *Ae. japonicus* and *Ae. koreicus*
+Users can apply the stochastic, time-discrete and spatially-explicit population dynamical model to four *Aedes* mosquitoes species: *Aedes aegypti*, *Ae. albopictus*, *Ae. japonicus* and *Ae. koreicus*
 
 The model is driven by temperature, photoperiod and intra-specific larval competition and can be applied to three different spatial scales: punctual, local and regional. These spatial scales consider different degrees of spatial complexity and data availability, by accounting for both active and passive dispersal of the modelled mosquito species as well as for the heterogeneity of input temperature data.
 

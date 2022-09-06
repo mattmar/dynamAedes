@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# dynamAedes <img src="man/figures/logo.png" align="right" />
+# dynamAedes <img src="man/figures/logo.png" align="right" width="178" heigth="134" />
 
 <!-- badges: start -->
 
@@ -13,11 +13,11 @@ status](https://www.r-pkg.org/badges/version/dynamAedes)](https://cran.r-project
 
 ## Overview
 
-**dynamAedes** is a unified modelling framework for invasive Aedes
+**dynamAedes** is a unified modelling framework for invasive *Aedes*
 mosquitoes.
 
 Users can apply the stochastic, time-discrete and spatially-explicit
-population dynamical model to four Aedes mosquitoes species: *Aedes
+population dynamical model to four *Aedes* mosquitoes species: *Aedes
 aegypti*, *Ae. albopictus*, *Ae. japonicus* and *Ae. koreicus*
 
 The model is driven by temperature, photoperiod and intra-specific
@@ -29,13 +29,13 @@ well as for the heterogeneity of input temperature data.
 
 The main features of **dynamAedes**:
 
-  - **dynamAedes** is a stochastic model, which imply that the range of
+-   **dynamAedes** is a stochastic model, which imply that the range of
     daily estimates depends on the number of iterations
 
-  - **dynamAedes** estimate the mosquito population dynamics and extract
+-   **dynamAedes** estimate the mosquito population dynamics and extract
     both its spatial and temporal trend
 
-  - At local scale, **dynamAedes** allow to estimate the active and
+-   At local scale, **dynamAedes** allow to estimate the active and
     passive dispersal of adults mosquitoes, returning the the average
     distance covered in a given period or the total number of colonized
     cells.

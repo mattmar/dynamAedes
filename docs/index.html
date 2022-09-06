@@ -73,7 +73,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/mattmar/dynamAedes.m/" class="external-link">
+  <a href="https://github.com/mattmar/dynamAedes/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -91,14 +91,15 @@
       </header><div class="row">
   <div class="contents col-md-9">
 <div class="section level1">
-<div class="page-header"><h1 id="dynamaedes-">dynamAedes <img src="reference/figures/logo.png" align="right"><a class="anchor" aria-label="anchor" href="#dynamaedes-"></a>
+<div class="page-header"><h1 id="dynamaedes-">dynamAedes <img src="reference/figures/logo.png" align="right" width="178" heigth="134"><a class="anchor" aria-label="anchor" href="#dynamaedes-"></a>
 </h1></div>
 <!-- badges: start -->
+
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p><strong>dynamAedes</strong> is a unified modelling framework for invasive Aedes mosquitoes.</p>
-<p>Users can apply the stochastic, time-discrete and spatially-explicit population dynamical model to four Aedes mosquitoes species: <em>Aedes aegypti</em>, <em>Ae. albopictus</em>, <em>Ae. japonicus</em> and <em>Ae. koreicus</em></p>
+<p><strong>dynamAedes</strong> is a unified modelling framework for invasive <em>Aedes</em> mosquitoes.</p>
+<p>Users can apply the stochastic, time-discrete and spatially-explicit population dynamical model to four <em>Aedes</em> mosquitoes species: <em>Aedes aegypti</em>, <em>Ae. albopictus</em>, <em>Ae. japonicus</em> and <em>Ae. koreicus</em></p>
 <p>The model is driven by temperature, photoperiod and intra-specific larval competition and can be applied to three different spatial scales: punctual, local and regional. These spatial scales consider different degrees of spatial complexity and data availability, by accounting for both active and passive dispersal of the modelled mosquito species as well as for the heterogeneity of input temperature data.</p>
 <p>The main features of <strong>dynamAedes</strong>:</p>
 <ul>
@@ -111,32 +112,11 @@
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Install the released version from CRAN</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"dynamAedes"</span><span class="op">)</span></span>
-<span><span class="co"># Or the development version from GitHub:</span></span>
-<span><span class="co"># install.packages("devtools")</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"mattmar/dynamAedes"</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="main-contributors">Main contributors<a class="anchor" aria-label="anchor" href="#main-contributors"></a>
-</h2>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ropenscilabs/rnaturalearth" class="external-link">rnaturalearth</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ropenscilabs/rnaturalearthdata" class="external-link">rnaturalearthdata</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-spatial/mapview" class="external-link">mapview</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/leaflet/" class="external-link">leaflet</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-spatial/leafem" class="external-link">leafem</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">World</span> <span class="op">&lt;-</span> <span class="fu">ne_countries</span><span class="op">(</span>scale <span class="op">=</span> <span class="st">"medium"</span>, returnclass <span class="op">=</span> <span class="st">"sf"</span><span class="op">)</span></span>
-<span><span class="va">myCountries</span><span class="op">&lt;-</span> <span class="va">World</span><span class="op">%&gt;%</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">name</span> <span class="op">==</span><span class="st">"Belgium"</span> <span class="op">|</span> <span class="va">name</span> <span class="op">==</span><span class="st">"Cambodia"</span> <span class="op">|</span> <span class="va">name</span> <span class="op">==</span><span class="st">"France"</span> <span class="op">|</span> <span class="va">name</span> <span class="op">==</span><span class="st">"Netherlands"</span> <span class="op">|</span> <span class="va">name</span> <span class="op">==</span><span class="st">"Germany"</span> <span class="op">|</span> <span class="va">name</span> <span class="op">==</span><span class="st">"Italy"</span> <span class="op">|</span> <span class="va">name</span> <span class="op">==</span><span class="st">"Australia"</span> <span class="op">)</span></span>
-<span></span>
-<span><span class="va">contributors</span><span class="op">&lt;-</span><span class="fu">read_xlsx</span><span class="op">(</span><span class="st">"/home/ddare/GitHub/dynamAedes_contributors.xlsx"</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">st_as_sf</span><span class="op">(</span>coords<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'lon'</span>, <span class="st">"lat"</span><span class="op">)</span>, crs<span class="op">=</span><span class="fl">4326</span><span class="op">)</span></span>
-<span><span class="fu">mapview</span><span class="op">(</span><span class="va">myCountries</span>, col.regions <span class="op">=</span><span class="st">"#F8766D"</span>, </span>
-<span>        color<span class="op">=</span><span class="st">"white"</span>,  zcol<span class="op">=</span><span class="st">"name"</span>,legend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">+</span></span>
-<span>  <span class="fu">mapview</span><span class="op">(</span><span class="va">contributors</span>, zcol<span class="op">=</span><span class="st">"Institution"</span>, legend<span class="op">=</span><span class="cn">FALSE</span> <span class="op">)</span> </span></code></pre></div>
+<code class="sourceCode R"><span class="co"># Install the released version from CRAN</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"dynamAedes"</span><span class="op">)</span>
+<span class="co"># Or the development version from GitHub:</span>
+<span class="co"># install.packages("devtools")</span>
+<span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"mattmar/dynamAedes"</span><span class="op">)</span></code></pre></div>
 </div>
 </div>
   </div>
@@ -146,8 +126,8 @@
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
 <li><a href="https://cloud.r-project.org/package=dynamAedes" class="external-link">View on CRAN</a></li>
-<li><a href="https://github.com/mattmar/dynamAedes.m/" class="external-link">Browse source code</a></li>
-<li><a href="https://github.com/mattmar/dynamAedes.m" class="external-link">Report a bug</a></li>
+<li><a href="https://github.com/mattmar/dynamAedes/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/mattmar/dynamAedes" class="external-link">Report a bug</a></li>
 </ul>
 </div>
 
@@ -192,7 +172,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
       </footer>

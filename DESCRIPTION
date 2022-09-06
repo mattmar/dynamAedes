@@ -5,7 +5,7 @@ Title: A Unified Mechanistic Model for the Population Dynamics of Invasive Aedes
 Authors@R: c(person("Matteo", "Marcantonio", role = c("aut", "cre"), email = "marcantoniomatteo@gmail.com"),person("Daniele", "Da Re", role = c("aut"), email = "dare.daniele@gmail.com")) 
 Depends: R (>= 3.6.0), raster
 Imports: drc, fields, foreach, insol, slam, doParallel, rgdal, sp
-BugReports: https://github.com/mattmar/dynamAedes.m
+BugReports: https://github.com/mattmar/dynamAedes
 Description: Generalised model for population dynamics of invasive Aedes mosquitoes. Rationale and model structure are described here: <doi:10.1016/j.ecoinf.2020.101180> and <doi:10.1101/2021.12.21.473628> .
 VignetteBuilder: knitr
 Encoding: UTF-8
