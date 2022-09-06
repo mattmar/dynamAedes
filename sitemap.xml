@@ -1,54 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://mattmar.github.io/dynamAedes/404.html</loc>
+    <loc>/404.html</loc>
   </url>
   <url>
-    <loc>https://mattmar.github.io/dynamAedes/articles/dynamAedes_local.html</loc>
+    <loc>/articles/dynamAedes_local.html</loc>
   </url>
   <url>
-    <loc>https://mattmar.github.io/dynamAedes/articles/dynamAedes_punctual.html</loc>
+    <loc>/articles/dynamAedes_punctual.html</loc>
   </url>
   <url>
-    <loc>https://mattmar.github.io/dynamAedes/articles/dynamAedes_regional.html</loc>
+    <loc>/articles/dynamAedes_regional.html</loc>
   </url>
   <url>
-    <loc>https://mattmar.github.io/dynamAedes/articles/index.html</loc>
+    <loc>/articles/index.html</loc>
   </url>
   <url>
-    <loc>https://mattmar.github.io/dynamAedes/authors.html</loc>
+    <loc>/authors.html</loc>
   </url>
   <url>
-    <loc>https://mattmar.github.io/dynamAedes/index.html</loc>
+    <loc>/index.html</loc>
   </url>
   <url>
-    <loc>https://mattmar.github.io/dynamAedes/news/index.html</loc>
+    <loc>/news/index.html</loc>
   </url>
   <url>
-    <loc>https://mattmar.github.io/dynamAedes/reference/adci.html</loc>
+    <loc>/reference/adci.html</loc>
   </url>
   <url>
-    <loc>https://mattmar.github.io/dynamAedes/reference/adci_sp.html</loc>
+    <loc>/reference/adci_sp.html</loc>
   </url>
   <url>
-    <loc>https://mattmar.github.io/dynamAedes/reference/dici.html</loc>
+    <loc>/reference/dici.html</loc>
   </url>
   <url>
-    <loc>https://mattmar.github.io/dynamAedes/reference/dynamAedes.html</loc>
+    <loc>/reference/dynamAedes.m.html</loc>
   </url>
   <url>
-    <loc>https://mattmar.github.io/dynamAedes/reference/get_rates_spatial.html</loc>
+    <loc>/reference/icci.html</loc>
   </url>
   <url>
-    <loc>https://mattmar.github.io/dynamAedes/reference/icci.html</loc>
+    <loc>/reference/index.html</loc>
   </url>
   <url>
-    <loc>https://mattmar.github.io/dynamAedes/reference/index.html</loc>
+    <loc>/reference/psi.html</loc>
   </url>
   <url>
-    <loc>https://mattmar.github.io/dynamAedes/reference/psi.html</loc>
-  </url>
-  <url>
-    <loc>https://mattmar.github.io/dynamAedes/reference/psi_sp.html</loc>
+    <loc>/reference/psi_sp.html</loc>
   </url>
 </urlset>
