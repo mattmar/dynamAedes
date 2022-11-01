@@ -53,7 +53,7 @@ dici <- function(input_sim=NULL, coords=NULL, eval_date=NULL, breaks=c(0.25,0.5,
 			round(quantile(unlist(sapply(1:length(distl),
 				function(y) {mean(if(x<=length(distl[[y]])) as.integer(distl[[y]][[x]]) else NA, na.rm=T)})), probs=breaks, na.rm=T),1)
 		}))
-	names(out) <- c("25%","50%","75%")
+	names(out) <- breaks
 	return(out)
 }
 

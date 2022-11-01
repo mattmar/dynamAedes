@@ -15,7 +15,7 @@ dynamAedes.m(
   jhwv = 2,
   temps.matrix = NULL,
   startd = 1,
-  endd = 10,
+  endd = NA,
   cells.coords = NULL,
   coords.proj4 = NA,
   lat = NA,

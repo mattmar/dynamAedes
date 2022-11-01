@@ -1,10 +1,10 @@
 Package: dynamAedes
-Version: 2.1
-Date: 2022-07-14
+Version: 2.1.0
+Date: 2022-09-19
 Title: A Unified Mechanistic Model for the Population Dynamics of Invasive Aedes Mosquitoes
 Authors@R: c(person("Matteo", "Marcantonio", role = c("aut", "cre"), email = "marcantoniomatteo@gmail.com"),person("Daniele", "Da Re", role = c("aut"), email = "dare.daniele@gmail.com")) 
 Depends: R (>= 3.6.0), raster
-Imports: drc, fields, foreach, insol, slam, doParallel, rgdal, sp
+Imports: drc, fields, foreach, insol, slam, doParallel, sp
 BugReports: https://github.com/mattmar/dynamAedes
 Description: Generalised model for population dynamics of invasive Aedes mosquitoes. Rationale and model structure are described here: <doi:10.1016/j.ecoinf.2020.101180> and <doi:10.1101/2021.12.21.473628> .
 VignetteBuilder: knitr
