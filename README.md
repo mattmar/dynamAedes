@@ -13,32 +13,22 @@ status](https://www.r-pkg.org/badges/version/dynamAedes)](https://cran.r-project
 
 ## Overview
 
-**dynamAedes** is a unified modelling framework for invasive *Aedes*
-mosquitoes.
-
-Users can apply the stochastic, time-discrete and spatially-explicit
-population dynamical model to four *Aedes* mosquitoes species: *Aedes
-aegypti*, *Ae. albopictus*, *Ae. japonicus* and *Ae. koreicus*
+**dynamAedes** is a stochastic, time-discrete and spatially-explicit population dynamical model for four invasive *Aedes* mosquito species: *Aedes aegypti*, *Ae. albopictus*, *Ae. japonicus* and *Ae. koreicus*.
 
 The model is driven by temperature, photoperiod and intra-specific
-larval competition and can be applied to three different spatial scales:
-punctual, local and regional. These spatial scales consider different
+larval competition and can be applied to three different "spatial scales":
+punctual, local and regional. These modes consider different
 degrees of spatial complexity and data availability, by accounting for
-both active and passive dispersal of the modelled mosquito species as
-well as for the heterogeneity of input temperature data.
+active and passive dispersal of mosquitoes as well as for specific input temperature data (weather station vs. gridded temperature data from remote sense).
 
-The main features of **dynamAedes**:
+The main features of **dynamAedes** are:
 
--   **dynamAedes** is a stochastic model, which imply that the range of
-    daily estimates depends on the number of iterations
+-   It's a stochastic model: the distribution of resulting metrics (e.g., number of adults) depends on the number of iterations.
 
--   **dynamAedes** estimate the mosquito population dynamics and extract
-    both its spatial and temporal trend
+-   At local scale, **dynamAedes** allows to simulate the active and passive dispersal of adult mosquitoes.
 
--   At local scale, **dynamAedes** allow to estimate the active and
-    passive dispersal of adults mosquitoes, returning the the average
-    distance covered in a given period or the total number of colonized
-    cells.
+-   It has four functions (*psi*, *adci*, *dici* and *icci*) to derive metrics on the space-time trends of the simulated populations, e.g., the 95% CI
+    of the dispersal in a given period or the number of colonized cells.
 
 ## Installation
 
