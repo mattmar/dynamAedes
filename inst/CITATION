@@ -26,7 +26,7 @@ bibentry(bibtype = "article",
                     person("Constantianus J.M.", "Koenraadt"),
                     person("Sophie O.", "Vanwambeke"),
                     person("Matteo", "Marcantonio")),
-         year = 2021,
-         journal = "BiorXiv",
-         url = "https://www.biorxiv.org/content/10.1101/2021.12.21.473628v1",
-         doi = "10.1101/2021.12.21.473628")
+         year = 2022,
+         journal = "Parasites and Vectors",
+         url = "https://doi.org/10.1186/s13071-022-05414-4",
+         doi = "10.1186/s13071-022-05414-4")

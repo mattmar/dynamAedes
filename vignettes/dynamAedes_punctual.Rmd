@@ -16,7 +16,7 @@ date: "`r Sys.Date()`"
 knitr::opts_chunk$set(fig.width=10, fig.height=10, fig.asp = 0.618, out.width = "95%", fig.align = "center", fig.dpi = 150, collapse = FALSE, comment = "#") 
 ```
 
-This tutorial explains step-by-step the main features of **dynamAedes** package, a unified modelling framework for invasive *Aedes* mosquitoes. Users can apply the stochastic, time-discrete and spatially-explicit population dynamical model initially developed in [Da Re et al., (2021)](https://doi.org/10.1016/j.ecoinf.2020.101180) for *Aedes aegypti* and then expanded for other three species: *Ae. albopictus*, *Ae. japonicus* and *Ae. koreicus* [Da Re et al., (*under review*)](http://dx.doi.org/10.1101/2021.12.21.473628).
+This tutorial explains step-by-step the main features of **dynamAedes** package, a unified modelling framework for invasive *Aedes* mosquitoes. Users can apply the stochastic, time-discrete and spatially-explicit population dynamical model initially developed in [Da Re et al., (2021)](https://doi.org/10.1016/j.ecoinf.2020.101180) for *Aedes aegypti* and then expanded for other three species: *Ae. albopictus*, *Ae. japonicus* and *Ae. koreicus* [Da Re et al., (2022)](https://doi.org/10.1186/s13071-022-05414-4).
 
 The model is driven by temperature, photoperiod and intra-specific larval competition and can be applied to three different spatial scales: punctual, local and regional. These spatial scales consider different degrees of spatial complexity and data availability, by accounting for both active and passive dispersal of the modelled mosquito species as well as for the heterogeneity of input temperature data.
 

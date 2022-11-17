@@ -13,6 +13,6 @@ Language: en-GB
 License: GPL(>=2)
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
-Suggests: parallel, rmarkdown, knitr, eesim, geosphere, ggplot2, gstat, rgeos, spatstat, tidyverse
+Suggests: parallel, rmarkdown, knitr, eesim, geosphere, ggplot2, gstat, rgeos, spatstat, rgdal, tidyverse
 Config/testthat/edition: 3
 URL: https://mattmar.github.io/dynamAedes/
