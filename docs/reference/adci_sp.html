@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">dynamAedes</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.1</span>
       </span>
     </div>
 
@@ -69,31 +69,42 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">adci_sp</span><span class="op">(</span>
-  input_sim <span class="op">=</span> <span class="cn">NULL</span>,
-  coords <span class="op">=</span> <span class="cn">NULL</span>,
-  eval_date <span class="op">=</span> <span class="cn">NULL</span>,
-  stage <span class="op">=</span> <span class="fl">1</span>,
-  breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span><span class="op">)</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">adci_sp</span><span class="op">(</span></span>
+<span>  input_sim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  coords <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  eval_date <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  stage <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  breaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>input_sim</dt>
 <dd><p>matrix. dynamAedes.m compressed output matrix</p></dd>
+
+
 <dt>coords</dt>
 <dd><p>matrix. A matrix reporting the spatial coordinates of the temperature observations.</p></dd>
+
+
 <dt>eval_date</dt>
 <dd><p>positive integer. Define the day of successful introduction evaluation, referring to the column number of the temperature matrix used to inform the model.</p></dd>
+
+
 <dt>stage</dt>
 <dd><p>positive integer. 0 (all), 1 (egg), 2 (juvenile), 3 (adult), 4 (diapausing egg).</p></dd>
+
+
 <dt>breaks</dt>
 <dd><p>numeric vector. Quantile breaks, default the first, the second and the third quantile: <code>c(0.25,0.5,0.75)</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>Returns a raster with the summary of mosquito abundance at each life stage for each day.</p>
+    
+
+<p>Returns a raster with the summary of mosquito abundance at each life stage for each day.</p>
     </div>
     <div id="author">
     <h2>Author</h2>
@@ -112,7 +123,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

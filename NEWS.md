@@ -1,4 +1,7 @@
-# dynamAedes 2.1
+# dynamAedes 2.1.1
+* Adding rgdal in the description
+
+# dynamAedes 2.1.0
 * Adding website with examples for the three scales (pkgdown)
 * Coordinates now internally transformed (if not in lat/long) for the derivation of the photoperiod
 * Adding option **coords.proj4** to specify coordinate projection (in proj4 format)

@@ -252,7 +252,7 @@ outdf %>%
   mutate(myStage=factor(myStage, levels= c('Egg', 'Diapausing egg', 'Juvenile', 'Adult'))) %>% 
   ggplot( aes(y=(`50%`),x=Date, group=factor(myStage),col=factor(myStage))) +
   ggtitle("Ae. albopictus Interquantile range abundance")+
-  geom_line(size=0.8)+
+  geom_line(size=1.2)+
   geom_ribbon(aes(ymin=`25%`,ymax=(`75%`),fill=factor(myStage)),
               col="white",
               alpha=0.2,
