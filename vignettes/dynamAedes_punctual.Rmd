@@ -184,7 +184,7 @@ outdf %>%
          Date=rep(seq.Date(as.Date(str), as.Date(endr)-2, by="day"),4)) %>% 
 ggplot( aes(x=Date, y=X50., group=factor(myStage),col=factor(myStage))) +
   ggtitle("Ae. albopictus Interquantile range abundance")+
-  geom_line(size=0.8)+
+  geom_line(linewidth=0.8)+
   geom_ribbon(aes(ymin=X25.,ymax=X75.,fill=factor(myStage)),
               col="white",
               alpha=0.2,

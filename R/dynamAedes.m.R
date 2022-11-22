@@ -97,7 +97,7 @@ dynamAedes.m <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.a
 	if( species!="aegypti" ){
 		jd <- JD(seq(as.POSIXct(startd), as.POSIXct(as.Date(startd)+dayspan), by='day'))
 		if( scale=="rg" ) {
-			photo.matrix <- lapply(jd, function(x){insol::daylength(lat=cells.coords.photo$y, long = cells.coords.photo$x, jd=x, 1)[,3]})
+			photo.matrix <- lapply(jd, function(x){insol::daylength(long = cells.coords.photo[,1], lat=cells.coords.photo[,2], jd=x, 1)[,3]})
 			photo.matrix <- do.call(cbind,photo.matrix)
 			} else if( !is.na(lat)&!is.na(long) ) {
 				dl <- daylength(lat,long,jd,1)[,3]

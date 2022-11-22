@@ -141,14 +141,24 @@ mat <-do.call(rbind, lapply(1:ncell(r), function(x) {
 }))
 ```
 
+```{r,  message=FALSE, warning=FALSE, hide=TRUE}
+oldpar <- par(mfrow = c(1,2)) 
+```
+
 A comparison between the distribution of the initial temperature time series and autocorrelated temperature surface
 ```{r}
 par(mfrow=c(2,1))
 hist(mat, xlab="Temperature (°C)", main="Histogram of simulated spatial autocorreled temperature")
 hist(sim_temp[[1]]$x, xlab="Temperature (°C)", main="Histogram of simulated temperatures", col="red")
 par(mfrow=c(1,1))
+```
+
+```{r,  message=FALSE, warning=FALSE, hide=TRUE}
+par(oldpar) 
+```
 
 # Format temperature data
+```{r}
 names(mat) <- paste0("d_", 1:ndays)
 df_temp <- cbind(df, mat)
 ```
@@ -354,7 +364,7 @@ outdf %>%
   mutate(myStage=factor(myStage, levels= c('Egg', 'Diapausing egg', 'Juvenile', 'Adult'))) %>% 
   ggplot( aes(y=`50%`,x=Date, group=factor(myStage),col=factor(myStage))) +
   ggtitle("Ae. albopictus Interquantile range abundance")+
-  geom_line(size=0.8)+
+  geom_line(linewidth=0.8)+
   geom_ribbon(aes(ymin=`25%`,ymax=`75%`,fill=factor(myStage)),
               col="white",
               alpha=0.2,

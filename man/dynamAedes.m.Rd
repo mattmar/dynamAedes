@@ -99,19 +99,19 @@ Matrix or a list of matrices containing, for each iteration, the number of indiv
 Function to simulate population dynamics of \emph{Aedes} mosquitoes
 }
 \examples{
-## Run dynmAedes at local scale for 5 days
+\donttest{
+## Run dynamAedes at local scale for 5 days
 # Make a toy temperature time series
-\dontrun{
 w <- matrix(seq(20,25,length.out=5),ncol=5)*1000
 # Run the model
 	dynamAedes.m(
 	species="koreicus", 
 	scale="ws",
 	intro.eggs=10, 
-	ihwv=2, 
+	jhwv=2, 
 	temps.matrix=w, 
-	startd=2, 
-	endd=5,
+	startd="2021-06-21", 
+	endd="2021-06-25",
 	lat=42,
 	long=8,
 	n.clusters=1, 
