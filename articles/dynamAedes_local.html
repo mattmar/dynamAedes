@@ -94,7 +94,7 @@
                         <h4 data-toc-skip class="author">Daniele Da Re,
 Sophie 0. Vanwambeke, Matteo Marcantonio</h4>
             
-            <h4 data-toc-skip class="date">2022-11-21</h4>
+            <h4 data-toc-skip class="date">2022-11-22</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mattmar/dynamAedes/blob/HEAD/vignettes/dynamAedes_local.Rmd" class="external-link"><code>vignettes/dynamAedes_local.Rmd</code></a></small>
       <div class="hidden name"><code>dynamAedes_local.Rmd</code></div>
@@ -253,21 +253,28 @@ multiplying it with the autocorrelated surface simulated above.</p>
 <span>    <span class="va">d_t</span> <span class="op">&lt;-</span> <span class="va">sim_temp</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">x</span><span class="op">*</span><span class="va">autocorr_factor</span><span class="op">[[</span><span class="va">x</span><span class="op">]</span><span class="op">]</span></span>
 <span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">d_t</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">oldpar</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span> </span></code></pre></div>
 <p>A comparison between the distribution of the initial temperature time
 series and autocorrelated temperature surface</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="va">mat</span>, xlab<span class="op">=</span><span class="st">"Temperature (°C)"</span>, main<span class="op">=</span><span class="st">"Histogram of simulated spatial autocorreled temperature"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="va">sim_temp</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">x</span>, xlab<span class="op">=</span><span class="st">"Temperature (°C)"</span>, main<span class="op">=</span><span class="st">"Histogram of simulated temperatures"</span>, col<span class="op">=</span><span class="st">"red"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="dynamAedes_local_files/figure-html/unnamed-chunk-8-1.png" width="95%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Format temperature data</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">mat</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"d_"</span>, <span class="fl">1</span><span class="op">:</span><span class="va">ndays</span><span class="op">)</span></span>
+<p><img src="dynamAedes_local_files/figure-html/unnamed-chunk-9-1.png" width="95%" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">oldpar</span><span class="op">)</span> </span></code></pre></div>
+</div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="format-temperature-data">Format temperature data<a class="anchor" aria-label="anchor" href="#format-temperature-data"></a>
+</h2>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">mat</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"d_"</span>, <span class="fl">1</span><span class="op">:</span><span class="va">ndays</span><span class="op">)</span></span>
 <span><span class="va">df_temp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">df</span>, <span class="va">mat</span><span class="op">)</span></span></code></pre></div>
-</div>
-</div>
 <div class="section level3">
 <h3 id="simulate-an-arbitrary-road-segment-for-medium-range-dispersal">Simulate an arbitrary road segment for medium-range dispersal<a class="anchor" aria-label="anchor" href="#simulate-an-arbitrary-road-segment-for-medium-range-dispersal"></a>
 </h3>
@@ -275,7 +282,7 @@ series and autocorrelated temperature surface</p>
 passive dispersal. Thus, we will simulate an arbitrary road segment
 along which adult mosquitoes can disperse passively (i.e., through car
 traffic).</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
 <span><span class="va">pts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/sp/man/spsample.html" class="external-link">spsample</a></span><span class="op">(</span><span class="va">bbox</span>, <span class="fl">5</span>, type<span class="op">=</span><span class="st">"random"</span><span class="op">)</span></span>
 <span><span class="va">roads</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/spEasy.html" class="external-link">spLines</a></span><span class="op">(</span><span class="va">pts</span><span class="op">)</span></span>
@@ -283,22 +290,22 @@ traffic).</p>
 <span><span class="co"># Check simulated segment</span></span>
 <span><span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span></span>
 <span><span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">roads</span>, add<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span></code></pre></div>
-<p><img src="dynamAedes_local_files/figure-html/unnamed-chunk-9-1.png" width="95%" style="display: block; margin: auto;"></p>
+<p><img src="dynamAedes_local_files/figure-html/unnamed-chunk-12-1.png" width="95%" style="display: block; margin: auto;"></p>
 <p>After defining the road segment we add a “buffer” of 0.05° m around
 the road segment. Adult mosquitoes that reach or develop into cells
 comprised in the 0.05° buffer around roads are thus able to undergo
 passive dispersal.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">buff</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/buffer.html" class="external-link">buffer</a></span><span class="op">(</span><span class="va">roads</span>, width<span class="op">=</span><span class="fl">250</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/crs.html" class="external-link">crs</a></span><span class="op">(</span><span class="va">buff</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/crs.html" class="external-link">crs</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span></span>
 <span><span class="co"># Check grid, road segment and buffer</span></span>
 <span><span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span></span>
 <span><span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">buff</span>, add<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span>
 <span><span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">roads</span>, add<span class="op">=</span><span class="cn">T</span>, col<span class="op">=</span><span class="st">"red"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="dynamAedes_local_files/figure-html/unnamed-chunk-10-1.png" width="95%" style="display: block; margin: auto;"></p>
+<p><img src="dynamAedes_local_files/figure-html/unnamed-chunk-13-1.png" width="95%" style="display: block; margin: auto;"></p>
 <p>Next, we derive a distance matrix between cells comprised in the
 spatial buffer along the road network. First, we select the cells.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df_sp</span> <span class="op">&lt;-</span> <span class="va">df</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/coordinates.html" class="external-link">coordinates</a></span><span class="op">(</span><span class="va">df_sp</span><span class="op">)</span><span class="op">=</span><span class="op">~</span><span class="va">x</span><span class="op">+</span><span class="va">y</span></span>
 <span><span class="va">df_sp</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/sets.html" class="external-link">intersect</a></span><span class="op">(</span><span class="va">df_sp</span>,<span class="va">buff</span><span class="op">)</span></span>
@@ -307,10 +314,10 @@ spatial buffer along the road network. First, we select the cells.</p>
 <span><span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span></span>
 <span><span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">buff</span>, add<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span>
 <span><span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">df_sp</span>, add<span class="op">=</span><span class="cn">T</span>, col<span class="op">=</span><span class="st">"red"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="dynamAedes_local_files/figure-html/unnamed-chunk-11-1.png" width="95%" style="display: block; margin: auto;"></p>
+<p><img src="dynamAedes_local_files/figure-html/unnamed-chunk-14-1.png" width="95%" style="display: block; margin: auto;"></p>
 <p>Then, we compute the Euclidean distance (in meters) between each
 selected cell.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dist_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/dist.html" class="external-link">dist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/coordinates.html" class="external-link">coordinates</a></span><span class="op">(</span><span class="va">df_sp</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -318,22 +325,22 @@ selected cell.</p>
 </h3>
 <p>Define a two-column matrix of coordinates to identify each cell in
 the lattice grid.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cc</span> <span class="op">&lt;-</span> <span class="va">df_temp</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x"</span>,<span class="st">"y"</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
 <p>As for model requirement, the distance matrix must have column names
 equal to row names.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">dist_matrix</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/row.names.html" class="external-link">row.names</a></span><span class="op">(</span><span class="va">dist_matrix</span><span class="op">)</span></span></code></pre></div>
 <p>Moreover, distances in the distance matrix must be rounded to the
 thousands.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dist_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">dist_matrix</span>,<span class="fl">2</span>,<span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">x</span><span class="op">/</span><span class="fl">1000</span>,<span class="fl">1</span><span class="op">)</span><span class="op">*</span><span class="fl">1000</span><span class="op">)</span> </span>
 <span></span>
 <span><span class="co"># An histogram showing the distribution of distances of cells along the road network</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="va">dist_matrix</span>, xlab<span class="op">=</span><span class="st">"Distance (meters)"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="dynamAedes_local_files/figure-html/unnamed-chunk-15-1.png" width="95%" style="display: block; margin: auto;"></p>
+<p><img src="dynamAedes_local_files/figure-html/unnamed-chunk-18-1.png" width="95%" style="display: block; margin: auto;"></p>
 <p>Select a cell that intersect roads for introduction:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
 <span><span class="va">icellcoords</span> <span class="op">&lt;-</span> <span class="va">df</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/row.names.html" class="external-link">row.names</a></span><span class="op">(</span><span class="va">dist_matrix</span><span class="op">)</span>,<span class="fl">1</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
@@ -344,10 +351,10 @@ thousands.</p>
 <span><span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">df_sp</span>, add<span class="op">=</span><span class="cn">T</span>, col<span class="op">=</span><span class="st">"red"</span><span class="op">)</span></span>
 <span><span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPoints</a></span><span class="op">(</span><span class="va">icellcoords</span><span class="op">)</span>, add<span class="op">=</span><span class="cn">T</span>, col<span class="op">=</span><span class="st">"blue"</span>, pch<span class="op">=</span><span class="fl">21</span><span class="op">)</span></span>
 <span><span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPoints</a></span><span class="op">(</span>coords<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/coordinates.html" class="external-link">coordinates</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span><span class="op">[</span><span class="va">icellid</span>,<span class="op">]</span>,ncol<span class="op">=</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>, add<span class="op">=</span><span class="cn">T</span>, col<span class="op">=</span><span class="st">"black"</span>, pch<span class="op">=</span><span class="fl">21</span><span class="op">)</span></span></code></pre></div>
-<p><img src="dynamAedes_local_files/figure-html/unnamed-chunk-16-1.png" width="95%" style="display: block; margin: auto;"></p>
+<p><img src="dynamAedes_local_files/figure-html/unnamed-chunk-19-1.png" width="95%" style="display: block; margin: auto;"></p>
 <p>We are now left with a few model variables which need to be
 defined.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Define cells along roads into which introduce propagules on day 1</span></span>
 <span><span class="va">intro.vector</span> <span class="op">&lt;-</span> <span class="va">icellid</span></span>
 <span><span class="co">## Define the day of introduction (June 1st is day 1)</span></span>
@@ -369,14 +376,14 @@ defined.</p>
 <p>Finally, let’s prepare the temperature matrix. Float numbers in the
 temperature matrix would slow the computational speed, thus we first
 multiply them by 1000 and then transform them in integer numbers.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">w</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">df_temp</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXlt</a></span><span class="op">(</span><span class="va">str</span><span class="op">)</span><span class="op">$</span><span class="va">yday</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXlt</a></span><span class="op">(</span><span class="va">endr</span><span class="op">)</span><span class="op">$</span><span class="va">yday</span><span class="op">]</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">x</span><span class="op">*</span><span class="fl">1000</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="section level4">
 <h4 id="run-the-model">Run the model<a class="anchor" aria-label="anchor" href="#run-the-model"></a>
 </h4>
 <p>Running the model with the settings specified in this example takes
 about 3 minutes.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">simout</span><span class="op">=</span><span class="fu"><a href="../reference/dynamAedes.m.html">dynamAedes.m</a></span><span class="op">(</span>species<span class="op">=</span><span class="st">"albopictus"</span>,</span>
 <span>            scale<span class="op">=</span><span class="st">"lc"</span>,  </span>
 <span>            jhwv<span class="op">=</span><span class="va">habitat_liters</span>,</span>
@@ -409,24 +416,24 @@ about 3 minutes.</p>
 object is a nested list.</p>
 <p>The <strong>first</strong> level corresponds to the number of model
 iterations</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">it</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co"># [1] 1</span></span></code></pre>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">simout</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co"># [1] 1</span></span></code></pre>
 <p>The <strong>second</strong> level corresponds to the simulated days.
 So if we inspect the first iteration, we observe that the model has
 computed 123 days, as we had specified above in the object
 <em>endr</em>.</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">simout</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co"># [1] 60</span></span></code></pre>
 <p>The <strong>third</strong> level corresponds to the amount of
 individuals for each stage (rows) within each grid cell of the landscape
 (columns). So if we inspect the first day within the first iteration, we
 obtain a matrix having:</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">simout</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co"># [1]   4 400</span></span></code></pre>
 <p>We can now use the auxiliary functions of the model to Analyse the
@@ -438,19 +445,19 @@ simulated period<a class="anchor" aria-label="anchor" href="#derive-probability-
 <p>First, we can retrieve the probability of successful introduction,
 computed as the proportion of model iterations that resulted in a viable
 mosquito population at a given date.</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/psi.html">psi</a></span><span class="op">(</span>input_sim <span class="op">=</span> <span class="va">simout</span>, eval_date <span class="op">=</span> <span class="fl">60</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#   Days_after_intro p_success      stage</span></span>
 <span><span class="co"># 1           Day 60         1 Population</span></span></code></pre>
 <p>We can also get a spatial output, using the function <em>psi_sp</em>,
 which require as additional input only the matrix of centroid
 coordinates of pixels.</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../reference/psi_sp.html">psi_sp</a></span><span class="op">(</span>coords <span class="op">=</span> <span class="va">cc</span>, input_sim <span class="op">=</span> <span class="va">simout</span>, eval_date <span class="op">=</span> <span class="fl">60</span>, n.clusters<span class="op">=</span><span class="va">cl</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">buff</span>, add<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span>
 <span><span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">df_sp</span>, add<span class="op">=</span><span class="cn">T</span>, col<span class="op">=</span><span class="st">"red"</span><span class="op">)</span></span>
 <span><span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPoints</a></span><span class="op">(</span><span class="va">icellcoords</span><span class="op">)</span>, add<span class="op">=</span><span class="cn">T</span>, col<span class="op">=</span><span class="st">"blue"</span>, pch<span class="op">=</span><span class="fl">21</span><span class="op">)</span></span></code></pre></div>
-<p><img src="dynamAedes_local_files/figure-html/unnamed-chunk-24-1.png" width="95%" style="display: block; margin: auto;">
+<p><img src="dynamAedes_local_files/figure-html/unnamed-chunk-27-1.png" width="95%" style="display: block; margin: auto;">
 At local scale, the interpretation of this output is more nuanced than
 for the other scales: a pixel having psi=0 can be a pixel where all the
 simulations resulted in an extinction or where the species has not yet
@@ -462,7 +469,7 @@ arrived through dispersal.</p>
 <p>We can now compute the interquantile range abundance of the simulated
 population over the whole landscape using the function
 <em>adci</em>.</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">simout</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="co">#retrieve the maximum number of simulated days</span></span>
 <span><span class="va">egg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="../reference/adci.html">adci</a></span><span class="op">(</span><span class="va">simout</span>, eval_date<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="va">dd</span>, breaks<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>,<span class="fl">0.50</span>,<span class="fl">0.75</span><span class="op">)</span>, st<span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">juv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="../reference/adci.html">adci</a></span><span class="op">(</span><span class="va">simout</span>, eval_date<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="va">dd</span>, breaks<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>,<span class="fl">0.50</span>,<span class="fl">0.75</span><span class="op">)</span>, st<span class="op">=</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
@@ -489,7 +496,7 @@ population over the whole landscape using the function
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>myStage<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">myStage</span>, levels<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Egg'</span>, <span class="st">'Diapausing egg'</span>, <span class="st">'Juvenile'</span>, <span class="st">'Adult'</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y<span class="op">=</span><span class="va">`50%`</span>,x<span class="op">=</span><span class="va">Date</span>, group<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">myStage</span><span class="op">)</span>,col<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">myStage</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Ae. albopictus Interquantile range abundance"</span><span class="op">)</span><span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">0.8</span><span class="op">)</span><span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth<span class="op">=</span><span class="fl">0.8</span><span class="op">)</span><span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html" class="external-link">geom_ribbon</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>ymin<span class="op">=</span><span class="va">`25%`</span>,ymax<span class="op">=</span><span class="va">`75%`</span>,fill<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">myStage</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>              col<span class="op">=</span><span class="st">"white"</span>,</span>
 <span>              alpha<span class="op">=</span><span class="fl">0.2</span>,</span>
@@ -498,15 +505,15 @@ population over the whole landscape using the function
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">myStage</span>, scales <span class="op">=</span> <span class="st">"free"</span><span class="op">)</span><span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_light</a></span><span class="op">(</span><span class="op">)</span><span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.pos<span class="op">=</span><span class="st">"bottom"</span>,  text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">14</span><span class="op">)</span> , strip.text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>face <span class="op">=</span> <span class="st">"italic"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="dynamAedes_local_files/figure-html/unnamed-chunk-25-1.png" width="95%" style="display: block; margin: auto;"></p>
+<p><img src="dynamAedes_local_files/figure-html/unnamed-chunk-28-1.png" width="95%" style="display: block; margin: auto;"></p>
 <p>We can also have a spatial output of quantiles of the abundance
 distribution of a given life stage and for a given simulated day by
 using the function <em>adci_sp</em> and specifiying pixel coordinates.
 For example for eggs:</p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">r</span><span class="op">=</span><span class="fu"><a href="../reference/adci_sp.html">adci_sp</a></span><span class="op">(</span><span class="va">simout</span>, coords<span class="op">=</span><span class="va">cc</span>, eval_date<span class="op">=</span><span class="fl">60</span>, breaks<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>,<span class="fl">0.975</span><span class="op">)</span>, stage<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span></span></code></pre></div>
-<p><img src="dynamAedes_local_files/figure-html/unnamed-chunk-26-1.png" width="95%" style="display: block; margin: auto;">
+<p><img src="dynamAedes_local_files/figure-html/unnamed-chunk-29-1.png" width="95%" style="display: block; margin: auto;">
 Note that if only a small number of mosquitoes are present in a pixel
 over many iterations, quantiles may be 0 (especially for low quantiles)
 and you may see a series of empty rasters!</p>
@@ -516,7 +523,7 @@ and you may see a series of empty rasters!</p>
 </h4>
 <p>Compute a summary of the number of invaded cells over model
 iterations</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">x</span><span class="op">=</span><span class="fu"><a href="../reference/icci.html">icci</a></span><span class="op">(</span><span class="va">simout</span>, eval_date<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">60</span>, breaks<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>,<span class="fl">0.50</span>,<span class="fl">0.75</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#    25% 50% 75% day</span></span>
@@ -526,7 +533,7 @@ iterations</p>
 <span><span class="co"># V4   5   5   5   4</span></span>
 <span><span class="co"># V5   5   5   5   5</span></span>
 <span><span class="co"># V6   5   5   5   6</span></span></code></pre>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#     25% 50% 75% day</span></span>
 <span><span class="co"># V55   4   4   4  55</span></span>
@@ -542,12 +549,12 @@ iterations</p>
 <p>Derive estimates of mosquito dispersal (in km^2) of the simulated
 mosquito populations (only when scale = “lc”) for any simulated day (in
 this case for 60 days from start and end of the simulate period).</p>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">x</span><span class="op">=</span><span class="fu"><a href="../reference/dici.html">dici</a></span><span class="op">(</span><span class="va">simout</span>, coords<span class="op">=</span><span class="va">cc</span>, eval_date<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">60</span>,length.out<span class="op">=</span><span class="fl">60</span><span class="op">)</span>, breaks<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>,<span class="fl">0.50</span>,<span class="fl">0.75</span><span class="op">)</span>, space<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">`0.25`</span><span class="op">~</span><span class="va">day</span>,<span class="va">x</span>,type<span class="op">=</span><span class="st">"l"</span>,ylab<span class="op">=</span><span class="st">"Population dispersal (in meters) from cell of introduction"</span>,xlab<span class="op">=</span><span class="st">"days from introduction"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">`0.5`</span><span class="op">~</span><span class="va">day</span>,<span class="va">x</span>,type<span class="op">=</span><span class="st">"l"</span>, col<span class="op">=</span><span class="st">"red"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">`0.75`</span><span class="op">~</span><span class="va">day</span>,<span class="va">x</span>,type<span class="op">=</span><span class="st">"l"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="dynamAedes_local_files/figure-html/unnamed-chunk-28-1.png" width="95%" style="display: block; margin: auto;"></p>
+<p><img src="dynamAedes_local_files/figure-html/unnamed-chunk-31-1.png" width="95%" style="display: block; margin: auto;"></p>
 </div>
 </div>
 </div>

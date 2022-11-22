@@ -233,25 +233,65 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">## Run dynmAedes at local scale for 5 days</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="co">## Run dynamAedes at local scale for 5 days</span></span></span>
 <span class="r-in"><span><span class="co"># Make a toy temperature time series</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="va">w</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">20</span>,<span class="fl">25</span>,length.out<span class="op">=</span><span class="fl">5</span><span class="op">)</span>,ncol<span class="op">=</span><span class="fl">5</span><span class="op">)</span><span class="op">*</span><span class="fl">1000</span></span></span>
 <span class="r-in"><span><span class="co"># Run the model</span></span></span>
 <span class="r-in"><span>  <span class="fu">dynamAedes.m</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  species<span class="op">=</span><span class="st">"koreicus"</span>, </span></span>
 <span class="r-in"><span>  scale<span class="op">=</span><span class="st">"ws"</span>,</span></span>
 <span class="r-in"><span>  intro.eggs<span class="op">=</span><span class="fl">10</span>, </span></span>
-<span class="r-in"><span>  ihwv<span class="op">=</span><span class="fl">2</span>, </span></span>
+<span class="r-in"><span>  jhwv<span class="op">=</span><span class="fl">2</span>, </span></span>
 <span class="r-in"><span>  temps.matrix<span class="op">=</span><span class="va">w</span>, </span></span>
-<span class="r-in"><span>  startd<span class="op">=</span><span class="fl">2</span>, </span></span>
-<span class="r-in"><span>  endd<span class="op">=</span><span class="fl">5</span>,</span></span>
+<span class="r-in"><span>  startd<span class="op">=</span><span class="st">"2021-06-21"</span>, </span></span>
+<span class="r-in"><span>  endd<span class="op">=</span><span class="st">"2021-06-25"</span>,</span></span>
 <span class="r-in"><span>  lat<span class="op">=</span><span class="fl">42</span>,</span></span>
 <span class="r-in"><span>  long<span class="op">=</span><span class="fl">8</span>,</span></span>
 <span class="r-in"><span>  n.clusters<span class="op">=</span><span class="fl">1</span>, </span></span>
 <span class="r-in"><span>  iter<span class="op">=</span><span class="fl">1</span>,</span></span>
 <span class="r-in"><span>  compressed.output<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>no non-missing arguments to max; returning -Inf</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  ### Model without dispersal ### </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ##########################################</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ## Life cycle iterations have begun... ##</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ##########################################</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |                                                                      |   0%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ########################################</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ## Iterations concluded.              ##</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ########################################</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]][[1]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              [,1]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> egg             3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> juvenile        7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> adult           0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> diapause_egg    0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]][[2]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              [,1]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> egg             0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> juvenile        9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> adult           0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> diapause_egg    0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]][[3]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              [,1]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> egg             0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> juvenile        9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> adult           0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> diapause_egg    0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"compressed")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </div>
