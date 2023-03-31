@@ -34,6 +34,57 @@
     <loc>/reference/dici.html</loc>
   </url>
   <url>
+    <loc>/reference/dot-DRC.beta.html</loc>
+  </url>
+  <url>
+    <loc>/reference/dot-a.a_disp.f.html</loc>
+  </url>
+  <url>
+    <loc>/reference/dot-a.gono_rate.f.html</loc>
+  </url>
+  <url>
+    <loc>/reference/dot-a.ovi_rate.f.html</loc>
+  </url>
+  <url>
+    <loc>/reference/dot-a.surv_rate.f.html</loc>
+  </url>
+  <url>
+    <loc>/reference/dot-beta.fun.html</loc>
+  </url>
+  <url>
+    <loc>/reference/dot-beta.init.html</loc>
+  </url>
+  <url>
+    <loc>/reference/dot-d.surv_rate.f.html</loc>
+  </url>
+  <url>
+    <loc>/reference/dot-e.dia_rate.f.html</loc>
+  </url>
+  <url>
+    <loc>/reference/dot-e.hatch_rate.f.html</loc>
+  </url>
+  <url>
+    <loc>/reference/dot-e.surv_rate.f.html</loc>
+  </url>
+  <url>
+    <loc>/reference/dot-euc.html</loc>
+  </url>
+  <url>
+    <loc>/reference/dot-i.ddmort_rate.f.html</loc>
+  </url>
+  <url>
+    <loc>/reference/dot-i.emer_rate.f.html</loc>
+  </url>
+  <url>
+    <loc>/reference/dot-i.surv_rate.f.html</loc>
+  </url>
+  <url>
+    <loc>/reference/dot-meuc.html</loc>
+  </url>
+  <url>
+    <loc>/reference/dot-returndis.html</loc>
+  </url>
+  <url>
     <loc>/reference/dynamAedes.m.html</loc>
   </url>
   <url>
