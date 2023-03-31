@@ -1,3 +1,9 @@
+# dynamAedes 2.1.2
+* Transitioning from 'rgdal' and 'sp' to 'terra'
+* Transitioning from 'insol' to 'geosphere'
+* Removing block-loading of 'tidyverse' (speeding up loading?)
+* Helper functions not anymore exported
+
 # dynamAedes 2.1.1
 * Adding rgdal in the description
 

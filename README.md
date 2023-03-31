@@ -18,17 +18,16 @@ status](https://www.r-pkg.org/badges/version/dynamAedes)](https://cran.r-project
 The model is driven by temperature, photoperiod and intra-specific
 larval competition and can be applied to three different "spatial scales":
 punctual, local and regional. These modes consider different
-degrees of spatial complexity and data availability, by accounting for
-active and passive dispersal of mosquitoes as well as for specific input temperature data (weather station vs. gridded temperature data from remote sense).
+degrees of spatial complexity and data availability, for example by accounting for
+active and passive dispersal of mosquitoes or for specific input temperature data (weather station vs. gridded remotely-sensed temperature data).
 
 The main features of **dynamAedes** are:
 
--   It's a stochastic model: the distribution of resulting metrics (e.g., number of adults) depends on the number of iterations.
+-   It allows to simulate the active and passive dispersal of adult mosquitoes (when *scale="local"*).
 
--   At local scale, **dynamAedes** allows to simulate the active and passive dispersal of adult mosquitoes.
+-   It's a stochastic model, thus the distribution of its output metrics (e.g., number of adults) integrates "random" variation and can thus differ slightly between different model runs.
 
--   It has four functions (*psi*, *adci*, *dici* and *icci*) to derive metrics on the space-time trends of the simulated populations, e.g., the 95% CI
-    of the dispersal in a given period or the number of colonized cells.
+-   It provides four functions (*psi*, *adci*, *dici* and *icci*) to easily derive summary metrics (i.g., based on user-defines quantiles) on the space-time trend of the simulated population dynamics, e.g., the 95% CI of the population dispersal in a given period or the number of cells colonised.
 
 ## Installation
 

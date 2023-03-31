@@ -3,4 +3,4 @@
 0 errors | 0 warnings | 0 note
 
 * This is a new release. All checks run.
-* All the issues that caused dynamAedes's archiviation were solved.
+* This package was removed from CRAN because depended on "insol" which became obsolete. I've now removed all the dependencies from "insol" package. 

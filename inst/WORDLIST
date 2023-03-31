@@ -1,5 +1,9 @@
 Ae
 Aedes
+DRC
+Marini
+OnofriAndreaPG
+Oviposition
 PSOCK
 Pasaoglu
 Proj
@@ -7,8 +11,11 @@ RasterLayer
 adci
 aegypti
 albopictus
+aomisc
+bloodmeal
 cellsize
 colums
+com
 coords
 correllation
 degg
@@ -17,11 +24,16 @@ dici
 dispbins
 dist
 doi
+drm
 ecoinf
 endr
 fra
+geosphere
+github
+gonotrophic
 icci
 idci
+insol
 interquantile
 ita
 japonicus
@@ -30,6 +42,7 @@ koreicus
 lat
 lc
 maxadisp
+oviposition
 photoperiod
 pkgdown
 pol
@@ -45,7 +58,9 @@ specifiying
 st
 subcompartiment
 successfull
+terra
 th
+tidyverse
 uk
 ws
 xyz

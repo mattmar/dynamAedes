@@ -44,18 +44,18 @@ dynamAedes.m <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.a
     ### Initial checks
 	#Species
 	if( !species%in%c("aegypti","albopictus","koreicus","japonicus") ) {
-		stop("Species not supported, exiting..." )
+		stop("Mosquito species not supported, exiting..." )
 	}
 	#Dayspan
 	if( is.na(endd) ) {
 		if( nchar(strsplit(as.character(startd),"-")[[1]][1])<4 ) {
-			stop("Dates in the wrong format: change them to %Y-%m-%d")
+			stop("Dates in the wrong format: change them to '%Y-%m-%d'.")
 		}
 		dayspan <- as.integer(ncol(temps.matrix)-1)
 	} 
 	else {
 		if( nchar(strsplit(as.character(startd),"-")[[1]][1])<4|nchar(strsplit(as.character(endd),"-")[[1]][1])<4 ) {
-			stop("Dates in the wrong format: change them to %Y-%m-%d")
+			stop("Dates in the wrong format: change them to '%Y-%m-%d'.")
 		}
 		dayspan <- as.integer(as.Date(endd)-as.Date(startd))
 	}
@@ -68,7 +68,6 @@ dynamAedes.m <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.a
 		if( is.na(coords.proj4) ) {
 			stop("No proj4 string for input coordinates. Please set 'coords.proj4' option.")
 			} else {
-				message("inside")
 				cells.coords.photo <- as.data.frame(coordinates(spTransform(SpatialPoints(cells.coords, proj4string=CRS(coords.proj4)), CRSobj=CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))))
 			}
 		}
@@ -95,12 +94,13 @@ dynamAedes.m <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.a
 									} else (stop("avgpdisp not supported yet..."))
 	## Derive daylength for laying of diapausing eggs in albopictus/koreicus/japonicus
 	if( species!="aegypti" ){
-		jd <- JD(seq(as.POSIXct(startd), as.POSIXct(as.Date(startd)+dayspan), by='day'))
+		doy <- as.numeric(format(seq(as.POSIXct(startd), as.POSIXct(as.Date(startd)+dayspan), by='day'), "%j"))
 		if( scale=="rg" ) {
-			photo.matrix <- lapply(jd, function(x){insol::daylength(long = cells.coords.photo[,1], lat=cells.coords.photo[,2], jd=x, 1)[,3]})
+			photo.matrix <- lapply(doy, function(x){daylength(lat=cells.coords.photo[,2], doy=x)})
+			
 			photo.matrix <- do.call(cbind,photo.matrix)
 			} else if( !is.na(lat)&!is.na(long) ) {
-				dl <- daylength(lat,long,jd,1)[,3]
+				dl <- daylength(lat,doy)
 				photo.matrix <- matrix(dl, nrow=1)
 				} else (stop("Something's wrong with scale or lat and long"))
 				} else{

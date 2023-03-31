@@ -1,18 +1,18 @@
 Package: dynamAedes
-Version: 2.1.1
-Date: 2022-11-21
+Version: 2.1.2
+Date: 2023-03-23
 Title: A Unified Mechanistic Model for the Population Dynamics of Invasive Aedes Mosquitoes
 Authors@R: c(person("Matteo", "Marcantonio", role = c("aut", "cre"), email = "marcantoniomatteo@gmail.com"),person("Daniele", "Da Re", role = c("aut"), email = "dare.daniele@gmail.com")) 
-Depends: R (>= 3.6.0), raster
-Imports: drc, fields, foreach, insol, slam, doParallel, sp
+Depends: R (>= 4.0.0)
+Imports: doParallel, dplyr, drc, fields, foreach, geosphere, raster, slam, sp
 BugReports: https://github.com/mattmar/dynamAedes
-Description: Generalised model for population dynamics of invasive Aedes mosquitoes. Rationale and model structure are described here: Da Re, ..., Marcantonio (2021) <doi:10.1016/j.ecoinf.2020.101180> and Da Re, ..., Marcantonio (2022) <doi:10.1101/2021.12.21.473628>.
+Description: Generalised model for population dynamics of invasive Aedes mosquitoes. Rationale and model structure are described here: Da Re et al. (2021) <doi:10.1016/j.ecoinf.2020.101180> and Da Re et al. (2022) <doi:10.1101/2021.12.21.473628>.
 VignetteBuilder: knitr
 Encoding: UTF-8
 Language: en-GB
 License: GPL(>=2)
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.1
-Suggests: parallel, rmarkdown, knitr, eesim, geosphere, ggplot2, gstat, rgeos, spatstat, rgdal, tidyverse
+RoxygenNote: 7.2.3
+Suggests: terra, parallel, rmarkdown, knitr, eesim, ggplot2, gstat, spatstat, rgdal
 Config/testthat/edition: 3
 URL: https://mattmar.github.io/dynamAedes/

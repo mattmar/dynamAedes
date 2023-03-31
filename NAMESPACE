@@ -9,17 +9,12 @@ importFrom("stats", "dgamma", "dlnorm", "lm", "predict", "rbinom", "rmultinom", 
 importFrom("fields", "rdist")
 importFrom("slam", "as.simple_sparse_array")
 importFrom("drc", "drm")
-importFrom("insol", "JD", "daylength")
+importFrom("geosphere", "daylength")
 importFrom("raster", "stack", "raster", "rasterFromXYZ")
 importFrom("sp", "gridded", "coordinates", "spTransform", "CRS", "SpatialPoints")
-
+importFrom("dplyr", "%>%", "bind_rows", "as_tibble", "mutate")
 #####################################
 ##               Export            ##
 #####################################
-export(dynamAedes.m, .beta.fun, .DRC.beta, .beta.init)
-export(.a.a_disp.f, .a.gono_rate.f, .a.ovi_rate.f, 
-.a.surv_rate.f, .i.emer_rate.f, .e.surv_rate.f,
-.i.surv_rate.f, .e.hatch_rate.f, .e.dia_rate.f, 
-.d.surv_rate.f, .i.ddmort_rate.f, psi, psi_sp, 
-icci, adci, adci_sp, dici, 
-.returndis, .euc, .meuc)
+export(dynamAedes.m)
+export(psi, psi_sp, icci, adci, adci_sp, dici)
