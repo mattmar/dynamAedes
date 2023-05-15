@@ -46,19 +46,25 @@ dynamAedes.m <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.a
 	if( !species%in%c("aegypti","albopictus","koreicus","japonicus") ) {
 		stop("Mosquito species not supported, exiting..." )
 	}
-	#Dayspan
+
+	#Define dayspan
 	if( is.na(endd) ) {
 		if( nchar(strsplit(as.character(startd),"-")[[1]][1])<4 ) {
 			stop("Dates in the wrong format: change them to '%Y-%m-%d'.")
 		}
-		dayspan <- as.integer(ncol(temps.matrix)-1)
-	} 
-	else {
-		if( nchar(strsplit(as.character(startd),"-")[[1]][1])<4|nchar(strsplit(as.character(endd),"-")[[1]][1])<4 ) {
-			stop("Dates in the wrong format: change them to '%Y-%m-%d'.")
+		if ( is.vector(temps.matrix) ) {
+			#-1 is because day 1 you introduce and day 2 starts life cycle?
+			dayspan <- as.integer(ncol(temps.matrix)-1)
+			} else { 
+				dayspan <- as.integer(ncol(temps.matrix)-1)
+			}
+		} 
+		else {
+			if( nchar(strsplit(as.character(startd),"-")[[1]][1])<4|nchar(strsplit(as.character(endd),"-")[[1]][1])<4 ) {
+				stop("Dates in the wrong format: change them to '%Y-%m-%d'.")
+			}
+			dayspan <- as.integer(as.Date(endd)-as.Date(startd))
 		}
-		dayspan <- as.integer(as.Date(endd)-as.Date(startd))
-	}
 	#Dayspan length
 	cells.coords.photo <- cells.coords
 	if( dayspan>ncol(temps.matrix) ) {
@@ -197,7 +203,7 @@ dynamAedes.m <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.a
 			}
 			setTxtProgressBar(pb, legind)
 			foreach(day = 2:dayspan, .combine=c, .export = ls(globalenv())) %do% {
-				if( !stopit ) {
+				while( !stopit ) {
 					if( !exists("counter") ) {
                     	# Index for dynamic array eggs
                     	de <- if(species=="koreicus"|species=="japonicus") 2 else 1
@@ -411,11 +417,12 @@ dynamAedes.m <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.a
                             }
     				## Print information on population structure today
     				if( verbose ) message("\n", as.Date(startd)+day, ". Day ",length(counter),"-- of iteration ",iteration," has ended. Population is e: ",sum(p.life.a[1,,])," i: ",sum(p.life.a[2,,])," a: " ,sum(p.life.a[3,,]), " d: ",sum(p.life.a[4,,]), " eh: ", sum(e.hatc.n+if(species!="aegypti") {d.hatc.n} else {0}), " el: ",sum(a.egg.n), " \n", "Max t: ",max(temps.matrix[,day]/1000), " \n")
-                		# Condition for exinction
-                		stopit <- sum(p.life.a,na.rm=TRUE)==0
-                	# Some (unnecessary?) garbage cleaning
+    				 ## Verify exinction
+                	 stopit <- sum(p.life.a,na.rm=TRUE)==0
+    				 if ( stopit & verbose ) message("Iteration ", iteration, " is extinct...\n")
+                	## Some (unnecessary?) garbage cleaning
                 	gc()
-                	# if TRUE arrays are compressed (by summing) in matrices so that information on sub-compartements is irreparably lost.
+                	## if TRUE arrays are compressed (by summing) in matrices so that information on sub-compartements is irreparably lost.
 						## Pre-end-of-day housekeeping
 						p.life.a[1,,(4*de)] <- p.life.a[1,,(4*de)] - e.hatc.n # Remove new hatched eggs from matrix
 						# Compress or not? Anyway, make daily output
@@ -431,19 +438,11 @@ dynamAedes.m <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.a
 						p.life.a[3,,5] <- a.new.n # new vector into matrix
 						p.life.a[3,,3] <- p.life.a[3,,2] # ovi d1 to ovi d2
 						p.life.a[3,,2] <- 0 # clean ovi d1 (d1 can only last for one day)
-                	# If TRUE a sparse array is returned (save memory but complex to process)
-						#if(sparse.output) {
-						#	return(list(as.simple_sparse_array(p.life.a)))
-						#}else{
-							return(list(p.life.aout))
-						#}
-						}else{
-							if(verbose) message("Extinct")
+						# Return the daily summary
+						return(list(p.life.aout))
 					} #end of stopif condition
-				# Return day output
-				return(p.life.a_out)
-			}
 		}
+	}
 		if( compressed.output ) {
 			attributes(rs) <- list(compressed=TRUE)
 			} else attributes(rs) <- list(compressed=FALSE)
