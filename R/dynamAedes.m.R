@@ -35,8 +35,7 @@
 #' @author Matteo Marcantonio \email{marcantoniomatteo@gmail.com}, Daniele Da Re \email{daniele.dare@uclouvain.be}
 #' @export
 
-dynamAedes.m <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adults=0, intro.juveniles=0, 
-	scale="ws", intro.cells=NULL, jhwv=2, temps.matrix=NULL, startd=1, endd=NA,
+dynamAedes.m <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adults=0, intro.juveniles=0, scale="ws", intro.cells=NULL, jhwv=2, temps.matrix=NULL, startd=1, endd=NA,
 	cells.coords=NULL, coords.proj4=NA, lat=NA, long=NA, road.dist.matrix=NULL, avgpdisp=NA,
 	iter=1, n.clusters=1, cluster.type="PSOCK", sparse.output=FALSE, compressed.output=TRUE,
 	suffix=NA, cellsize=250, maxadisp=600, dispbins=10, verbose=FALSE, seeding=FALSE) {
@@ -65,12 +64,18 @@ dynamAedes.m <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.a
 			}
 			dayspan <- as.integer(as.Date(endd)-as.Date(startd))
 		}
-	#Dayspan length
+	# Set dayspan length
 	cells.coords.photo <- cells.coords
 	if( dayspan>ncol(temps.matrix) ) {
 		stop("You're trying to run the model for more days than columns in 'temps.matrix', exiting..." ) 
 	}
-	if( species!="aegypti" & scale=="rg" & abs(max(cells.coords[,2]))>90 ) {
+	## Set maxlat for checks
+	if(scale!="ws") {
+		maxlat <- abs(max(cells.coords[,2]))
+		} else {
+			maxlat <- lat
+		}
+	if( species!="aegypti" & scale=="rg" & maxlat>90 ) {
 		if( is.na(coords.proj4) ) {
 			stop("No proj4 string for input coordinates. Please set 'coords.proj4' option.")
 			} else {
