@@ -308,9 +308,9 @@ return( i.dmort.pred )
 #' @return vector of rates.
 .e.surv_rate.f <- function(temp.new, sp) {
   if(sp=="aegypti") {
-    surv_r <- c(0,0,0,0,0,0,0.4,0.6,0.78,0.81,0.88,0.95,0.96,0.91,0.93,0.83,0.90,0.48,0)
+    surv_r <- c(0,0,0,0,0.2,0.3,0.5,0.7,0.78,0.81,0.88,0.95,1.00,0.93,0.93,0.83,0.90,0.48,0)
     temp_r <- c(-17,-15,-12,-10,-7,-5,-2,0,15.6,16,21,22,25.0,26.7,28.0,31.0,32.0,35.0,40.0)
-    model <- drm(surv_r ~ temp_r, fct = .DRC.beta())
+    model <- lm(surv_r ~ poly(temp_r,5))
     e.surv.pred <- predict(model,data.frame(temp.v=temp.new))
     }else if(sp=="albopictus" ) {
       a= 0.955

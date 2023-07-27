@@ -9,8 +9,8 @@
 #' @param scale character. Define the model spatial scale: punctual/weather station "ws", local "lc", or regional "rg". Active and passive dispersal is enabled only for \code{scale = "lc"}. Default \code{scale = "ws"}.
 #' @param intro.cells positive integer. One or more cells (id) where to introduce the population at local ("lc") scale. If intro.cells=NULL, then a random cell is used for introduction; If intro.cells is a vector of cell ids then a cell is drawn at random from the vector (with repetition) for introduction in each model iteration. 
 #' @param jhwv positive integer. Juvenile-habitat water volume, define the volume (L) of water habitat presents in each spatial unit (parametrised with data retrieved from \doi{10.1111/1365-2664.12620}). Default \code{lhwv = 1}.
-#' @param startd Character  date (ISO format "%Y-%m-%d"). Date of start of simulations.
-#' @param endd Character  date (ISO format "%Y-%m-%d"). Date of end of simulation. It can be \code{NA}; then it will be derived using the number of columns in \code{temps.matrix}.
+#' @param startd Character date (ISO format "%Y-%m-%d"). Date of start of simulations.
+#' @param endd Character date (ISO format "%Y-%m-%d"). Date of end of simulation. It can be \code{NA}; then it will be derived using the number of columns in \code{temps.matrix}.
 #' @param iter positive integer. Define the number of model iterations. 
 #' @param temps.matrix matrix. A matrix of daily (average) temperatures (in degrees **Celsius degree x 1000**) used to fit the life cycle rates. This matrix must be organised with the daily temperature observations as columns and the geographic position of the i-grid cell as rows. \bold{Importantly}, the first column must match \code{startd} date.
 #' @param cells.coords matrix. A matrix reporting the spatial coordinates of the temperature observations.
@@ -308,7 +308,6 @@ dynamAedes.m <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.a
                 		i.intro.n
                 		} else p.life.a[2,,(6*dj)]
                 	## Add immatures hatched the same day
-						#message(length(e.hatc.n), "    ", length(d.hatc.n))
 						p.life.a[2,,1] <- e.hatc.n + if(species!="aegypti") {d.hatc.n} else {0}
                 	## Add immatures that did not emerge yesterday to immatures that today are ready to emerge
                 	p.life.a[2,,(6*dj)] <- p.life.a[2,,(6*dj)] + i.temp.v
