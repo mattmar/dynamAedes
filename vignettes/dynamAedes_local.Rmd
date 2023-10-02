@@ -213,14 +213,16 @@ Define a two-column matrix of coordinates to identify each cell in the lattice g
 cc <- df_temp[,c("x","y")]
 ```
 
-As for model requirement, the distance matrix must have column names equal to row names.
+As for model requirement, the distance matrix must have col names corresponding to rows in the original raster and equal to row names.
 ```{r}
+row.names(dist_matrix) <- df_sp$id
 colnames(dist_matrix) <- row.names(dist_matrix)
 ```
 
 Moreover, distances in the distance matrix must be rounded to the thousands.
 ```{r}
 dist_matrix <- apply(dist_matrix,2,function(x) round(x/1000,1)*1000) 
+storage.mode(dist_matrix) <- "integer"
 
 # An histogram showing the distribution of distances of cells along the road network
 hist(dist_matrix, xlab="Distance (meters)")
@@ -325,15 +327,25 @@ iterations that resulted in a viable mosquito population at a given date.
 psi(input_sim = simout, eval_date = 60)
 ```
 
-We can also get a spatial output, using the function *psi_sp*, which require as additional input only the matrix of centroid coordinates of pixels.
-
+We can also get a spatial output thanks to the function *psi_sp*, which requires the matrix of the centroid coordinates of pixels as only additional input.
 ```{r}
-plot(psi_sp(coords = cc, input_sim = simout, eval_date = 60, n.clusters=cl))
+psi.output <- psi_sp(coords = cc, input_sim = simout, eval_date = 60, n.clusters=cl)
+```
+
+Then we can plot everything to have an overview on mosquito population dynamics and movements given road network and average temperature surface.
+```{r}
+values(r) <- round(rowMeans(df_temp/1000),5)
+cols <- colorRampPalette(c("transparent", "red"))(2)
+
+raster::plot(r,legend=FALSE)
 raster::plot(buff, add=T)
 raster::plot(df_sp, add=T, col="red")
-raster::plot(SpatialPoints(icellcoords), add=T, col="blue", pch=21)
+raster::plot(SpatialPoints(icellcoords), add=T, col="black", pch=21)
+
+plot(r, legend.only=TRUE, horizontal = TRUE, legend.args = list(text='Temperature',line=-3.5), add=T)
+plot(psi.output, alpha=0.5, add=T, legend.args = list(text='Prob colonisation'), col=cols)
 ```
-At local scale, the interpretation of this output is more nuanced than for the other scales: a pixel having psi=0 can be a pixel where all the simulations resulted in an extinction or where the species has not yet arrived through dispersal. 
+At local scale, the interpretation of this output is more nuanced than for the other scales: a pixel having psi=0 can be a pixel where all the simulations resulted in an extinction or where the species has not yet arrived through dispersal. To understand the value of the pixels may be useful to iterate the *psi_sp* function along the vector of simulated days.
 
 ### Derive abundance 95% CI for each life stage and in each day
 We can now compute the interquantile range abundance of the simulated population over the whole landscape using the function *adci*. 

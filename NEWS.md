@@ -1,3 +1,11 @@
+# dynamAedes 2.2.0
+* Substitutes `fields::rdist` with terra::distance which solves a bug in active dispersal
+* Adds a switch for active dispersal only `pDispersal=FALSE`
+* Removes warnings changing Beta function with polynomial for egg survival in aegypti
+* Raised 0 hatching rate to 15°C
+* Other minor cosmetic changes
+* Modify verbose option for debugging, now an integer with values 0 (silent), 1 or 2.
+
 # dynamAedes 2.1.2
 * Transitioning from 'rgdal' and 'sp' to 'terra'
 * Transitioning from 'insol' to 'geosphere'

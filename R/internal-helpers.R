@@ -273,12 +273,11 @@ return( i.dmort.pred )
 #' @return vector of rates.
 .e.hatch_rate.f <- function(temp.new, sp) {
   if(sp=="aegypti") {
-    hatc_d <- c(0,  0.025,1,0.98, 0.99, 0.73, 0.30, 0.016)
-    temp_d <- c(7, 12,   19,  23, 24.5, 26.5, 29.5, 40)
-    model <- lm(hatc_d ~ poly(temp_d,3))
+    hatc_d <- c(0,0, 0.025,0.98, 0.99, 0.73, 0.30, 0.016, 0)
+    temp_d <- c(7,12,19,   23,   24.5, 26.5, 29.5, 40,    45)
+    model <- lm(hatc_d ~ poly(temp_d,5))
     e.hatch.pred <- predict(model,data.frame(temp_d=temp.new), response=TRUE)
-    e.hatch.pred <- ifelse(e.hatch.pred<0, 0, e.hatch.pred)
-    e.hatch.pred[which(temp.new>41)] <- 0
+    e.hatch.pred[which(temp.new<=15 | temp.new>=39)] <- 0
     }else if(sp=="albopictus") {
       hatc_d <-c(2,4.4,4.0,50,100,60,51.4,10.0,0)/100 
       temp_d <-seq(0,40,by=5)
@@ -309,10 +308,11 @@ return( i.dmort.pred )
 .e.surv_rate.f <- function(temp.new, sp) {
   if(sp=="aegypti") {
     surv_r <- c(0,0,0,0,0.2,0.3,0.5,0.7,0.78,0.81,0.88,0.95,1.00,0.93,0.93,0.83,0.90,0.48,0)
-    temp_r <- c(-17,-15,-12,-10,-7,-5,-2,0,15.6,16,21,22,25.0,26.7,28.0,31.0,32.0,35.0,40.0)
+    temp_r <- c(-17,-15,-12,-10,-7,-5,-2,0,15.6,16,21,22,25.0,26.7,28.0,31.0,32.0,35.0,41.0)
     model <- lm(surv_r ~ poly(temp_r,5))
-    e.surv.pred <- predict(model,data.frame(temp.v=temp.new))
-    }else if(sp=="albopictus" ) {
+    e.surv.pred <- predict(model,data.frame(temp_r=temp.new))
+    e.surv.pred[temp.new >= 41 | temp.new <= -10] <- 0
+    }else if(sp=="albopictus") {
       a= 0.955
       b= 16
       c= -17 

@@ -1,3 +1,8 @@
+## 2.1.*
+# Multiple introductions for punctual scale: Eva?;
+# Implement evaporation function and precipitation input;
+# dynamAedes object to store attributes of the scenario;
+
 # dynamAedes.m 1.0.0
 ## package: Add vignettes
 ## package: Add plotting functions
