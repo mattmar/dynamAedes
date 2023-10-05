@@ -53,11 +53,12 @@ adci_sp=function (input_sim = NULL, coords = NULL, eval_date = NULL, stage = 1, 
       tmp = rate.sp[, y]
       tmp = as.data.frame(cbind(coords, tmp))
       names(tmp)[1:2] = c("X", "Y")
-      tmp=rasterFromXYZ(tmp)
+      tmp=terra::rast(tmp, type="xyz")
       names(tmp) = paste0("p", breaks[y])
       return(tmp)
         })
-    outr=stack(rb)
+    outr=return(do.call(c,rb))
+
 })
   }
   names(myOut)=paste0("d_", eval_date)

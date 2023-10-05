@@ -1,5 +1,5 @@
 ---
-title: "The punctual scale model"
+title: "1. The punctual scale model"
 author: "Daniele Da Re, Sophie 0. Vanwambeke, Matteo Marcantonio"
 output: 
   rmarkdown::html_vignette:
@@ -13,7 +13,8 @@ date: "`r Sys.Date()`"
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(fig.width=10, fig.height=10, fig.asp = 0.618, out.width = "95%", fig.align = "center", fig.dpi = 150, collapse = FALSE, comment = "#") 
+knitr::opts_chunk$set(fig.width=10, fig.height=10, fig.asp = 0.618, out.width = "95%", fig.align = "center", fig.dpi = 150, collapse = FALSE, comment = "#")
+options(rmarkdown.html_vignette.check_title = FALSE)
 ```
 
 This tutorial explains step-by-step the main features of **dynamAedes** package, a unified modelling framework for invasive *Aedes* mosquitoes. Users can apply the stochastic, time-discrete and spatially-explicit population dynamical model initially developed in [Da Re et al., (2021)](https://doi.org/10.1016/j.ecoinf.2020.101180) for *Aedes aegypti* and then expanded for other three species: *Ae. albopictus*, *Ae. japonicus* and *Ae. koreicus* [Da Re et al., (2022)](https://doi.org/10.1186/s13071-022-05414-4).
@@ -22,31 +23,28 @@ The model is driven by temperature, photoperiod and intra-specific larval compet
 
 We will describe the model applications for *Ae. albopictus* and for all spatial scales by using a simulated temperature dataset.
 
+At the punctual scale, the model only requires a weather station temperature time series provided as a numerical matrix (in degree Celsius). For the purpose of this tutorial, we simulate a 1-year long temperature time series.
+
+# 1. Input data
+## 1.1. Simulate temperature data with seasonal trend
+We first simulate a 1-year temperature time series with seasonal trend. For the time series we consider a mean value of 16°C and standard deviation of 2°C.
+
 ```{r,  message=FALSE, warning=FALSE}
 #Load packages
-require(spatstat)
-require(gstat)
-require(parallel)
-require(eesim)
-require(dplyr)
-require(geosphere)
-require(ggplot2)
-require(terra)
-require(rgdal)
-require(raster)
-require(dynamAedes)
+# simulate temperatures
+library(eesim)
 
+# modelling 
+library(dynamAedes)
+
+# data manipulation and plotting
+library(dplyr)
+library(ggplot2)
 Sys.setlocale("LC_TIME", "en_GB.UTF-8")  
 ```
 
-# Punctual scale model
-At punctual scale, the model only requires a weather station temperature time series provided as a numerical matrix (in degree Celsius). For the purpose of this tutorial, we simulate a 1-year long temperature time series.
-
-## Simulate temperature data with seasonal trend
-We first simulate a 1-year temperature time series with seasonal trend. For the time series we consider a mean value of 16°C and standard deviation of 2°C.
-
 ```{r}
-ndays = 365*1 #length of the time series in days
+ndays <- 365*1 #length of the time series in days
 set.seed(123)
 sim_temp <- create_sims(n_reps = 1, 
                         n = ndays, 
@@ -73,37 +71,37 @@ plot(sim_temp[[1]]$date,
      )
 ```
 
-## Format the simulated input datasets and run the model
-### Model settings
-Float numbers in the temperature matrix would slow the computational speed, they must be multiplied by 1000 and then transformed in integer numbers. We also transpose the matrix from long to wide format, since we conceptualized the model structure considering the rows as the spatial component (e.g., observations; here = 1) and the columns as the temporal one (e.g., variables).
+# 2. Modelling 
+## 2.1 Model settings
 
-We are now left with a few model parameters which need to be defined by the user.
+We define a few model parameters which need to be defined by the user.
 ```{r}
 ## Define the day of introduction (July 1st is day 1)
-str = "2000-07-01"
+str <- "2000-07-01"
 ## Define the end-day of life cycle (August 1st is the last day)
-endr = "2000-08-01"
+endr <- "2000-08-01"
 ## Define the number of eggs to be introduced
-ie = 1000
+ie <- 1000
 ## Define the number of model iterations
-it = 1 # The higher the number of simulations the better
+it <- 1 # The higher the number of simulations the better
 ## Define the number of liters for the larval density-dependent mortality
-habitat_liters=1
+habitat_liters <- 1
 #Define latitude and longitude for the diapause process
-myLat=42
-myLon=7
+myLat <- 42
+myLon <- 7
 ## Define the number of parallel processes (for sequential itarations set nc=1)
-cl = 1
-## Set output name for the *.RDS output will be saved
-#outname= paste0("dynamAedes.m_albo_ws_dayintro_",str,"_end",endr,"_niters",it,"_neggs",ie)
+cl <- 1
 ```
+
+
+Float numbers in the temperature matrix would slow the computational speed, they must be multiplied by 1000 and then transformed in integer numbers. We also transpose the matrix from long to wide format, since we conceptualized the model structure considering the rows as the spatial component (e.g., observations; here = 1) and the columns as the temporal one (e.g., variables).
 
 ```{r}
 df_temp <- data.frame("Date" = sim_temp[[1]]$date, "temp" = sim_temp[[1]]$x)
 w <- t(as.integer(df_temp$temp*1000)[format(as.Date(str)+1,"%j"):format(as.Date(endr)+1,"%j")])
 ```
 
-### Run the model
+## 2.2 Run the model
 Running the model with the settings specified in this example takes about 2 minutes.
 ```{r,   message=FALSE, warning=FALSE}
 simout <- dynamAedes.m(species="albopictus", 
@@ -122,7 +120,8 @@ simout <- dynamAedes.m(species="albopictus",
                      seeding=TRUE)
 ```
 
-## Analyse the results
+# 3. Analyse the results
+
 We first explore the model output structure: the *simout* object is a nested list.
 
 The **first** level corresponds to the number of model iterations
@@ -130,6 +129,7 @@ The **first** level corresponds to the number of model iterations
 print(it)
 print(length(simout))
 ```
+
 The **second** level corresponds to the simulated days.
 So if we inspect the first iteration, we observe that the model has computed `rlength(simout[[1]])` days, since we have started the simulation on the 1st of July and ended on the 1st of August.
 
@@ -146,15 +146,14 @@ simout[[1]][[15]]
 ```
 We can now use the auxiliary functions of the package to analyse the results. 
 
-### Derive probability of a successfull introduction at the end of the simulated period
-First, we can retrieve the "probability of successful introduction", computed as the proportion of model
-iterations that resulted in a viable mosquito population at a given date. In this case the results is 1, since we have only one iteration and the population is still viable at the end of the simulation.
+## 3.1 Derive probability of a successfull introduction at the end of the simulated period
+First, we can retrieve the "probability of successful introduction", computed as the proportion of model iterations that resulted in a viable mosquito population at a given date. In this case the results is 1, since we have only one iteration and the population is still viable at the end of the simulation.
 
 ```{r message=FALSE, warning=FALSE}
 psi(input_sim = simout, eval_date = 30)
 ```
 
-### Derive abundance 95% CI for each life stage and in each day
+## 3.2 Derive abundance 95% CI for each life stage and in each day
 We now compute the interquantile range abundance for all the stages of the simulated population using the function *adci*.
 ```{r, message=FALSE, warning=FALSE}
 # Retrieve the maximum number of simulated days
@@ -184,11 +183,11 @@ outdf %>%
          Date=rep(seq.Date(as.Date(str), as.Date(endr)-2, by="day"),4)) %>% 
 ggplot( aes(x=Date, y=X50., group=factor(myStage),col=factor(myStage))) +
   ggtitle("Ae. albopictus Interquantile range abundance")+
-  geom_line(linewidth=0.8)+
   geom_ribbon(aes(ymin=X25.,ymax=X75.,fill=factor(myStage)),
               col="white",
               alpha=0.2,
               outline.type="full")+
+  geom_line(linewidth=0.8)+
   labs(x="Date", y="Interquantile range abundance", col="Stage", fill="Stage")+
   facet_wrap(~myStage, scales = "free_y")+
   theme_light()+

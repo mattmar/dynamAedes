@@ -91,7 +91,7 @@ dynamAedes.m(
 
 \item{dispbins}{positive integer. When scale = "lc", defines the resolution of the active dispersal kernel, default dispbins = 10.}
 
-\item{verbose}{integer. if 1 then an overview of population dynamics is printed in the console, if 2 more information on population dinamycs are printed out. Default is 0 (silent).}
+\item{verbose}{integer. if 1 then an overview of population dynamics is printed in the console, if 2 more information on population dynamics are printed out. Default is 0 (silent).}
 
 \item{seeding}{logical, default \code{FALSE}, if \code{seeding=TRUE} a fixed seed is applied for result reproducibility.}
 }

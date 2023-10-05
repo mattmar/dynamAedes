@@ -1,5 +1,5 @@
 ---
-title: "The regional scale model"
+title: "3. The regional scale model"
 author: "Daniele Da Re, Sophie 0. Vanwambeke, Matteo Marcantonio"
 output: 
   rmarkdown::html_vignette:
@@ -14,6 +14,7 @@ date: "`r Sys.Date()`"
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(fig.width=10, fig.height=10, fig.asp = 0.618, out.width = "95%", fig.align = "center", fig.dpi = 150, collapse = FALSE, comment = "#") 
+options(rmarkdown.html_vignette.check_title = FALSE)
 ```
 
 This tutorial explains step-by-step the main features of **dynamAedes** package, a unified modelling framework for invasive *Aedes* mosquitoes. Users can apply the stochastic, time-discrete and spatially-explicit population dynamical model initially developed in [Da Re et al., (2021)](https://doi.org/10.1016/j.ecoinf.2020.101180) for *Aedes aegypti* and then expanded for other three species: *Ae. albopictus*, *Ae. japonicus* and *Ae. koreicus* [Da Re et al., (2022)](https://doi.org/10.1186/s13071-022-05414-4).
@@ -22,24 +23,6 @@ The model is driven by temperature, photoperiod and intra-specific larval compet
 
 We will describe the model applications for *Ae. albopictus* and for all spatial scales by using a simulated temperature dataset.
 
-```{r,  message=FALSE, warning=FALSE}
-#Load packages
-require(spatstat)
-require(gstat)
-require(parallel)
-require(eesim)
-require(dplyr)
-require(geosphere)
-require(ggplot2)
-require(terra)
-require(rgdal)
-require(raster)
-require(dynamAedes)
-
-Sys.setlocale("LC_TIME", "en_GB.UTF-8")  
-```
-
-# Regional scale model
 The model at regional scale is the same as running the model at "punctual" scale for each cell of the grid but without accounting for active or passive dispersal. Each cell is therefore a close unit or mosquito population. With this setting, the model requires two input datasets: 
 
 * a numerical temperature matrix (in degree Celsius) defined in space and time (space in the rows, time in the columns);
@@ -51,10 +34,30 @@ For the purpose of this tutorial, we will use the following simulated datasets:
   2. A 1-year long spatially and temporally correlated temperature time series; 
 
 
-## Prepare input data
-### Create lattice arena
+# 1. Input data
+
+## 1.1 Create lattice arena
+
 First, we define the physical space into which the introduction of our mosquitoes will happen. 
 We define a squared lattice arena having 5 km side and 250 m resolution (20 colums and 20 rows, 400 total cells).
+
+```{r,  message=FALSE, warning=FALSE}
+#Load packages
+# spatial analysis
+library(gstat)
+library(terra)
+
+# simulate temperatures
+library(eesim)
+
+# modelling 
+library(dynamAedes)
+
+# data manipulation and plotting
+library(dplyr)
+library(ggplot2)
+Sys.setlocale("LC_TIME", "en_GB.UTF-8")  
+```
 
 ```{r}
 gridDim <- 20 # 5000m/250 m = 20 columns and rows
@@ -78,29 +81,29 @@ set.seed(123)
 xyz <- predict(zDummy, newdata=xy, nsim=1)
 ```
 
-We generate a spatially autocorrelated raster adding the SA variable (*xyz$sim1*) to the RasterLayer object. The autocorrelated surface could for example represent the distribution of vegetation cover in a urban landscape.
+We generate a spatially autocorrelated raster adding the SA variable (*xyz$sim1*) to the SpatRaster object. The autocorrelated surface could for example represent the distribution of vegetation cover in a urban landscape.
+
 ```{r}
 utm32N <- "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
-r <- raster(nrow=gridDim, ncol=gridDim, crs=utm32N, ext=extent(1220000,1225000, 5700000,5705000))
+r <- terra::rast(nrow=gridDim, ncol=gridDim, crs=utm32N, ext=terra::ext(1220000,1225000, 5700000,5705000))
+terra::values(r) <- xyz$sim1
+plot(r, main="SAC landscape")
 
-values(r)=xyz$sim1
-plot(r)
-
-df <- data.frame("id"=1:nrow(xyz), raster::coordinates(r))
-bbox <- as(extent(r), "SpatialPolygons")
+# convert to a data.frame
+df <- data.frame("id"=1:nrow(xyz), terra::crds(r))
+bbox <- terra::as.polygons(terra::ext(r), crs=utm32N)
 
 # Store Parameters for autocorrelation
-autocorr_factor <- values(r)
+autocorr_factor <- terra::values(r)
 ```
 
-
-### Simulate temperature data with seasonal trend
-We first simulate a 1-year temperature time series with seasonal trend. For the time series we consider a mean value of 16°C and standard deviation of 2°C.
+## 1.2 Simulate temperature data with seasonal trend
+We  simulate a 1-year temperature time series with seasonal trend. For the time series we consider a mean value of 16°C and standard deviation of 2°C.
 
 ```{r}
 ndays = 365*1 #length of the time series in days
 set.seed(123)
-sim_temp <- create_sims(n_reps = 1, 
+sim_temp <- eesim::create_sims(n_reps = 1, 
                         n = ndays, 
                         central = 16, 
                         sd = 2, 
@@ -126,13 +129,12 @@ plot(sim_temp[[1]]$date,
 ```
 
 We can then "expand onto space" the temperature time series by multiplying it with the autocorrelated surface simulated above. 
+
 ```{r}
-mat <- lapply(1:ncell(r), function(x) {
+mat <- do.call(rbind, lapply(1:ncell(r), function(x) {
 	d_t <- sim_temp[[1]]$x*autocorr_factor[[x]]
 	return(d_t)
-})
-
-mat <- do.call(rbind,mat)
+}))
 ```
 
 ```{r,  message=FALSE, warning=FALSE, hide=TRUE}
@@ -142,7 +144,7 @@ oldpar <- par(mfrow = c(1,2))
 A comparison between the distribution of the initial temperature time series and autocorrelated temperature surface
 ```{r}
 par(mfrow=c(2,1))
-hist(mat, xlab="Temperature (°C)", main="Histogram of simulated spatial autocorreled temperatures")
+hist(mat, xlab="Temperature (°C)", main="Histogram of simulated spatial autocorreled temperature")
 hist(sim_temp[[1]]$x, xlab="Temperature (°C)", main="Histogram of simulated temperatures", col="red")
 par(mfrow=c(1,1))
 ```
@@ -151,14 +153,18 @@ par(mfrow=c(1,1))
 par(oldpar) 
 ```
 
-# Format temperature data
+
+### 1.2.1 Format temperature data
 ```{r}
 names(mat) <- paste0("d_", 1:ndays)
 df_temp <- cbind(df, mat)
 ```
 
-## Model settings
+# 2. Modelling 
+## 2.1 Model settings
+
 Float numbers in the temperature matrix would slow the computational speed, thus we first multiply them by 1000 and then transform them in integer numbers. **w** will be subset to match the simulated time period below.
+
 ```{r}
 w <- sapply(df_temp[,-c(1:3)], function(x) as.integer(x*1000))
 ```
@@ -171,30 +177,31 @@ cc <- df_temp[,c("x","y")]
 We are now left with a few model variables which need to be defined.
 ```{r, evaluate=FALSE}
 ## Define the day of introduction (May 1st is day 1)
-str = "2000-06-01"
+str <- "2000-06-01"
 ## Define the end-day of life cycle (July 2nd is the last day)
-endr = "2000-07-02"
+endr <- "2000-07-02"
 ## Define the number of eggs to be introduced
-ie = 100
+ie <- 100
 ## Define the number of model iterations
-it = 1 # The higher the number of simulations the better
+it <- 1 # The higher the number of simulations the better
 ## Define the number of liters for the larval density-dependent mortality
-habitat_liters=1
+habitat_liters <- 1
 ## Define proj4 string for input coordinates
-utm32N = "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs" 
+utm32N <- "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs" 
 ## Define the number of parallel processes (for sequential iterations set nc=1)
-cl = 1
+cl <- 1
 ```
 
-### Run the model
+## 2.2 Run the model
+
 Running the model with the settings specified in this example takes about 3 minutes.
 ```{r results='hide', message=FALSE, warning=FALSE, evaluate=FALSE}
-simout=dynamAedes.m(species="albopictus", 
+simout <- dynamAedes.m(species="albopictus", 
             scale="rg",  
             jhwv=habitat_liters,  
             temps.matrix=w[,as.numeric(format(as.Date(str),"%j")):as.numeric(format(as.Date(endr),"%j"))],
             coords.proj4=utm32N,
-            cells.coords=cc,
+            cells.coords=as.matrix(cc),
             startd=str,
             endd=endr,
             n.clusters=cl,
@@ -204,7 +211,7 @@ simout=dynamAedes.m(species="albopictus",
             seeding=TRUE,
             verbose=FALSE)
 ```
-## Analyse the results
+#3. Analyse the results
 We first explore model output structure: the *simout* object is a nested list.
 
 The **first** level corresponds to the number of model iterations
@@ -226,9 +233,9 @@ dim(simout[[1]][[1]])
 ```
 We can now use the auxiliary functions of the package to Analyse the results. 
 
-### Derive probability of a successfull introduction at the end of the simulated period
-First, we can retrieve the "probability of a successful introduction", computed as the proportion of model
-iterations that resulted in a viable mosquito population (in any cells of the grid) at a given date.
+## 3.1 Derive probability of a successfull introduction at the end of the simulated period
+
+First, we can retrieve the "probability of a successful introduction", computed as the proportion of model iterations that resulted in a viable mosquito population (in any cells of the grid) at a given date.
 ```{r, evaluate=FALSE}
 psi(input_sim = simout, eval_date = 30)
 ```
@@ -239,7 +246,7 @@ We can also get a "spatial output", using the function *psi_sp*, which requires 
 plot(psi_sp(coords = cc, input_sim = simout, eval_date = 30, n.clusters=cl))
 ```
 
-### Derive abundance 95% CI for each life stage and in each day
+## 3.2 Derive abundance 95% CI for each life stage and in each day
 We can now compute the interquantile range abundance of the simulated population using the function *adci* over the whole landscape. 
 ```{r message=FALSE, warning=FALSE, evaluate=FALSE}
 dd <- max(sapply(simout, function(x) length(x)))#retrieve the maximum number of simulated days
@@ -248,25 +255,23 @@ juv <- as.data.frame(adci(simout, eval_date=1:dd, breaks=c(0.25,0.50,0.75), st=2
 ad <- as.data.frame(adci(simout, eval_date=1:dd, breaks=c(0.25,0.50,0.75), st=3))
 eggd <- as.data.frame(adci(simout, eval_date=1:dd, breaks=c(0.25,0.50,0.75), st=4))
 
-egg$myStage='Egg'
-juv$myStage='Juvenile'
-ad$myStage='Adult'
-eggd$myStage='Diapausing egg'
+egg$myStage <- 'Egg'
+juv$myStage <- 'Juvenile'
+ad$myStage <- 'Adult'
+eggd$myStage <- 'Diapausing egg'
 
-outdf=bind_rows(egg, juv, ad, eggd) %>% 
-  as_tibble()
-
+outdf <- rbind(egg, juv, ad, eggd) 
 outdf$Date=rep(seq.Date(as.Date(str),as.Date(str)+dd-1, by="day"),4)
 
 outdf %>% 
   mutate(myStage=factor(myStage, levels= c('Egg', 'Diapausing egg', 'Juvenile', 'Adult'))) %>% 
   ggplot( aes(y=(`50%`),x=Date, group=factor(myStage),col=factor(myStage))) +
   ggtitle("Ae. albopictus Interquantile range abundance")+
-  geom_line(linewidth=1.2)+
   geom_ribbon(aes(ymin=`25%`,ymax=(`75%`),fill=factor(myStage)),
               col="white",
               alpha=0.2,
               outline.type="full")+
+  geom_line(linewidth=1.2)+
   labs(x="Date", y="Interquantile range abundance", col="Stage", fill="Stage")+
   facet_wrap(~myStage, scales = "free")+
   theme_light()+

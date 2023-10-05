@@ -28,7 +28,7 @@
 #' @param sparse.output logical. The output matrix is optimised for sparse-matrix algebra (e.g. zeros are indexed).
 #' @param compressed.output logical. Default TRUE, if FALSE provide abundance for each model's subcompartiment; if FALSE abundances are summed per compartment.
 #' @param suffix character. Model output suffix for output RDS. 
-#' @param verbose integer. if 1 then an overview of population dynamics is printed in the console, if 2 more information on population dinamycs are printed out. Default is 0 (silent).
+#' @param verbose integer. if 1 then an overview of population dynamics is printed in the console, if 2 more information on population dynamics are printed out. Default is 0 (silent).
 #' @param seeding logical, default \code{FALSE}, if \code{seeding=TRUE} a fixed seed is applied for result reproducibility.  
 #' @return Matrix or a list of matrices containing, for each iteration, the number of individuals in each life stage per day (and for each grid cell of the study area if scale="lc" or "rg"). If the argument compressed.output=FALSE (default TRUE), the model returns the daily number of individuals in each life stage sub-compartment.	
 #' @example inst/examples/dynamAedes.m.R
@@ -84,7 +84,7 @@ if(scale!="ws") {
 		if( is.na(coords.proj4) ) {
 			stop("No proj4 string for input coordinates. Please set 'coords.proj4' option.")
 			} else {
-				cells.coords.photo <- as.data.frame(coordinates(spTransform(SpatialPoints(cells.coords, proj4string=CRS(coords.proj4)), CRSobj=CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))))
+				cells.coords.photo <- terra::crds(terra::project(terra::vect(x= cells.coords, type="points", atts=NULL, crs=coords.proj4), "EPSG:4326"), df=TRUE)
 			}
 		}
 		if( maxlat>90 )	{
@@ -116,7 +116,7 @@ if( is.na(avgpdisp) ) {
 if( species!="aegypti" ){
 	doy <- as.numeric(format(seq(as.POSIXct(startd), as.POSIXct(as.Date(startd)+dayspan), by='day'), "%j"))
 	if( scale=="rg" ) {
-		photo.matrix <- lapply(doy, function(x){daylength(lat=cells.coords.photo[,2], doy=x)})
+		photo.matrix <- lapply(doy, function(x){geosphere::daylength(lat=cells.coords.photo[,2], doy=x)})
 		photo.matrix <- do.call(cbind,photo.matrix)
 		} else if( !is.na(lat)&!is.na(long) ) {
 			dl <- daylength(lat,doy)
@@ -135,7 +135,7 @@ if(cluster.type=="PSOCK") {
 	cl <- makeCluster(spec=n.clusters, type=cluster.type, nnodes=n.clusters, outfile="")
 	} else(message("The only supported `cluster.type` is SOCK"))
 ## Register the environment 
-registerDoParallel(cl, cores=n.clusters)
+doParallel::registerDoParallel(cl, cores=n.clusters)
 if(seeding) parallel::clusterEvalQ(cl, set.seed(2021))
 ## Define space dimensionality into which simulations occour
 space <- nrow(temps.matrix)
@@ -145,7 +145,7 @@ pb <- txtProgressBar(char = "%", min = 0, max = iter, style = 3)
 ### End of preamble ###
 #%%%%%%%%%%%%%%%%%%%%%#
 ### Iterations: start parallelised introduction "iteration" ###
-rs <- foreach( iteration=1:iter, .packages="foreach", .export = ls(globalenv()) ) %dopar% {
+rs <- foreach::foreach( iteration=1:iter, .packages="foreach", .export = ls(globalenv()) ) %dopar% {
 ## Condition to satisfy to stop the life cycle: sum(pop) == 0, in case the day before extinction has happened
 stopit <- FALSE
 ## Update progress bar
@@ -471,6 +471,6 @@ if( !is.na(suffix) ) {
 	saveRDS(rs, paste(suffix,".RDS",sep=""))
 	} else message("\n\n\n########################################\n## Iterations concluded.##\n########################################\n\n\n")
 # Close cluster
-stopCluster(cl)
+parallel::stopCluster(cl)
 return(rs)
 }

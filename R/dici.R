@@ -38,10 +38,10 @@ dici <- function(input_sim=NULL, coords=NULL, eval_date=NULL, breaks=c(0.25,0.5,
 				coords1$inv <- 0
 				coords1$inv[x[[maxdate]]] <- 1
 				names(coords1)=c("X", "Y", paste0("day",maxdate,"_inv_cells_Iteration"))
-				coords1 <- rasterFromXYZ(coords1)
+				coords1 <- terra::rast(coords1, type="xyz")
 				return(coords1)
 			})
-			return(stack(outs))
+			return(do.call(c,outs))
 		}
 	}
 }

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">dynamAedes</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.5</span>
       </span>
     </div>
 
@@ -32,13 +32,13 @@
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
-      <a href="../articles/dynamAedes_local.html">The local scale model</a>
+      <a href="../articles/dynamAedes_01_punctual.html">1. The punctual scale model</a>
     </li>
     <li>
-      <a href="../articles/dynamAedes_punctual.html">The punctual scale model</a>
+      <a href="../articles/dynamAedes_02_local.html">2. The local scale model</a>
     </li>
     <li>
-      <a href="../articles/dynamAedes_regional.html">The regional scale model</a>
+      <a href="../articles/dynamAedes_03_regional.html">3. The regional scale model</a>
     </li>
   </ul></li>
 <li>
@@ -64,11 +64,26 @@
     </div>
 
     <div class="section level2">
+<h2 class="page-header" data-toc-text="2.2.5" id="dynamaedes-225">dynamAedes 2.2.5<a class="anchor" aria-label="anchor" href="#dynamaedes-225"></a></h2>
+<ul><li>Removes definitely rgdal from package</li>
+<li>Clears NAMESPACE</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="2.2.0" id="dynamaedes-220">dynamAedes 2.2.0<a class="anchor" aria-label="anchor" href="#dynamaedes-220"></a></h2>
+<ul><li>Substitutes <code><a href="https://rdrr.io/pkg/fields/man/rdist.html" class="external-link">fields::rdist</a></code> with terra::distance which solves a bug in active dispersal</li>
+<li>Adds a switch for active dispersal only <code>pDispersal=FALSE</code>
+</li>
+<li>Removes warnings changing Beta function with polynomial for egg survival in Aedes aegypti</li>
+<li>Raised 0 hatching rate to 15°C for aegypti</li>
+<li>Other minor cosmetic changes</li>
+<li>Modify verbose option for debugging, now an integer with values 0 (silent), 1 or 2.</li>
+</ul></div>
+    <div class="section level2">
 <h2 class="page-header" data-toc-text="2.1.2" id="dynamaedes-212">dynamAedes 2.1.2<small>2023-03-30</small><a class="anchor" aria-label="anchor" href="#dynamaedes-212"></a></h2>
 <ul><li>Transitioning from ‘rgdal’ and ‘sp’ to ‘terra’</li>
 <li>Transitioning from ‘insol’ to ‘geosphere’</li>
 <li>Removing block-loading of ‘tidyverse’ (speeding up loading?)</li>
-<li>Helper functions not anymore exported</li>
+<li>Helper functions not exported any more</li>
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="2.1.1" id="dynamaedes-211">dynamAedes 2.1.1<small>2022-12-09</small><a class="anchor" aria-label="anchor" href="#dynamaedes-211"></a></h2>
@@ -78,7 +93,7 @@
 <ul><li>Adding website with examples for the three scales (pkgdown)</li>
 <li>Coordinates now internally transformed (if not in lat/long) for the derivation of the photoperiod</li>
 <li>Adding option <strong>coords.proj4</strong> to specify coordinate projection (in proj4 format)</li>
-<li>Renaming dynamAedes as dynamAedes</li>
+<li>Renaming dynamAedes as dynamAedes.m</li>
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="2.0.3" id="dynamaedes-203">dynamAedes 2.0.3<a class="anchor" aria-label="anchor" href="#dynamaedes-203"></a></h2>

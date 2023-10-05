@@ -39,11 +39,14 @@ psi_sp = function(input_sim=NULL,coords=NULL, eval_date=NULL, n.clusters=1) {
 			my.out=Reduce('+', mylist)/length(input_sim)
   		#rasterize
 		}
-		return(stack(apply(my.out, 2, function(x) {
+		rateList <- apply(my.out, 2, function(x) {
 			rate.sp=as.data.frame(cbind(coords, data.frame(x)))
-			names(rate.sp)=c("X", "Y", "ProbIntro")
-			rate.sp<-rasterFromXYZ(rate.sp)
-			return(rate.sp)
-		})))
+			#names(rate.sp)=c("X", "Y", "ProbIntro")
+			rate.sp<-terra::rast(rate.sp, type="xyz")
+			#return(rate.sp)
+		})
+		rateList <-do.call(c, unname(rateList))
+		names(rateList) <- my_names
+		return(rateList)
 	}
 }
