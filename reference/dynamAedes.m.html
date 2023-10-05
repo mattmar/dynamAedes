@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">dynamAedes</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.5</span>
       </span>
     </div>
 
@@ -32,13 +32,13 @@
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
-      <a href="../articles/dynamAedes_local.html">The local scale model</a>
+      <a href="../articles/dynamAedes_01_punctual.html">1. The punctual scale model</a>
     </li>
     <li>
-      <a href="../articles/dynamAedes_punctual.html">The punctual scale model</a>
+      <a href="../articles/dynamAedes_02_local.html">2. The local scale model</a>
     </li>
     <li>
-      <a href="../articles/dynamAedes_regional.html">The regional scale model</a>
+      <a href="../articles/dynamAedes_03_regional.html">3. The regional scale model</a>
     </li>
   </ul></li>
 <li>
@@ -87,6 +87,7 @@
 <span>  long <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  road.dist.matrix <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  avgpdisp <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  pDispersal <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  iter <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  n.clusters <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  cluster.type <span class="op">=</span> <span class="st">"PSOCK"</span>,</span>
@@ -96,7 +97,7 @@
 <span>  cellsize <span class="op">=</span> <span class="fl">250</span>,</span>
 <span>  maxadisp <span class="op">=</span> <span class="fl">600</span>,</span>
 <span>  dispbins <span class="op">=</span> <span class="fl">10</span>,</span>
-<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  seeding <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -141,11 +142,11 @@
 
 
 <dt>startd</dt>
-<dd><p>Character  date (ISO format "%Y-%m-%d"). Date of start of simulations.</p></dd>
+<dd><p>Character date (ISO format "%Y-%m-%d"). Date of start of simulations.</p></dd>
 
 
 <dt>endd</dt>
-<dd><p>Character  date (ISO format "%Y-%m-%d"). Date of end of simulation. It can be <code>NA</code>; then it will be derived using the number of columns in <code>temps.matrix</code>.</p></dd>
+<dd><p>Character date (ISO format "%Y-%m-%d"). Date of end of simulation. It can be <code>NA</code>; then it will be derived using the number of columns in <code>temps.matrix</code>.</p></dd>
 
 
 <dt>cells.coords</dt>
@@ -165,11 +166,15 @@
 
 
 <dt>road.dist.matrix</dt>
-<dd><p>matrix. when <code>scale = "lc"</code>, defines the matrix containing the distances (in meters) between grid cells intersecting the road network for the mosquito passive dispersal process.</p></dd>
+<dd><p>matrix. when <code>scale = "lc"</code>, defines the matrix containing the distances (in meters) between grid cells intersecting the road network for the mosquito passive dispersal process. colnames(road.dist.matrix) must correspond to the same cell in temps.matrix (may be an issue if the coordinates used for creating road.dist.matrix have been subset to match road segments).</p></dd>
 
 
 <dt>avgpdisp</dt>
-<dd><p>optional. when <code>scale = "lc"</code>, define the average car trip distance for the mosquito passive dispersal process. The value can be set by the users (positive numeric), or the estimates made by <a href="https://publications.jrc.ec.europa.eu/repository/handle/JRC77079" class="external-link">Pasaoglu et al. 2012</a>) for the following European countries: France "fra", Germany "deu", Italy "ita", Poland "pol", Spain "esp" and the United Kingdom "uk". The average passive dispersal distance must be smaller than the maximum distance in <strong>road.dist.matrix</strong>.</p></dd>
+<dd><p>optional. when <code>scale = "lc"</code>, define the average car trip distance (in meters) for the mosquito passive dispersal process. The value can be set by the users (positive numeric), or the estimates made by <a href="https://publications.jrc.ec.europa.eu/repository/handle/JRC77079" class="external-link">Pasaoglu et al. 2012</a>) for the following European countries: France "fra", Germany "deu", Italy "ita", Poland "pol", Spain "esp" and the United Kingdom "uk". The average passive dispersal distance must be smaller than the maximum distance in <strong>road.dist.matrix</strong>.</p></dd>
+
+
+<dt>pDispersal</dt>
+<dd><p>boolean. if TRUE (default) then the model considers passive dispersal.</p></dd>
 
 
 <dt>iter</dt>
@@ -197,19 +202,19 @@
 
 
 <dt>cellsize</dt>
-<dd><p>(positive integer. When <code>scale = "lc"</code>, defines the minimal distance for the active dispersal kernel and should match the spatial resolution of temps.matrix to avoid inconsistencies. Default cellsize = 250</p></dd>
+<dd><p>positive integer. When <code>scale = "lc"</code>, defines the minimal distance for the active dispersal kernel and should match the spatial resolution of temps.matrix to avoid inconsistencies. Default cellsize = 250.</p></dd>
 
 
 <dt>maxadisp</dt>
-<dd><p>positive integer. When <code>scale = "lc"</code>, defines the maximum daily dispersal, default maxadisp = 600.</p></dd>
+<dd><p>positive integer. When <code>scale = "lc"</code>, defines the maximum daily active dispersal, default maxadisp = 600.</p></dd>
 
 
 <dt>dispbins</dt>
-<dd><p>positive integer. When scale = "lc", defines the resolution of the dispersal kernel, default dispbins = 10.</p></dd>
+<dd><p>positive integer. When scale = "lc", defines the resolution of the active dispersal kernel, default dispbins = 10.</p></dd>
 
 
 <dt>verbose</dt>
-<dd><p>logical. if TRUE then an overview of population dynamics is printed in the console.</p></dd>
+<dd><p>integer. if 1 then an overview of population dynamics is printed in the console, if 2 more information on population dynamics are printed out. Default is 0 (silent).</p></dd>
 
 
 <dt>seeding</dt>
@@ -261,28 +266,28 @@
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ########################################</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ## Iterations concluded.              ##</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ## Iterations concluded.##</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ########################################</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[1]][[1]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              [,1]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> egg             4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> juvenile        6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> adult           0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> diapause_egg    0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]][[2]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              [,1]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> egg             2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> juvenile        8</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> adult           0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> diapause_egg    0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]][[2]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              [,1]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> egg             0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> juvenile        9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> adult           0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> diapause_egg    0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[1]][[3]]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              [,1]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> egg             1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> egg             0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> juvenile        9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> adult           0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> diapause_egg    0</span>

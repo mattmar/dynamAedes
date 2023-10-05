@@ -2,8 +2,8 @@ pandoc: 2.19.2
 pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
-  dynamAedes_local: dynamAedes_local.html
-  dynamAedes_punctual: dynamAedes_punctual.html
-  dynamAedes_regional: dynamAedes_regional.html
-last_built: 2023-07-27T08:51Z
+  dynamAedes_01_punctual: dynamAedes_01_punctual.html
+  dynamAedes_02_local: dynamAedes_02_local.html
+  dynamAedes_03_regional: dynamAedes_03_regional.html
+last_built: 2023-10-05T11:25Z
 
