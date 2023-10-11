@@ -8,8 +8,13 @@
 #' @export
 
 psi <- function(input_sim=NULL, eval_date=NULL){
+	if(!is.numeric(eval_date)) {
+		stop("eval_date not defined, exiting...")
+	}
+
+	input_sim = input_sim@simulation
 	if( max(eval_date) > max(sapply(input_sim,length)) ) {
-		stop("eval_date > than maximum number of simulated days across all iterations...")
+		stop("eval_date > maximum number of simulated days across all iterations...")
 	} else {
 		pe_out <- sapply(eval_date, function(y) {
 			pe <- sum(unlist(lapply(input_sim, function(x) {

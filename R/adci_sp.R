@@ -10,12 +10,18 @@
 #' @author Matteo Marcantonio \email{marcantoniomatteo@gmail.com}, Daniele Da Re \email{daniele.dare@uclouvain.be}
 #' @export
 
-adci_sp=function (input_sim = NULL, coords = NULL, eval_date = NULL, stage = 1, breaks = c(0.25, 0.5, 0.75)){
+adci_sp=function (input_sim = NULL, eval_date = NULL, stage = 1, breaks = c(0.25, 0.5, 0.75)){
+    if(!is.numeric(eval_date)) {
+      stop("eval_date not defined, exiting...")
+    } 
+
+  input_sim=input_sim@simulation
+
   if(stage<1|stage>4) {
     stop("stage can be 1 (egg), 2 (juvenile), 3 (adult), 4 (diapausing eggs) ...")
   }
   if (max(eval_date) > max(sapply(input_sim, length))) {
-    stop("eval_date > than number of simulated days...")
+    stop("eval_date > number of simulated days...")
   }
   if (all(unlist(lapply(input_sim, function(x) {
     sapply(x, length)

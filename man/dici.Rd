@@ -6,7 +6,6 @@
 \usage{
 dici(
   input_sim = NULL,
-  coords = NULL,
   eval_date = NULL,
   breaks = c(0.25, 0.5, 0.75),
   space = FALSE
@@ -14,8 +13,6 @@ dici(
 }
 \arguments{
 \item{input_sim}{matrix. \code{dynamAedes.m} compressed output matrix (\code{compressed=TRUE}).}
-
-\item{coords}{matrix. A matrix reporting the spatial coordinates of the temperature observations.}
 
 \item{eval_date}{numeric. Define the day of evaluation; it refers to the column number of the input temperature matrix.}
 

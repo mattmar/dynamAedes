@@ -5,14 +5,14 @@
 \title{Life cycle simulation of \emph{Aedes} mosquitoes}
 \usage{
 dynamAedes.m(
-  species = "aegypti",
+  species = NULL,
   intro.eggs = 0,
   intro.deggs = 0,
   intro.adults = 0,
   intro.juveniles = 0,
-  scale = "ws",
+  scale = NULL,
   intro.cells = NULL,
-  jhwv = 2,
+  jhwv = NULL,
   temps.matrix = NULL,
   startd = 1,
   endd = NA,
@@ -26,7 +26,6 @@ dynamAedes.m(
   iter = 1,
   n.clusters = 1,
   cluster.type = "PSOCK",
-  sparse.output = FALSE,
   compressed.output = TRUE,
   suffix = NA,
   cellsize = 250,
@@ -78,8 +77,6 @@ dynamAedes.m(
 \item{n.clusters}{positive integer. Defines the number of parallel processes.}
 
 \item{cluster.type}{character. Defines the type of cluster, default "PSOCK".}
-
-\item{sparse.output}{logical. The output matrix is optimised for sparse-matrix algebra (e.g. zeros are indexed).}
 
 \item{compressed.output}{logical. Default TRUE, if FALSE provide abundance for each model's subcompartiment; if FALSE abundances are summed per compartment.}
 

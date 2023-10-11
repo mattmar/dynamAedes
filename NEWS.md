@@ -1,3 +1,7 @@
+# dynamAedes 2.2.6
+* Introduces output object as a dynamAedesClass
+* Allows for species abbreviation at least 2 characters long (e.g., "ae")
+
 # dynamAedes 2.2.5
 * Removes definitely rgdal from package
 * Clears NAMESPACE

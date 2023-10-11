@@ -8,7 +8,7 @@ adci(
   input_sim = NA,
   stage = 1,
   n.clusters = 1,
-  eval_date = 0,
+  eval_date = NULL,
   breaks = c(0.25, 0.5, 0.75)
 )
 }

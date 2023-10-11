@@ -8,9 +8,15 @@
 #' @author Matteo Marcantonio \email{marcantoniomatteo@gmail.com}, Daniele Da Re \email{daniele.dare@uclouvain.be}
 #' @export
 
-icci <- function(input_sim=NA, eval_date=0, breaks=c(0.25,0.5,0.75)){
+icci <- function(input_sim=NA, eval_date=NULL, breaks=c(0.25,0.5,0.75)){
+	if(!is.numeric(eval_date)) {
+		stop("eval_date not defined, exiting...")
+	}	
+
+
+	input_sim = input_sim@simulation
 	if( max(eval_date) > max(sapply(input_sim,length)) ) {
-		stop("eval_date > than number of simulated days...")
+		stop("eval_date > number of simulated days...")
 	}
 	if( all(unlist(lapply(input_sim, function(x) { sapply(x,length) } ))==4) ) {
 		stop("Non-spatial data, set scale='lc' or scale='rg' in dynamAedes.m()")

@@ -4,12 +4,10 @@
 \alias{psi_sp}
 \title{Probability of successful introduction (spatial)}
 \usage{
-psi_sp(input_sim = NULL, coords = NULL, eval_date = NULL, n.clusters = 1)
+psi_sp(input_sim = NULL, eval_date = NULL, n.clusters = 1)
 }
 \arguments{
 \item{input_sim}{matrix. \code{dynamAedes.m} compressed output matrix (\code{compressed=TRUE}).}
-
-\item{coords}{matrix. A matrix reporting the spatial coordinates of temperature observations.}
 
 \item{eval_date}{positive integer. Define the day(s) to calculate the proportion of successful introductions which should match the column number of the temperature matrix used to inform the model.}
 

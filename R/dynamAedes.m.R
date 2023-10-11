@@ -25,7 +25,6 @@
 #' @param dispbins positive integer. When scale = "lc", defines the resolution of the active dispersal kernel, default dispbins = 10.
 #' @param n.clusters positive integer. Defines the number of parallel processes.
 #' @param cluster.type character. Defines the type of cluster, default "PSOCK".
-#' @param sparse.output logical. The output matrix is optimised for sparse-matrix algebra (e.g. zeros are indexed).
 #' @param compressed.output logical. Default TRUE, if FALSE provide abundance for each model's subcompartiment; if FALSE abundances are summed per compartment.
 #' @param suffix character. Model output suffix for output RDS. 
 #' @param verbose integer. if 1 then an overview of population dynamics is printed in the console, if 2 more information on population dynamics are printed out. Default is 0 (silent).
@@ -36,39 +35,46 @@
 #' @author Matteo Marcantonio \email{marcantoniomatteo@gmail.com}, Daniele Da Re \email{daniele.dare@uclouvain.be}
 #' @export
 
-dynamAedes.m <- function(species="aegypti", intro.eggs=0, intro.deggs=0, intro.adults=0, intro.juveniles=0, scale="ws", intro.cells=NULL, jhwv=2, temps.matrix=NULL, startd=1, endd=NA,
-	cells.coords=NULL, coords.proj4=NA, lat=NA, long=NA, road.dist.matrix=NULL, avgpdisp=NA, pDispersal=TRUE,
-	iter=1, n.clusters=1, cluster.type="PSOCK", sparse.output=FALSE, compressed.output=TRUE,
-	suffix=NA, cellsize=250, maxadisp=600, dispbins=10, verbose=0, seeding=FALSE) {
+dynamAedes.m <- function(species=NULL, intro.eggs=0, intro.deggs=0, intro.adults=0, intro.juveniles=0, scale=NULL, intro.cells=NULL, jhwv=NULL, temps.matrix=NULL, startd=1, endd=NA, cells.coords=NULL, coords.proj4=NA, lat=NA, long=NA, road.dist.matrix=NULL, avgpdisp=NA, pDispersal=TRUE, iter=1, n.clusters=1, cluster.type="PSOCK", compressed.output=TRUE,	suffix=NA, cellsize=250, maxadisp=600, dispbins=10, verbose=0, seeding=FALSE) {
 
 #%%%%%%%%%%%%%%%%%%%#
 ### Initial checks
-#Species
-if( !species%in%c("aegypti","albopictus","koreicus","japonicus") ) {
-	stop("Mosquito species not supported, exiting..." )
+# Check species names (abbreviation allowed: at least two characters)
+if(nchar(species) < 2) {
+  stop("Please provide an abbreviation that is at least two characters long.")
+}
+full_species <- c("aegypti", "albopictus", "koreicus", "japonicus")
+matches <- grep(paste0("^", species), full_species)
+if(length(matches) == 1) {
+  species <- full_species[matches]
+} else if(length(matches) > 1) {
+  stop("Ambiguous abbreviation provided, please be more specific, exiting...")
+} else {
+  stop("Mosquito species not supported, exiting...")
 }
 
-#Sasfer version of sample
+#Safer version of sample
 .resample <- function(x, ...) x[sample.int(length(x), ...)]
 
-#Define dayspan
-if( is.na(endd) ) {
-	if( nchar(strsplit(as.character(startd),"-")[[1]][1])<4 ) {
-		stop("Dates in the wrong format: change them to '%Y-%m-%d'.")
-	}
-	if ( is.vector(temps.matrix) ) {
-#-1 is because in day 1 you introduce and day 2 the life cycle begins?
-dayspan <- as.integer(ncol(temps.matrix)-1)
-} else { 
-	dayspan <- as.integer(ncol(temps.matrix)-1)
+# Check dayspan as well as date format function
+check_date_format <- function(date) {
+  if (!grepl("^\\d{4}-\\d{2}-\\d{2}$", date)) {
+    stop("Dates in the wrong format: change them to '%Y-%m-%d'.")
+  }
 }
-} 
-else {
-	if( nchar(strsplit(as.character(startd),"-")[[1]][1])<4 | nchar(strsplit(as.character(endd),"-")[[1]][1])<4 ) {
-		stop("Dates in the wrong format: change them to '%Y-%m-%d'.")
-	}
-	dayspan <- as.integer(as.Date(endd)-as.Date(startd))
+
+# Check start date format
+check_date_format(as.character(startd))
+
+# Determine dayspan
+if (is.na(endd)) {
+  dayspan <- ncol(temps.matrix) - 1
+} else {
+  # Check end date format
+  check_date_format(as.character(endd))
+  dayspan <- as.integer(as.Date(endd) - as.Date(startd))
 }
+
 # Set dayspan length
 cells.coords.photo <- cells.coords
 if( dayspan>ncol(temps.matrix) ) {
@@ -84,7 +90,7 @@ if(scale!="ws") {
 		if( is.na(coords.proj4) ) {
 			stop("No proj4 string for input coordinates. Please set 'coords.proj4' option.")
 			} else {
-				cells.coords.photo <- terra::crds(terra::project(terra::vect(x= cells.coords, type="points", atts=NULL, crs=coords.proj4), "EPSG:4326"), df=TRUE)
+				cells.coords.photo <- terra::crds(terra::project(terra::vect(x=cells.coords, type="points", atts=NULL, crs=coords.proj4), "EPSG:4326"), df=TRUE)
 			}
 		}
 		if( maxlat>90 )	{
@@ -472,5 +478,27 @@ if( !is.na(suffix) ) {
 	} else message("\n\n\n########################################\n## Iterations concluded.##\n########################################\n\n\n")
 # Close cluster
 parallel::stopCluster(cl)
-return(rs)
+
+#Return results as a dynamAedesClass
+return(
+	new("dynamAedesClass", 
+		species=species, 
+		scale=scale, 
+		start_date=startd, end_date=endd, 
+		n_iterations=iter, 
+		stage_intro=ifelse(!is.na(intro.eggs), "eggs", ifelse(!is.na(intro.juveniles), "juveniles", "adults")),
+		n_intro=ifelse(!is.na(intro.eggs), intro.eggs, ifelse(!is.na(intro.juveniles), intro.juveniles, intro.adults)),
+		coordinates=if(!scale=="ws") {matrix(cells.coords, ncol=2)} else{matrix(c(long, lat), byrow=TRUE, nrow=1)},
+		compressed_output=compressed.output,
+		jhwv=jhwv, 
+		simulation=rs,
+		dispersal=if(scale=="lc") {list(
+			pDispersal=pDispersal,
+			avg_p_disp_distance=avgpdisp,
+			max_a_disp_distance=maxadisp,
+			bins_a_disp_distance=dispbins,
+			cellSize_a_disp_distance=cellsize
+			)} else {as.list("Simulations without dispersal")}
+		)
+	)
 }

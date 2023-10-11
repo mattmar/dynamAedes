@@ -10,7 +10,14 @@
 #' @author Matteo Marcantonio \email{marcantoniomatteo@gmail.com}, Daniele Da Re \email{daniele.dare@uclouvain.be}
 #' @export
 
-adci <- function(input_sim=NA, stage=1, n.clusters=1, eval_date=0, breaks=c(0.25,0.5,0.75)){
+adci <- function(input_sim=NA, stage=1, n.clusters=1, eval_date=NULL, breaks=c(0.25,0.5,0.75)){
+	if(!is.numeric(eval_date)) {
+		stop("eval_date not defined, exiting...")
+	}	
+
+	coords = simout@coordinates
+	input_sim=input_sim@simulation
+
 	if(attributes(input_sim)$compressed) {
 		if(stage<1|stage>4) {
 			stop("stage can be 1 (egg), 2 (juvenile), 3 (adult), 4 (diapausing eggs) ...")

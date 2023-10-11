@@ -9,8 +9,15 @@ importFrom("stats", "dgamma", "dlnorm", "lm", "predict", "rbinom", "rmultinom", 
 importFrom("drc", "drm")
 importFrom("geosphere", "daylength")
 importFrom("terra", "distance","crds","project","vect")
+
 #####################################
 ##               Export            ##
 #####################################
+
+export(adci)
+export(adci_sp)
+export(dici)
 export(dynamAedes.m)
-export(psi, psi_sp, icci, adci, adci_sp, dici)
+export(icci)
+export(psi)
+export(psi_sp)
