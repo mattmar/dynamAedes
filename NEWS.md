@@ -1,3 +1,9 @@
+# dynamAedes 2.2.7
+* Adapts all auxiliary functions to the `dynamAedesClass` output.
+* Adds `adci` function that allows for substages statistics and merges space/non-space outputs.
+* Adds `summary` and `max` methods for class `dynamAedesClass`.
+* Removes dplyr from vignettes and packages.
+
 # dynamAedes 2.2.6
 * Introduces output object as a dynamAedesClass
 * Allows for species abbreviation at least 2 characters long (e.g., "ae")

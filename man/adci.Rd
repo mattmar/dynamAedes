@@ -2,33 +2,39 @@
 % Please edit documentation in R/adci.R
 \name{adci}
 \alias{adci}
-\title{Summaries of mosquito abundance.}
+\title{Summaries of mosquito abundance}
 \usage{
 adci(
-  input_sim = NA,
-  stage = 1,
-  n.clusters = 1,
+  input_sim = NULL,
+  stage = NULL,
+  sub_stage = NULL,
+  breaks = c(0.25, 0.5, 0.75),
   eval_date = NULL,
-  breaks = c(0.25, 0.5, 0.75)
+  n.clusters = 1,
+  type = "N"
 )
 }
 \arguments{
-\item{input_sim}{matrix. dynamAedes.m compressed output matrix.}
+\item{input_sim}{matrix. \code{dynamAedes} compressed or uncompressed output matrix.}
 
-\item{stage}{positive integer. 0 (all), 1 (egg), 2 (juvenile), 3 (adult), 4 (diapausing egg).}
+\item{stage}{character. "Eggs", "Juveniles", "Adults", or "DiapauseEggs" or any shorter attempt longer than 3 letters.}
 
-\item{n.clusters}{positive integer. Define the number of parallel processes.}
+\item{sub_stage}{character. For uncompressed outputs only, defines the substage of interest. Please see cheat-sheet table.}
 
-\item{eval_date}{positive integer. Define the day of successful introduction evaluation, referring to the column number of the temperature matrix used to inform the model.}
+\item{breaks}{numeric vector. Quantile breaks, default the first, the second and the third quartile: \code{c(0.25,0.5,0.75)}.}
 
-\item{breaks}{numeric vector. Quantile breaks, default the first, the second and the third quantile: \code{c(0.25,0.5,0.75)}.}
+\item{eval_date}{positive integer. Define the day to evaluate from the first day of introduction. Note that this can be particularly demanding in the case of spatial outputs.}
+
+\item{n.clusters}{integer. Number of parallel processes.}
+
+\item{type}{character. The type of output. Set "O" to force overall time-only summary over spatial. Default is "N" (normal).}
 }
 \value{
-Returns a table with the summary of mosquito abundance per life stage (or substage if \code{compressed.output=FALSE} in \code{dynamAedes.m} function) for each day.
+Returns a data frame or a raster with the summary of mosquito abundance at each life stage for each day.
 }
 \description{
-Summaries of mosquito abundance at each life stage for each day.
+Summaries of mosquito abundance at each life stage and sub-stage for each day.
 }
 \author{
-Matteo Marcantonio \email{marcantoniomatteo@gmail.com}, Daniele Da Re \email{daniele.dare@uclouvain.be}
+Matteo Marcantonio \email{marcantoniomatteo@gmail.com}, Daniele Da Re \email{dare.daniele@gmail.com}
 }

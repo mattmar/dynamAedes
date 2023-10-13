@@ -8,14 +8,15 @@ importFrom("utils", "setTxtProgressBar", "txtProgressBar")
 importFrom("stats", "dgamma", "dlnorm", "lm", "predict", "rbinom", "rmultinom", "rpois", "sortedXyData", "quantile", "setNames", "glm")
 importFrom("drc", "drm")
 importFrom("geosphere", "daylength")
-importFrom("terra", "distance","crds","project","vect")
+importFrom("terra", "distance","crds","project","vect","rast")
+importFrom("abind", "abind")
+importFrom("methods", "new")
 
 #####################################
 ##               Export            ##
 #####################################
 
 export(adci)
-export(adci_sp)
 export(dici)
 export(dynamAedes.m)
 export(icci)

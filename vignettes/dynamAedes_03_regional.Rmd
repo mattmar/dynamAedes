@@ -1,12 +1,12 @@
 ---
-title: "3. The regional scale model"
-author: "Daniele Da Re, Sophie 0. Vanwambeke, Matteo Marcantonio"
+title: "03. The Regional Scale Model"
+author: "Daniele Da Re, Sophie O. Vanwambeke, Matteo Marcantonio"
 output: 
   rmarkdown::html_vignette:
-  toc: true
-  toc_depth: 3
-vignette: >
-  %\VignetteIndexEntry{The regional scale model}
+    toc: true
+    toc_depth: 3
+vignette: |
+  %\VignetteIndexEntry{03. The Regional Scale Model}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 date: "`r Sys.Date()`"
@@ -17,46 +17,36 @@ knitr::opts_chunk$set(fig.width=10, fig.height=10, fig.asp = 0.618, out.width = 
 options(rmarkdown.html_vignette.check_title = FALSE)
 ```
 
-This tutorial explains step-by-step the main features of **dynamAedes** package, a unified modelling framework for invasive *Aedes* mosquitoes. Users can apply the stochastic, time-discrete and spatially-explicit population dynamical model initially developed in [Da Re et al., (2021)](https://doi.org/10.1016/j.ecoinf.2020.101180) for *Aedes aegypti* and then expanded for other three species: *Ae. albopictus*, *Ae. japonicus* and *Ae. koreicus* [Da Re et al., (2022)](https://doi.org/10.1186/s13071-022-05414-4).
+This vignette provides a comprehensive guide to the dynamAedes package, a unified modelling framework for invasive Aedes mosquitoes. Users can employ this spatially-explicit, time-discrete, stochastic population dynamical model, which was initially formulated for *Aedes aegypti* in [Da Re et al., (2021)](https://doi.org/10.1016/j.ecoinf.2020.101180) and subsequently adapted for Ae. albopictus, Ae. japonicus, and Ae. koreicus [Da Re et al., (2022)](https://doi.org/10.1186/s13071-022-05414-4).
 
-The model is driven by temperature, photoperiod and intra-specific larval competition and can be applied to three different spatial scales: punctual, local and regional. These spatial scales consider different degrees of spatial complexity and data availability, by accounting for both active and passive dispersal of the modelled mosquito species as well as for the heterogeneity of input temperature data.
+This model integrates factors like temperature, photoperiod, and intra-specific larval competition and is versatile across three spatial scales: punctual, local, and regional. The various scales provide flexibility in addressing spatial complexity and data availability, accommodating both active and passive mosquito dispersal and varying input temperature data.
 
-We will describe the model applications for *Ae. albopictus* and for all spatial scales by using a simulated temperature dataset.
+For illustrative purposes, this guide focuses on model applications for *Ae. albopictus* across all spatial scales using a simulated temperature dataset.
 
-The model at regional scale is the same as running the model at "punctual" scale for each cell of the grid but without accounting for active or passive dispersal. Each cell is therefore a close unit or mosquito population. With this setting, the model requires two input datasets: 
+At the regional scale, the model operates similarly to the "punctual" scale, processing each grid cell separately without considering active or passive dispersal. This makes each cell an isolated mosquito population. To execute the model in this context, two datasets are essential: 
 
-* a numerical temperature matrix (in degree Celsius) defined in space and time (space in the rows, time in the columns);
-* a two-column numerical matrix reporting the centroid coordinates (in meters) of each cell. 
+* A temperature matrix (in °C) spatially and temporally defined.
+* A two-column matrix showcasing the centroid coordinates (in meters) for every cell. 
 
-For the purpose of this tutorial, we will use the following simulated datasets:
+For the purpose of this guide, we will employ simulated datasets:
 
-  1. A 5 km lattice grid with 250 m cell size; 
-  2. A 1-year long spatially and temporally correlated temperature time series; 
+  1. A grid with a 5 km lattice and 250 m cell size.
+  2. A spatially and temporally correlated temperature time series spanning one year.
 
+# 1. Data Input
 
-# 1. Input data
+## 1.1 Defining the Lattice Arena
 
-## 1.1 Create lattice arena
-
-First, we define the physical space into which the introduction of our mosquitoes will happen. 
-We define a squared lattice arena having 5 km side and 250 m resolution (20 colums and 20 rows, 400 total cells).
+To begin, we will establish a squared lattice arena, which will serve as the site for our mosquito introduction. The chosen dimensions are 5 km on each side with a resolution of 250 m (comprising 20 columns and 20 rows, totalling 400 cells).
 
 ```{r,  message=FALSE, warning=FALSE}
-#Load packages
-# spatial analysis
+# Libraries
 library(gstat)
 library(terra)
-
-# simulate temperatures
 library(eesim)
-
-# modelling 
 library(dynamAedes)
-
-# data manipulation and plotting
-library(dplyr)
 library(ggplot2)
-Sys.setlocale("LC_TIME", "en_GB.UTF-8")  
+Sys.setlocale("LC_TIME", "en_GB.UTF-8")
 ```
 
 ```{r}
@@ -64,8 +54,7 @@ gridDim <- 20 # 5000m/250 m = 20 columns and rows
 xy <- expand.grid(x=1:gridDim, y=1:gridDim)
 ```
 
-We then add a spatial pattern into the lattice area. This spatial pattern will be used later to add spatial correllation (SAC) to the temperature time series. 
-The spatial autocorrelated pattern will be obtained using a semivariogram model with defined sill (value that the semivarion attains at the range) and range (distance of 0 spatial correlation) and then predicting the semivariogram model over the lattice grid using unconditional Gaussian simulation.
+To infuse a spatial element into the lattice area, we will overlay a spatial pattern, which will subsequently be used to impart spatial correlation to the temperature time series. This spatially correlated pattern is derived using a semivariogram model with a specified sill and range. We then predict this model over the grid using unconditional Gaussian simulation.
  
 ```{r, message=FALSE}
 varioMod <- vgm(psill=0.5, range=100, model='Exp') # psill = partial sill = (sill-nugget)
@@ -81,7 +70,7 @@ set.seed(123)
 xyz <- predict(zDummy, newdata=xy, nsim=1)
 ```
 
-We generate a spatially autocorrelated raster adding the SA variable (*xyz$sim1*) to the SpatRaster object. The autocorrelated surface could for example represent the distribution of vegetation cover in a urban landscape.
+Creating a spatially correlated raster with the SA variable enhances our understanding of environmental features like urban vegetation distribution.
 
 ```{r}
 utm32N <- "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
@@ -101,7 +90,7 @@ autocorr_factor <- terra::values(r)
 We  simulate a 1-year temperature time series with seasonal trend. For the time series we consider a mean value of 16°C and standard deviation of 2°C.
 
 ```{r}
-ndays = 365*1 #length of the time series in days
+ndays = 365
 set.seed(123)
 sim_temp <- eesim::create_sims(n_reps = 1, 
                         n = ndays, 
@@ -119,11 +108,11 @@ A visualisation of the distribution of temperature values and temporal trend.
 ```{r}
 hist(sim_temp[[1]]$x, 
      xlab="Temperature (°C)", 
-     main="Histogram of simulated temperatures")
+     main="Histogram of Simulated Temperatures")
 
 plot(sim_temp[[1]]$date,
      sim_temp[[1]]$x,
-     main="Simulated temperatures seasonal trend", 
+     main="Simulated Temperature Seasonal Trend", 
      xlab="Date", ylab="Temperature (°C)"
      )
 ```
@@ -152,7 +141,6 @@ par(mfrow=c(1,1))
 ```{r,  message=FALSE, warning=FALSE, hide=TRUE}
 par(oldpar) 
 ```
-
 
 ### 1.2.1 Format temperature data
 ```{r}
@@ -193,8 +181,8 @@ cl <- 1
 ```
 
 ## 2.2 Run the model
-
 Running the model with the settings specified in this example takes about 3 minutes.
+
 ```{r results='hide', message=FALSE, warning=FALSE, evaluate=FALSE}
 simout <- dynamAedes.m(species="albopictus", 
             scale="rg",  
@@ -212,27 +200,39 @@ simout <- dynamAedes.m(species="albopictus",
             verbose=FALSE)
 ```
 #3. Analyse the results
-We first explore model output structure: the *simout* object is a nested list.
-
-The **first** level corresponds to the number of model iterations
-```{r, evaluate=FALSE}
-print(it)
-print(length(simout))
+A first summary of simulations can be obtained with:
+```{r, warning=FALSE}
+summary(simout)
 ```
 
-The **second** level corresponds to the simulated days.
-So if we inspect the first iteration, we observe that the model has computed `rlength(simout[[1]])` days, since we have started the simulation on the 1st of July and ended on the 1st of August.
-```{r, evaluate=FALSE}
-length(simout[[1]])
+The *simout* object is a S4 object where simulation outputs and related details are saved in different slot:
+
+For example, the number of model iterations is saved in: 
+```{r, warning=FALSE, message=FALSE, results='hide'}
+simout@n_iterations
 ```
 
-The **third** level of the output list object corresponds to the amount of individuals for each stage (rows) within each grid cell of the landscape (columns).
-If we inspect the first day within the first iteration, we obtain a matrix having
-```{r, evaluate=FALSE}
-dim(simout[[1]][[1]])
+The simulation output is stored in:
+```{r, warning=FALSE, message=FALSE, results='hide'}
+simout@simulation
 ```
+
+Which is a list where the the **first** level stores simulation of different iteration, while the **second**corresponds to the simulated days in the corresponding iteration.
+If we inspect the first iteration, we observe that the model has computed `length(simout[[1]])` days, since we have started the simulation on the 1st of July and ended on the 1st of August.
+
+```{r, warning=FALSE}
+length(simout@simulation[[1]])
+```
+
+The **third** level corresponds to the quantity of individuals for each stage (rows) in each day within each grid cell of the landscape (columns).
+If we inspect the first day within the first iteration, we obtain a matrix having:
+```{r, evaluate=FALSE}
+dim(simout@simulation[[1]][[1]])
+```
+
 We can now use the auxiliary functions of the package to Analyse the results. 
 
+# 3. Analyse the results
 ## 3.1 Derive probability of a successfull introduction at the end of the simulated period
 
 First, we can retrieve the "probability of a successful introduction", computed as the proportion of model iterations that resulted in a viable mosquito population (in any cells of the grid) at a given date.
@@ -243,37 +243,43 @@ psi(input_sim = simout, eval_date = 30)
 We can also get a "spatial output", using the function *psi_sp*, which requires as additional input only the matrix of the pixels coordinates
 
 ```{r, evaluate=FALSE}
-plot(psi_sp(coords = cc, input_sim = simout, eval_date = 30, n.clusters=cl))
+plot(psi_sp(input_sim = simout, eval_date = 30))
 ```
 
 ## 3.2 Derive abundance 95% CI for each life stage and in each day
 We can now compute the interquantile range abundance of the simulated population using the function *adci* over the whole landscape. 
 ```{r message=FALSE, warning=FALSE, evaluate=FALSE}
-dd <- max(sapply(simout, function(x) length(x)))#retrieve the maximum number of simulated days
-egg <- as.data.frame(adci(simout, eval_date=1:dd, breaks=c(0.25,0.50,0.75), st=1))
-juv <- as.data.frame(adci(simout, eval_date=1:dd, breaks=c(0.25,0.50,0.75), st=2))
-ad <- as.data.frame(adci(simout, eval_date=1:dd, breaks=c(0.25,0.50,0.75), st=3))
-eggd <- as.data.frame(adci(simout, eval_date=1:dd, breaks=c(0.25,0.50,0.75), st=4))
+dd <- max(simout) #retrieve the maximum number of simulated days
 
-egg$myStage <- 'Egg'
-juv$myStage <- 'Juvenile'
-ad$myStage <- 'Adult'
-eggd$myStage <- 'Diapausing egg'
+# Compute the inter-quartile of abundances along the iterations
+breaks=c(0.25,0.50,0.75)
+ed=1:dd
 
-outdf <- rbind(egg, juv, ad, eggd) 
-outdf$Date=rep(seq.Date(as.Date(str),as.Date(str)+dd-1, by="day"),4)
+# type "O" derives a non-spatial time series
+outdf <- rbind(
+  adci(simout, eval_date=ed, breaks=breaks, stage="Eggs", type="O"),
+  adci(simout, eval_date=ed, breaks=breaks, stage="Juvenile", type="O"),
+  adci(simout, eval_date=ed, breaks=breaks, stage="Adults", type="O"),
+  adci(simout, eval_date=ed, breaks=breaks, stage="Dia", type="O")
+  )
+```
 
-outdf %>% 
-  mutate(myStage=factor(myStage, levels= c('Egg', 'Diapausing egg', 'Juvenile', 'Adult'))) %>% 
-  ggplot( aes(y=(`50%`),x=Date, group=factor(myStage),col=factor(myStage))) +
-  ggtitle("Ae. albopictus Interquantile range abundance")+
-  geom_ribbon(aes(ymin=`25%`,ymax=(`75%`),fill=factor(myStage)),
-              col="white",
-              alpha=0.2,
-              outline.type="full")+
-  geom_line(linewidth=1.2)+
-  labs(x="Date", y="Interquantile range abundance", col="Stage", fill="Stage")+
-  facet_wrap(~myStage, scales = "free")+
-  theme_light()+
-  theme(legend.pos="bottom",  text = element_text(size=14) , strip.text = element_text(face = "italic"))
+Then we can look at the time series of the population dynamics stage by stage at the whole landscape level.
+```{r, message=FALSE, warning=FALSE}
+outdf$stage <- factor(outdf$stage, levels= c('Egg', 'DiapauseEgg', 'Juvenile', 'Adult'))
+outdf$Date <- rep(seq.Date(as.Date(str), as.Date(endr) - 2, by="day"), 4)
+
+ggplot(outdf, aes(x=Date, y=X50., group=factor(stage), col=factor(stage))) +
+ggtitle("Ae. albopictus Interquantile range abundance") +
+geom_ribbon(aes(ymin=X25., ymax=X75., fill=factor(stage)), 
+  col="white", 
+  alpha=0.2, 
+  outline.type="full") +
+geom_line(linewidth=0.8) +
+labs(x="Date", y="Interquantile range abundance", col="Stage", fill="Stage") +
+facet_wrap(~stage, scales = "free_y") +
+theme_light() +
+theme(legend.pos="bottom",  
+  text = element_text(size=16), 
+  strip.text = element_text(face = "italic"))
 ```

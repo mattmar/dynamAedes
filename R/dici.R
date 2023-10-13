@@ -12,7 +12,10 @@
 dici <- function(input_sim=NULL, eval_date=NULL, breaks=c(0.25,0.5,0.75), space=FALSE) {
 		if(!is.numeric(eval_date)) {
 		stop("eval_date not defined, exiting...")
-	}	
+	}
+	if(!input_sim@compressed_output) {
+		stop("Provide compressed simulation output...")
+	}
 
 	coords = input_sim@coordinates
 	input_sim = input_sim@simulation
