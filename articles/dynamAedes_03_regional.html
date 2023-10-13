@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>3. The regional scale model • dynamAedes</title>
+<title>03. The Regional Scale Model • dynamAedes</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
@@ -17,7 +17,7 @@
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="3. The regional scale model">
+<script src="../pkgdown.js"></script><meta property="og:title" content="03. The Regional Scale Model">
 <meta property="og:description" content="dynamAedes">
 <meta property="og:image" content="/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">dynamAedes</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.7</span>
       </span>
     </div>
 
@@ -57,13 +57,13 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/dynamAedes_01_punctual.html">1. The punctual scale model</a>
+      <a href="../articles/dynamAedes_01_punctual.html">01. The punctual scale model</a>
     </li>
     <li>
-      <a href="../articles/dynamAedes_02_local.html">2. The local scale model</a>
+      <a href="../articles/dynamAedes_02_local.html">02. The local scale model</a>
     </li>
     <li>
-      <a href="../articles/dynamAedes_03_regional.html">3. The regional scale model</a>
+      <a href="../articles/dynamAedes_03_regional.html">03. The Regional Scale Model</a>
     </li>
   </ul>
 </li>
@@ -91,11 +91,11 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>3. The regional scale model</h1>
+      <h1 data-toc-skip>03. The Regional Scale Model</h1>
                         <h4 data-toc-skip class="author">Daniele Da Re,
-Sophie 0. Vanwambeke, Matteo Marcantonio</h4>
+Sophie O. Vanwambeke, Matteo Marcantonio</h4>
             
-            <h4 data-toc-skip class="date">2023-10-05</h4>
+            <h4 data-toc-skip class="date">2023-10-13</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mattmar/dynamAedes/blob/HEAD/vignettes/dynamAedes_03_regional.Rmd" class="external-link"><code>vignettes/dynamAedes_03_regional.Rmd</code></a></small>
       <div class="hidden name"><code>dynamAedes_03_regional.Rmd</code></div>
@@ -104,78 +104,67 @@ Sophie 0. Vanwambeke, Matteo Marcantonio</h4>
 
     
     
-<p>This tutorial explains step-by-step the main features of
-<strong>dynamAedes</strong> package, a unified modelling framework for
-invasive <em>Aedes</em> mosquitoes. Users can apply the stochastic,
-time-discrete and spatially-explicit population dynamical model
-initially developed in <a href="https://doi.org/10.1016/j.ecoinf.2020.101180" class="external-link">Da Re et al.,
-(2021)</a> for <em>Aedes aegypti</em> and then expanded for other three
-species: <em>Ae. albopictus</em>, <em>Ae. japonicus</em> and <em>Ae.
-koreicus</em> <a href="https://doi.org/10.1186/s13071-022-05414-4" class="external-link">Da Re
-et al., (2022)</a>.</p>
-<p>The model is driven by temperature, photoperiod and intra-specific
-larval competition and can be applied to three different spatial scales:
-punctual, local and regional. These spatial scales consider different
-degrees of spatial complexity and data availability, by accounting for
-both active and passive dispersal of the modelled mosquito species as
-well as for the heterogeneity of input temperature data.</p>
-<p>We will describe the model applications for <em>Ae. albopictus</em>
-and for all spatial scales by using a simulated temperature dataset.</p>
-<p>The model at regional scale is the same as running the model at
-“punctual” scale for each cell of the grid but without accounting for
-active or passive dispersal. Each cell is therefore a close unit or
-mosquito population. With this setting, the model requires two input
-datasets:</p>
+<p>This vignette provides a comprehensive guide to the dynamAedes
+package, a unified modelling framework for invasive Aedes mosquitoes.
+Users can employ this spatially-explicit, time-discrete, stochastic
+population dynamical model, which was initially formulated for <em>Aedes
+aegypti</em> in <a href="https://doi.org/10.1016/j.ecoinf.2020.101180" class="external-link">Da Re et al.,
+(2021)</a> and subsequently adapted for Ae. albopictus, Ae. japonicus,
+and Ae. koreicus <a href="https://doi.org/10.1186/s13071-022-05414-4" class="external-link">Da
+Re et al., (2022)</a>.</p>
+<p>This model integrates factors like temperature, photoperiod, and
+intra-specific larval competition and is versatile across three spatial
+scales: punctual, local, and regional. The various scales provide
+flexibility in addressing spatial complexity and data availability,
+accommodating both active and passive mosquito dispersal and varying
+input temperature data.</p>
+<p>For illustrative purposes, this guide focuses on model applications
+for <em>Ae. albopictus</em> across all spatial scales using a simulated
+temperature dataset.</p>
+<p>At the regional scale, the model operates similarly to the “punctual”
+scale, processing each grid cell separately without considering active
+or passive dispersal. This makes each cell an isolated mosquito
+population. To execute the model in this context, two datasets are
+essential:</p>
 <ul>
-<li>a numerical temperature matrix (in degree Celsius) defined in space
-and time (space in the rows, time in the columns);</li>
-<li>a two-column numerical matrix reporting the centroid coordinates (in
-meters) of each cell.</li>
+<li>A temperature matrix (in °C) spatially and temporally defined.</li>
+<li>A two-column matrix showcasing the centroid coordinates (in meters)
+for every cell.</li>
 </ul>
-<p>For the purpose of this tutorial, we will use the following simulated
-datasets:</p>
+<p>For the purpose of this guide, we will employ simulated datasets:</p>
 <ol style="list-style-type: decimal">
-<li>A 5 km lattice grid with 250 m cell size;</li>
-<li>A 1-year long spatially and temporally correlated temperature time
-series;</li>
+<li>A grid with a 5 km lattice and 250 m cell size.</li>
+<li>A spatially and temporally correlated temperature time series
+spanning one year.</li>
 </ol>
 <div class="section level2">
-<h2 id="input-data">1. Input data<a class="anchor" aria-label="anchor" href="#input-data"></a>
+<h2 id="data-input">1. Data Input<a class="anchor" aria-label="anchor" href="#data-input"></a>
 </h2>
 <div class="section level3">
-<h3 id="create-lattice-arena">1.1 Create lattice arena<a class="anchor" aria-label="anchor" href="#create-lattice-arena"></a>
+<h3 id="defining-the-lattice-arena">1.1 Defining the Lattice Arena<a class="anchor" aria-label="anchor" href="#defining-the-lattice-arena"></a>
 </h3>
-<p>First, we define the physical space into which the introduction of
-our mosquitoes will happen. We define a squared lattice arena having 5
-km side and 250 m resolution (20 colums and 20 rows, 400 total
-cells).</p>
+<p>To begin, we will establish a squared lattice arena, which will serve
+as the site for our mosquito introduction. The chosen dimensions are 5
+km on each side with a resolution of 250 m (comprising 20 columns and 20
+rows, totalling 400 cells).</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#Load packages</span></span>
-<span><span class="co"># spatial analysis</span></span>
+<code class="sourceCode R"><span><span class="co"># Libraries</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-spatial/gstat/" class="external-link">gstat</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/" class="external-link">terra</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># simulate temperatures</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://github.com/sakoehler7/eesim" class="external-link">eesim</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># modelling </span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mattmar.github.io/dynamAedes/" class="external-link">dynamAedes</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># data manipulation and plotting</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/locales.html" class="external-link">Sys.setlocale</a></span><span class="op">(</span><span class="st">"LC_TIME"</span>, <span class="st">"en_GB.UTF-8"</span><span class="op">)</span>  </span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/locales.html" class="external-link">Sys.setlocale</a></span><span class="op">(</span><span class="st">"LC_TIME"</span>, <span class="st">"en_GB.UTF-8"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co"># [1] ""</span></span></code></pre>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gridDim</span> <span class="op">&lt;-</span> <span class="fl">20</span> <span class="co"># 5000m/250 m = 20 columns and rows</span></span>
 <span><span class="va">xy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/expand.grid.html" class="external-link">expand.grid</a></span><span class="op">(</span>x<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="va">gridDim</span>, y<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="va">gridDim</span><span class="op">)</span></span></code></pre></div>
-<p>We then add a spatial pattern into the lattice area. This spatial
-pattern will be used later to add spatial correllation (SAC) to the
-temperature time series. The spatial autocorrelated pattern will be
-obtained using a semivariogram model with defined sill (value that the
-semivarion attains at the range) and range (distance of 0 spatial
-correlation) and then predicting the semivariogram model over the
-lattice grid using unconditional Gaussian simulation.</p>
+<p>To infuse a spatial element into the lattice area, we will overlay a
+spatial pattern, which will subsequently be used to impart spatial
+correlation to the temperature time series. This spatially correlated
+pattern is derived using a semivariogram model with a specified sill and
+range. We then predict this model over the grid using unconditional
+Gaussian simulation.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">varioMod</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/gstat/man/vgm.html" class="external-link">vgm</a></span><span class="op">(</span>psill<span class="op">=</span><span class="fl">0.5</span>, range<span class="op">=</span><span class="fl">100</span>, model<span class="op">=</span><span class="st">'Exp'</span><span class="op">)</span> <span class="co"># psill = partial sill = (sill-nugget)</span></span>
 <span><span class="co"># Set up an additional variable from simple kriging</span></span>
@@ -189,10 +178,9 @@ lattice grid using unconditional Gaussian simulation.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
 <span><span class="va">xyz</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">zDummy</span>, newdata<span class="op">=</span><span class="va">xy</span>, nsim<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co"># [using unconditional Gaussian simulation]</span></span></code></pre>
-<p>We generate a spatially autocorrelated raster adding the SA variable
-(<em>xyz$sim1</em>) to the SpatRaster object. The autocorrelated surface
-could for example represent the distribution of vegetation cover in a
-urban landscape.</p>
+<p>Creating a spatially correlated raster with the SA variable enhances
+our understanding of environmental features like urban vegetation
+distribution.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">utm32N</span> <span class="op">&lt;-</span> <span class="st">"+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"</span></span>
 <span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/rast.html" class="external-link">rast</a></span><span class="op">(</span>nrow<span class="op">=</span><span class="va">gridDim</span>, ncol<span class="op">=</span><span class="va">gridDim</span>, crs<span class="op">=</span><span class="va">utm32N</span>, ext<span class="op">=</span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/ext.html" class="external-link">ext</a></span><span class="op">(</span><span class="fl">1220000</span>,<span class="fl">1225000</span>, <span class="fl">5700000</span>,<span class="fl">5705000</span><span class="op">)</span><span class="op">)</span></span>
@@ -214,7 +202,7 @@ urban landscape.</p>
 the time series we consider a mean value of 16°C and standard deviation
 of 2°C.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ndays</span> <span class="op">=</span> <span class="fl">365</span><span class="op">*</span><span class="fl">1</span> <span class="co">#length of the time series in days</span></span>
+<code class="sourceCode R"><span><span class="va">ndays</span> <span class="op">=</span> <span class="fl">365</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
 <span><span class="va">sim_temp</span> <span class="op">&lt;-</span> <span class="fu">eesim</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/eesim/man/create_sims.html" class="external-link">create_sims</a></span><span class="op">(</span>n_reps <span class="op">=</span> <span class="fl">1</span>, </span>
 <span>                        n <span class="op">=</span> <span class="va">ndays</span>, </span>
@@ -231,12 +219,12 @@ temporal trend.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="va">sim_temp</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">x</span>, </span>
 <span>     xlab<span class="op">=</span><span class="st">"Temperature (°C)"</span>, </span>
-<span>     main<span class="op">=</span><span class="st">"Histogram of simulated temperatures"</span><span class="op">)</span></span></code></pre></div>
+<span>     main<span class="op">=</span><span class="st">"Histogram of Simulated Temperatures"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="dynamAedes_03_regional_files/figure-html/unnamed-chunk-6-1.png" width="95%" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sim_temp</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">date</span>,</span>
 <span>     <span class="va">sim_temp</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">x</span>,</span>
-<span>     main<span class="op">=</span><span class="st">"Simulated temperatures seasonal trend"</span>, </span>
+<span>     main<span class="op">=</span><span class="st">"Simulated Temperature Seasonal Trend"</span>, </span>
 <span>     xlab<span class="op">=</span><span class="st">"Date"</span>, ylab<span class="op">=</span><span class="st">"Temperature (°C)"</span></span>
 <span>     <span class="op">)</span></span></code></pre></div>
 <p><img src="dynamAedes_03_regional_files/figure-html/unnamed-chunk-6-2.png" width="95%" style="display: block; margin: auto;"></p>
@@ -323,33 +311,55 @@ about 3 minutes.</p>
 <span>            compressed.output<span class="op">=</span><span class="cn">TRUE</span>,</span>
 <span>            seeding<span class="op">=</span><span class="cn">TRUE</span>,</span>
 <span>            verbose<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p>#3. Analyse the results We first explore model output structure: the
-<em>simout</em> object is a nested list.</p>
-<p>The <strong>first</strong> level corresponds to the number of model
-iterations</p>
+<p>#3. Analyse the results A first summary of simulations can be
+obtained with:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">it</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co"># [1] 1</span></span></code></pre>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">simout</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co"># Summary of dynamAedes simulations:</span></span>
+<span><span class="co"># ----------------------------------</span></span>
+<span><span class="co"># Species:                  Aedes albopictus </span></span>
+<span><span class="co"># Scale:                    RG </span></span>
+<span><span class="co"># Start Date:               2000-06-01 </span></span>
+<span><span class="co"># End Date:                 2000-07-02 </span></span>
+<span><span class="co"># Number of Iterations:     1 </span></span>
+<span><span class="co"># Introduced Stage:         egg </span></span>
+<span><span class="co"># Number Introduced:        100 </span></span>
+<span><span class="co"># Is Output Compressed?:    Yes </span></span>
+<span><span class="co"># Water in the System:      1 L </span></span>
+<span><span class="co"># Min days with population: 30 </span></span>
+<span><span class="co"># Max days with population: 30</span></span></code></pre>
+<p>The <em>simout</em> object is a S4 object where simulation outputs
+and related details are saved in different slot:</p>
+<p>For example, the number of model iterations is saved in:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">simout</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co"># [1] 1</span></span></code></pre>
-<p>The <strong>second</strong> level corresponds to the simulated days.
-So if we inspect the first iteration, we observe that the model has
-computed <code>rlength(simout[[1]])</code> days, since we have started
-the simulation on the 1st of July and ended on the 1st of August.</p>
+<code class="sourceCode R"><span><span class="va">simout</span><span class="op">@</span><span class="va">n_iterations</span></span></code></pre></div>
+<p>The simulation output is stored in:</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">simout</span><span class="op">@</span><span class="va">simulation</span></span></code></pre></div>
+<p>Which is a list where the the <strong>first</strong> level stores
+simulation of different iteration, while the
+<strong>second</strong>corresponds to the simulated days in the
+corresponding iteration. If we inspect the first iteration, we observe
+that the model has computed <code>length(simout[[1]])</code> days, since
+we have started the simulation on the 1st of July and ended on the 1st
+of August.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">simout</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">simout</span><span class="op">@</span><span class="va">simulation</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co"># [1] 30</span></span></code></pre>
-<p>The <strong>third</strong> level of the output list object
-corresponds to the amount of individuals for each stage (rows) within
-each grid cell of the landscape (columns). If we inspect the first day
-within the first iteration, we obtain a matrix having</p>
+<p>The <strong>third</strong> level corresponds to the quantity of
+individuals for each stage (rows) in each day within each grid cell of
+the landscape (columns). If we inspect the first day within the first
+iteration, we obtain a matrix having:</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">simout</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">simout</span><span class="op">@</span><span class="va">simulation</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co"># [1]   4 400</span></span></code></pre>
 <p>We can now use the auxiliary functions of the package to Analyse the
 results.</p>
 </div>
+</div>
+<div class="section level2">
+<h2 id="analyse-the-results">3. Analyse the results<a class="anchor" aria-label="anchor" href="#analyse-the-results"></a>
+</h2>
 <div class="section level3">
 <h3 id="derive-probability-of-a-successfull-introduction-at-the-end-of-the-simulated-period">3.1 Derive probability of a successfull introduction at the end of
 the simulated period<a class="anchor" aria-label="anchor" href="#derive-probability-of-a-successfull-introduction-at-the-end-of-the-simulated-period"></a>
@@ -366,8 +376,8 @@ given date.</p>
 <em>psi_sp</em>, which requires as additional input only the matrix of
 the pixels coordinates</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../reference/psi_sp.html">psi_sp</a></span><span class="op">(</span>coords <span class="op">=</span> <span class="va">cc</span>, input_sim <span class="op">=</span> <span class="va">simout</span>, eval_date <span class="op">=</span> <span class="fl">30</span>, n.clusters<span class="op">=</span><span class="va">cl</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="dynamAedes_03_regional_files/figure-html/unnamed-chunk-20-1.png" width="95%" style="display: block; margin: auto;"></p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../reference/psi_sp.html">psi_sp</a></span><span class="op">(</span>input_sim <span class="op">=</span> <span class="va">simout</span>, eval_date <span class="op">=</span> <span class="fl">30</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="dynamAedes_03_regional_files/figure-html/unnamed-chunk-22-1.png" width="95%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="derive-abundance-95-ci-for-each-life-stage-and-in-each-day">3.2 Derive abundance 95% CI for each life stage and in each day<a class="anchor" aria-label="anchor" href="#derive-abundance-95-ci-for-each-life-stage-and-in-each-day"></a>
@@ -376,34 +386,39 @@ the pixels coordinates</p>
 population using the function <em>adci</em> over the whole
 landscape.</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">simout</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="co">#retrieve the maximum number of simulated days</span></span>
-<span><span class="va">egg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="../reference/adci.html">adci</a></span><span class="op">(</span><span class="va">simout</span>, eval_date<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="va">dd</span>, breaks<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>,<span class="fl">0.50</span>,<span class="fl">0.75</span><span class="op">)</span>, st<span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">juv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="../reference/adci.html">adci</a></span><span class="op">(</span><span class="va">simout</span>, eval_date<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="va">dd</span>, breaks<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>,<span class="fl">0.50</span>,<span class="fl">0.75</span><span class="op">)</span>, st<span class="op">=</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">ad</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="../reference/adci.html">adci</a></span><span class="op">(</span><span class="va">simout</span>, eval_date<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="va">dd</span>, breaks<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>,<span class="fl">0.50</span>,<span class="fl">0.75</span><span class="op">)</span>, st<span class="op">=</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">eggd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="../reference/adci.html">adci</a></span><span class="op">(</span><span class="va">simout</span>, eval_date<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="va">dd</span>, breaks<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>,<span class="fl">0.50</span>,<span class="fl">0.75</span><span class="op">)</span>, st<span class="op">=</span><span class="fl">4</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">dd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">simout</span><span class="op">)</span> <span class="co">#retrieve the maximum number of simulated days</span></span>
 <span></span>
-<span><span class="va">egg</span><span class="op">$</span><span class="va">myStage</span> <span class="op">&lt;-</span> <span class="st">'Egg'</span></span>
-<span><span class="va">juv</span><span class="op">$</span><span class="va">myStage</span> <span class="op">&lt;-</span> <span class="st">'Juvenile'</span></span>
-<span><span class="va">ad</span><span class="op">$</span><span class="va">myStage</span> <span class="op">&lt;-</span> <span class="st">'Adult'</span></span>
-<span><span class="va">eggd</span><span class="op">$</span><span class="va">myStage</span> <span class="op">&lt;-</span> <span class="st">'Diapausing egg'</span></span>
+<span><span class="co"># Compute the inter-quartile of abundances along the iterations</span></span>
+<span><span class="va">breaks</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>,<span class="fl">0.50</span>,<span class="fl">0.75</span><span class="op">)</span></span>
+<span><span class="va">ed</span><span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="va">dd</span></span>
 <span></span>
-<span><span class="va">outdf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">egg</span>, <span class="va">juv</span>, <span class="va">ad</span>, <span class="va">eggd</span><span class="op">)</span> </span>
-<span><span class="va">outdf</span><span class="op">$</span><span class="va">Date</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.Date.html" class="external-link">seq.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="va">str</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="va">str</span><span class="op">)</span><span class="op">+</span><span class="va">dd</span><span class="op">-</span><span class="fl">1</span>, by<span class="op">=</span><span class="st">"day"</span><span class="op">)</span>,<span class="fl">4</span><span class="op">)</span></span>
+<span><span class="co"># type "O" derives a non-spatial time series</span></span>
+<span><span class="va">outdf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="../reference/adci.html">adci</a></span><span class="op">(</span><span class="va">simout</span>, eval_date<span class="op">=</span><span class="va">ed</span>, breaks<span class="op">=</span><span class="va">breaks</span>, stage<span class="op">=</span><span class="st">"Eggs"</span>, type<span class="op">=</span><span class="st">"O"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="../reference/adci.html">adci</a></span><span class="op">(</span><span class="va">simout</span>, eval_date<span class="op">=</span><span class="va">ed</span>, breaks<span class="op">=</span><span class="va">breaks</span>, stage<span class="op">=</span><span class="st">"Juvenile"</span>, type<span class="op">=</span><span class="st">"O"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="../reference/adci.html">adci</a></span><span class="op">(</span><span class="va">simout</span>, eval_date<span class="op">=</span><span class="va">ed</span>, breaks<span class="op">=</span><span class="va">breaks</span>, stage<span class="op">=</span><span class="st">"Adults"</span>, type<span class="op">=</span><span class="st">"O"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="../reference/adci.html">adci</a></span><span class="op">(</span><span class="va">simout</span>, eval_date<span class="op">=</span><span class="va">ed</span>, breaks<span class="op">=</span><span class="va">breaks</span>, stage<span class="op">=</span><span class="st">"Dia"</span>, type<span class="op">=</span><span class="st">"O"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
+<p>Then we can look at the time series of the population dynamics stage
+by stage at the whole landscape level.</p>
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">outdf</span><span class="op">$</span><span class="va">stage</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">outdf</span><span class="op">$</span><span class="va">stage</span>, levels<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Egg'</span>, <span class="st">'DiapauseEgg'</span>, <span class="st">'Juvenile'</span>, <span class="st">'Adult'</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">outdf</span><span class="op">$</span><span class="va">Date</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.Date.html" class="external-link">seq.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="va">str</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="va">endr</span><span class="op">)</span> <span class="op">-</span> <span class="fl">2</span>, by<span class="op">=</span><span class="st">"day"</span><span class="op">)</span>, <span class="fl">4</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">outdf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>myStage<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">myStage</span>, levels<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Egg'</span>, <span class="st">'Diapausing egg'</span>, <span class="st">'Juvenile'</span>, <span class="st">'Adult'</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y<span class="op">=</span><span class="op">(</span><span class="va">`50%`</span><span class="op">)</span>,x<span class="op">=</span><span class="va">Date</span>, group<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">myStage</span><span class="op">)</span>,col<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">myStage</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Ae. albopictus Interquantile range abundance"</span><span class="op">)</span><span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html" class="external-link">geom_ribbon</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>ymin<span class="op">=</span><span class="va">`25%`</span>,ymax<span class="op">=</span><span class="op">(</span><span class="va">`75%`</span><span class="op">)</span>,fill<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">myStage</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>              col<span class="op">=</span><span class="st">"white"</span>,</span>
-<span>              alpha<span class="op">=</span><span class="fl">0.2</span>,</span>
-<span>              outline.type<span class="op">=</span><span class="st">"full"</span><span class="op">)</span><span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth<span class="op">=</span><span class="fl">1.2</span><span class="op">)</span><span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x<span class="op">=</span><span class="st">"Date"</span>, y<span class="op">=</span><span class="st">"Interquantile range abundance"</span>, col<span class="op">=</span><span class="st">"Stage"</span>, fill<span class="op">=</span><span class="st">"Stage"</span><span class="op">)</span><span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">myStage</span>, scales <span class="op">=</span> <span class="st">"free"</span><span class="op">)</span><span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_light</a></span><span class="op">(</span><span class="op">)</span><span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.pos<span class="op">=</span><span class="st">"bottom"</span>,  text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">14</span><span class="op">)</span> , strip.text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>face <span class="op">=</span> <span class="st">"italic"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="dynamAedes_03_regional_files/figure-html/unnamed-chunk-21-1.png" width="95%" style="display: block; margin: auto;"></p>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">outdf</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">Date</span>, y<span class="op">=</span><span class="va">X50.</span>, group<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">stage</span><span class="op">)</span>, col<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">stage</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Ae. albopictus Interquantile range abundance"</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html" class="external-link">geom_ribbon</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>ymin<span class="op">=</span><span class="va">X25.</span>, ymax<span class="op">=</span><span class="va">X75.</span>, fill<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">stage</span><span class="op">)</span><span class="op">)</span>, </span>
+<span>  col<span class="op">=</span><span class="st">"white"</span>, </span>
+<span>  alpha<span class="op">=</span><span class="fl">0.2</span>, </span>
+<span>  outline.type<span class="op">=</span><span class="st">"full"</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth<span class="op">=</span><span class="fl">0.8</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x<span class="op">=</span><span class="st">"Date"</span>, y<span class="op">=</span><span class="st">"Interquantile range abundance"</span>, col<span class="op">=</span><span class="st">"Stage"</span>, fill<span class="op">=</span><span class="st">"Stage"</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">stage</span>, scales <span class="op">=</span> <span class="st">"free_y"</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_light</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.pos<span class="op">=</span><span class="st">"bottom"</span>,  </span>
+<span>  text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">16</span><span class="op">)</span>, </span>
+<span>  strip.text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>face <span class="op">=</span> <span class="st">"italic"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="dynamAedes_03_regional_files/figure-html/unnamed-chunk-24-1.png" width="95%" style="display: block; margin: auto;"></p>
 </div>
 </div>
   </div>
