@@ -33,7 +33,7 @@ For the purpose of this guide, we will employ simulated datasets:
   1. A grid with a 5 km lattice and 250 m cell size.
   2. A spatially and temporally correlated temperature time series spanning one year.
 
-# 1. Data Input
+# 1. Input Data
 
 ## 1.1 Defining the Lattice Arena
 
