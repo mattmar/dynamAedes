@@ -95,7 +95,7 @@
                         <h4 data-toc-skip class="author">Daniele Da Re,
 Sophie 0. Vanwambeke, Matteo Marcantonio</h4>
             
-            <h4 data-toc-skip class="date">2023-10-26</h4>
+            <h4 data-toc-skip class="date">2023-10-31</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mattmar/dynamAedes/blob/HEAD/vignettes/dynamAedes_02_local.Rmd" class="external-link"><code>vignettes/dynamAedes_02_local.Rmd</code></a></small>
       <div class="hidden name"><code>dynamAedes_02_local.Rmd</code></div>
@@ -394,15 +394,15 @@ defined.</p>
 <span><span class="co">## Define the end-day of life cycle (August 1st is the last day)</span></span>
 <span><span class="va">endr</span> <span class="op">&lt;-</span> <span class="st">"2000-09-01"</span></span>
 <span><span class="co">## Define the number of adult females to be introduced</span></span>
-<span><span class="va">ia</span> <span class="op">&lt;-</span> <span class="fl">5000</span></span>
+<span><span class="va">ia</span> <span class="op">&lt;-</span> <span class="fl">10000</span></span>
 <span><span class="co">## Define the number of model iterations</span></span>
-<span><span class="va">it</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="co"># The higher the number of simulations the better</span></span>
+<span><span class="va">it</span> <span class="op">&lt;-</span> <span class="fl">5</span> <span class="co"># The higher the number of simulations the better</span></span>
 <span><span class="co">## Define the number of liters for the larval density-dependent mortality</span></span>
 <span><span class="va">habitat_liters</span> <span class="op">&lt;-</span> <span class="fl">100</span></span>
 <span><span class="co">##Define average trip distance</span></span>
 <span><span class="va">mypDist</span> <span class="op">&lt;-</span> <span class="fl">1000</span></span>
 <span><span class="co">## Define the number of parallel processes (for sequential iterations set nc=1)</span></span>
-<span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
+<span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fl">5</span></span>
 <span><span class="co">## Define proj4 string</span></span>
 <span><span class="va">utm32N</span> <span class="op">&lt;-</span> <span class="st">"+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"</span> </span></code></pre></div>
 <p>Finally, let us prepare the temperature matrix. Float numbers in the
@@ -504,7 +504,7 @@ during the simulation.</li>
 <span>            cellsize<span class="op">=</span><span class="fl">250</span>,</span>
 <span>            maxadisp<span class="op">=</span><span class="fl">600</span>,</span>
 <span>            dispbins<span class="op">=</span><span class="fl">10</span>,</span>
-<span>            seeding<span class="op">=</span><span class="cn">TRUE</span>,</span>
+<span>            seeding<span class="op">=</span><span class="cn">FALSE</span>,</span>
 <span>            verbose<span class="op">=</span><span class="cn">FALSE</span></span>
 <span>            <span class="op">)</span></span></code></pre></div>
 <p>This simulation, with the provided settings, takes approximately 1
@@ -522,14 +522,12 @@ minute to complete. The result of the simulation will be stored in the
 <pre><code><span><span class="co"># Summary of dynamAedes simulations:</span></span>
 <span><span class="co"># ----------------------------------</span></span>
 <span><span class="co"># Species:                  Aedes albopictus </span></span>
-<span><span class="co"># Scale:                    LC </span></span>
-<span><span class="co">#   Avg passive dispersal:  1000 </span></span>
-<span><span class="co">#   Max active dispersal:   600 </span></span>
+<span><span class="co"># Scale:                    LOCAL </span></span>
 <span><span class="co"># Start Date:               2000-07-01 </span></span>
 <span><span class="co"># End Date:                 2000-09-01 </span></span>
-<span><span class="co"># Number of Iterations:     1 </span></span>
+<span><span class="co"># Number of Iterations:     5 </span></span>
 <span><span class="co"># Introduced Stage:         adult </span></span>
-<span><span class="co"># Number Introduced:        5000 </span></span>
+<span><span class="co"># Number Introduced:        10000 </span></span>
 <span><span class="co"># Is Output Compressed?:    Yes </span></span>
 <span><span class="co"># Water in the System:      100 L </span></span>
 <span><span class="co"># Min days with population: 61 </span></span>
@@ -647,7 +645,7 @@ distribution of a given life stage and for a given simulated day by
 using the function <em>adci</em>. For example for eggs:</p>
 <div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/adci.html">adci</a></span><span class="op">(</span><span class="va">simout</span>, eval_date<span class="op">=</span><span class="fl">60</span>, breaks<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>,<span class="fl">0.975</span><span class="op">)</span>, stage<span class="op">=</span><span class="st">"Eggs"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co"># LC scale input simulation provided</span></span></code></pre>
+<pre><code><span><span class="co"># LOCAL scale input simulation provided</span></span></code></pre>
 <pre><code><span><span class="co"># Compressed simulation provided</span></span></code></pre>
 <pre><code><span><span class="co"># Computing spatio-temporal abundance estimate.</span></span></code></pre>
 <div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
@@ -668,19 +666,19 @@ iterations</p>
 <pre><code><span><span class="co">#    25% 50% 75% day</span></span>
 <span><span class="co"># V1   2   2   2   1</span></span>
 <span><span class="co"># V2   2   2   2   2</span></span>
-<span><span class="co"># V3   4   4   4   3</span></span>
-<span><span class="co"># V4   4   4   4   4</span></span>
-<span><span class="co"># V5   3   3   3   5</span></span>
-<span><span class="co"># V6   3   3   3   6</span></span></code></pre>
+<span><span class="co"># V3   4   4   5   3</span></span>
+<span><span class="co"># V4   5   5   5   4</span></span>
+<span><span class="co"># V5   4   4   4   5</span></span>
+<span><span class="co"># V6   5   5   5   6</span></span></code></pre>
 <div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">xcells</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#     25% 50% 75% day</span></span>
-<span><span class="co"># V55  35  35  35  55</span></span>
-<span><span class="co"># V56  44  44  44  56</span></span>
-<span><span class="co"># V57  45  45  45  57</span></span>
-<span><span class="co"># V58  51  51  51  58</span></span>
-<span><span class="co"># V59  56  56  56  59</span></span>
-<span><span class="co"># V60  57  57  57  60</span></span></code></pre>
+<span><span class="co"># V55  54  57  63  55</span></span>
+<span><span class="co"># V56  58  58  59  56</span></span>
+<span><span class="co"># V57  59  62  66  57</span></span>
+<span><span class="co"># V58  63  68  74  58</span></span>
+<span><span class="co"># V59  65  70  77  59</span></span>
+<span><span class="co"># V60  71  73  75  60</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="estimates-of-mosquito-dispersal-spread-in-km2">3.4 Estimates of mosquito dispersal spread (in km2 )<a class="anchor" aria-label="anchor" href="#estimates-of-mosquito-dispersal-spread-in-km2"></a>
