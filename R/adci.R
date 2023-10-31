@@ -120,6 +120,7 @@ adci <- function(input_sim = NULL, stage = NULL, sub_stage = NULL,
 
           all.matrix <- abind::abind(all.matrix, along=3)
 
+          # Removing mclapply due to issue terra~mclapply (External pointer)
           all.matrix <- lapply(breaks, function(x) {
             quant_res <- apply(all.matrix, c(1,2), quantile, probs=x, na.rm=T)
             rast_obj <- rast(data.frame(coords, quant_res), type="xyz")
@@ -180,7 +181,7 @@ adci <- function(input_sim = NULL, stage = NULL, sub_stage = NULL,
                     })
                   })
                 all.matrix <- abind::abind(all.matrix, along=3)
-
+                # Removing mclapply due to issue terra~mclapply (External pointer)
                 all.matrix.raster <- lapply(breaks, function(x) {
                   quant_res <- apply(all.matrix, c(1,2), quantile, probs=x, na.rm=T)
                   rast_obj <- rast(data.frame(coords, quant_res), type="xyz")

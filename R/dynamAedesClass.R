@@ -26,6 +26,7 @@ setClass("dynamAedesClass", slots=list(
 )
 
 #' Summary method for dynamAedesClass
+
 #' Provides a summary of simulations based on the dynamAedesClass.
 #' 
 #' @param object An object of class \code{dynamAedesClass}.
@@ -81,7 +82,7 @@ setMethod("summary", "dynamAedesClass", function(object) {
 #'
 #' @examples
 #' \dontrun{
-#' summary(sim)
+#' max(sim)
 #' }
 #' 
 #' @aliases max,dynamAedesClass-max
@@ -94,6 +95,7 @@ setMethod("max", "dynamAedesClass",
           })
 
 #' Min method for dynamAedesClass
+
 #' Provides the min number of days with at least one
 #' propagule in the system (any stage) along iterations.
 #' @param x An object of class \code{dynamAedesClass}.
@@ -103,7 +105,7 @@ setMethod("max", "dynamAedesClass",
 #'
 #' @examples
 #' \dontrun{
-#' summary(sim)
+#' min(sim)
 #' }
 #' 
 #' @aliases min,dynamAedesClass-min

@@ -483,7 +483,7 @@ parallel::stopCluster(cl)
 return(
 	new("dynamAedesClass", 
 		species=species, 
-		scale=scale, 
+		scale=ifelse(scale=="ws","Weaether Station",ifelse(scale=="lc","Local","Regional")), 
 		start_date=startd, end_date=ifelse(is.na(endd), "1990-01-01", endd), 
 		n_iterations=iter, 
 		stage_intro=ifelse(intro.eggs!=0, "egg", ifelse(intro.juveniles!=0, "juvnile", ifelse(intro.adults!=0, "adult", "Diapause egg"))),

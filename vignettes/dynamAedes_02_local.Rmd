@@ -58,6 +58,7 @@ library(eesim)
 library(dynamAedes)
 library(ggplot2)
 Sys.setlocale("LC_TIME", "en_GB.UTF-8")
+
 ```
 
 ```{r}
@@ -261,15 +262,15 @@ str <- "2000-07-01"
 ## Define the end-day of life cycle (August 1st is the last day)
 endr <- "2000-09-01"
 ## Define the number of adult females to be introduced
-ia <- 5000
+ia <- 10000
 ## Define the number of model iterations
-it <- 1 # The higher the number of simulations the better
+it <- 5 # The higher the number of simulations the better
 ## Define the number of liters for the larval density-dependent mortality
 habitat_liters <- 100
 ##Define average trip distance
 mypDist <- 1000
 ## Define the number of parallel processes (for sequential iterations set nc=1)
-cl <- 1
+cl <- 5
 ## Define proj4 string
 utm32N <- "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs" 
 ```
@@ -327,7 +328,7 @@ simout <- dynamAedes.m(species="albopictus",
             cellsize=250,
             maxadisp=600,
             dispbins=10,
-            seeding=TRUE,
+            seeding=FALSE,
             verbose=FALSE
             )
 ```
