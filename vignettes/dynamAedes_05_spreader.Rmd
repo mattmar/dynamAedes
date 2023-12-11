@@ -1,0 +1,182 @@
+---
+title: "05. Temporal downscaling of entomological surveillance observations"
+author: "Daniele Da Re, Giovanni Marini"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 3
+vignette: |
+  %\VignetteIndexEntry{05. Temporal downscaling of entomological surveillance observations}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(fig.width=10, fig.height=10, fig.asp = 0.618, out.width = "95%", fig.align = "center", fig.dpi = 150, collapse = FALSE, comment = "#") 
+options(rmarkdown.html_vignette.check_title = FALSE)
+```
+
+This vignette provides a comprehensive guide to the `spreader` function available in the `dynamAedes` package ([Da Re et al., 2022](https://doi.org/10.1186/s13071-022-05414-4)). This function performs a temporal downscaling of observations captured by entomological traps (e.g. ovitraps, CDC-traps, BG-sentinel) *spreading* the observed counts over the period of activation of the traps.
+
+In fact, stakeholders in charge of mosquito surveillance activities, such as public health agencies or research centres, adopt different monitoring schemes (i.e., size of the traps, length of the monitoring period, length of the activation period of the trap, etc.), depending on their needs, budget, and personnel. As a result, the monitoring schemes are highly heterogeneous between (but also within) countries ([Jourdain et al., 2019](https://doi.org/10.1371/journal.pntd.0007314), [Miranda et al., 2022](https://doi.org/10.46471/gigabyte.57)), restricting the temporal and spatial extent of each monitoring effort and producing gaps in data collection.
+
+To account for this heterogeneity, we adopted some rules to standardize the different observations and coded them into the `spreader` function. In this example, we will use a toy dataset reproducing the outcome of the yearly monitoring activity of *Aedes albopictus* employing ovitraps.
+
+Ovitraps are cheap and efficient tools consisting of a dark container filled with water and a substrate where mosquitoes can lay their eggs. Ovitraps are generally inspected on a weekly or biweekly basis, depending on the local protocol adopted by the stakeholders. We chose the week as the fundamental temporal unit, therefore, if the monitoring period is extended beyond one week, the `spreader` function will distribute randomly the observed number of eggs throughout the trap activity period using a binomial draw with a probability equal to *1/n* weeks of activation. This means that if a trap was active for 2 weeks and collected 500 eggs, the observed 500 eggs would be randomly assigned to each week with a probability *p = 1/2*, resulting in, e.g. 256 eggs collected during the 1st week and 244 collected during the second.
+
+Most of the monitoring efforts span from May (week 20) to October (week 40). Though there is some variability in the length of the monitoring period depending on the stakeholders' resources and local protocols, the beginning and end of the monitoring year are often characterized by few or no observations. To handle missing or incomplete data and ensure consistency in analyzing the observed counts throughout the years, we modified the observed data according to the following assumptions:
+
+ * For November, December, January and February, if no observations were provided, the egg count is assumed to be zero. However, if
+ observations were available, and the weekly number of observations was calculated as the average of the observations for each month.
+
+ * In March and April, if no observations were provided, the observed count is marked as "NA," indicating missing or unavailable data, because under warm temperature conditions, for some mosquito species egg hatching might already occur in March (e.g.[Petric et al., 2021](https://doi.org/10.4081/gh.2021.996)).
+
+# 1. Surveillance database
+
+We start with a simulated dataset of a seasonal ovitraps monitoring. 
+```{r,  message=FALSE, warning=FALSE}
+# Libraries
+library(dplyr)
+library(lubridate)
+library(stringr)
+library(dynamAedes)
+library(ggplot2)
+Sys.setlocale("LC_TIME", "en_GB.UTF-8")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+templatedf <- structure(list(year = c(2014, 2014, 2014, 2014, 2014, 2014, 2014, 2014, 2014, 2014, 2014, 2014, 2014), 
+               setting_date = structure(c(16181,16202, 16223, 16251, 16265, 16279, 16293, 16307, 16321, 16335, 16349, 16363, 16377), class = "Date"), 
+               sampling_date = structure(c(16202, 16223, 16251, 16265, 16279, 16293, 16307, 16321, 16335, 16349, 16363, 16377, 16391), class = "Date"), 
+               value = c(0, 0, 0, 53, 26, 273, 215, 203, 76, 0, 137, 19, 0), 
+               lifeStage = c("Eggs", "Eggs", "Eggs", "Eggs", "Eggs", "Eggs", "Eggs", "Eggs", "Eggs", "Eggs", "Eggs", "Eggs", "Eggs"), trap_type = c("Ovitraps", "Ovitraps", "Ovitraps", "Ovitraps", "Ovitraps", "Ovitraps", "Ovitraps", "Ovitraps", "Ovitraps", "Ovitraps", "Ovitraps", "Ovitraps", "Ovitraps"), 
+               species = c("Aedes albopictus", "Aedes albopictus", "Aedes albopictus", "Aedes albopictus", "Aedes albopictus", "Aedes albopictus", 
+                           "Aedes albopictus", "Aedes albopictus", "Aedes albopictus", "Aedes albopictus", "Aedes albopictus", "Aedes albopictus", 
+                           "Aedes albopictus")), 
+          row.names = c(NA, -13L), class = c("tbl_df", "tbl", "data.frame"))
+```
+```{r, echo=FALSE}
+knitr::kable(templatedf, align = "lccrr")
+```
+
+Where the `setting_date` represents the date when the trap was activated and the `sampling_date` the date when the trap was inspected and the number of eggs, displayed in the `value` field, recorded.
+
+# 2. Pre-processing
+Now we can measure the activation period, i.e. the sampling frequency, of the trap by counting the weeks between the installation of the trap and the sampling.
+```{r}
+templatedf <- templatedf %>% 
+  mutate(delta_week=lubridate::week(sampling_date) - lubridate::week(setting_date))
+
+ggplot(templatedf, aes(x = delta_week)) + 
+  geom_bar(fill="#1A85FF") + 
+  scale_x_continuous(breaks = 1:4)+
+  labs(x = "Weeks", y="Frequency") +
+  ggtitle("Sampling frequency")+
+  theme_classic()+
+  theme(legend.background=element_blank(),
+        panel.grid = element_blank(),
+        legend.position = 'none',
+        plot.title = element_text(hjust = 0.5),
+        text = element_text(size=16), 
+        strip.text = element_text(size=16),
+        legend.text = element_text(size=16,angle = 0), legend.title = element_text(size=16),
+        legend.key.size = unit(1.5, 'cm'))
+```
+
+To downscale the observed number of eggs on a weekly basis, we first need to add the missing dates to the observational data.frame. This means temporally extending the data.frame to cover the whole year.
+```{r}
+mySeq <- tibble("date"=seq.Date(as.Date('2014-01-01'), as.Date('2014-12-31'), by="day")) %>% 
+          mutate(temporalID = paste0(lubridate::year(date), "_" , lubridate::week(date)), 
+                 wday = wday(date) ) %>% 
+  filter(wday ==2) %>% 
+  select(date, temporalID)  
+  
+#add temporal ID to the observational dataset and merge the missing dates
+tmp <- templatedf %>%
+  mutate(temporalID=paste0(year,  "_",    stringr::str_pad(week(sampling_date), 2, pad="0"))) %>% 
+  select(temporalID, value, delta_week) %>% 
+  full_join(mySeq, by="temporalID" ) %>% 
+  arrange(date)
+
+tmp %>% print(n=52)
+```
+
+# 3. The `spreader` function
+
+## 3.1 User-defined sampling period
+We can now apply the `spreader` function, specifying the required arguments and observing the temporal downscaling performed on the `value_adj` field. The parameter `counter.field` is set to consider the `delta_week` column as a specification for the length (in weeks) of each sampling.
+
+```{r}
+# apply spreader function
+ex <- spreader(mydf = tmp, 
+         date.field = "date", 
+         value.field = "value", 
+         counter.field = "delta_week",
+         seed=123)
+ex %>% print(n=52)
+```
+
+To visualize the effect of the temporal downscaling: 
+
+```{r, warning=FALSE}
+cols <- c("Observed" = "#E1BE6A", "Post-processed" = "#40B0A6" )
+
+bind_rows(templatedf %>% 
+  mutate(week = lubridate::week(sampling_date), 
+         field = "Observed") %>% 
+  select(week, value, field), 
+  ex %>% 
+  mutate(week = lubridate::week(date), 
+         field = "Post-processed") %>% 
+  select(week, value_adj, field) %>%   
+  dplyr::rename(  value = value_adj)
+  )%>% 
+  ggplot(aes(week, value,  col=field, fill=field)) + 
+  geom_bar(position="dodge", stat="identity", size=0.5, width = 0.8)+
+  scale_color_manual(values = cols)+
+  scale_fill_manual(values = cols)+
+  ylim(0, 250)+
+  facet_wrap(~field,nrow=2)+
+  labs(x="Week", y="Egg abundance" )+
+  scale_x_continuous( breaks = seq(5, 50, by =5), limits=c(1, 52))+
+  theme_classic()+
+  theme(legend.background=element_blank(),
+        panel.grid = element_blank(),
+        legend.position = 'none',
+        text = element_text(size=16), 
+        strip.text = element_text(size=16),
+        legend.text = element_text(size=16,angle = 0), legend.title = element_text(size=16),
+        legend.key.size = unit(1.5, 'cm'))
+```
+
+Firstly, we can note that the new observations consist of zeros for weeks 1-8 (January and February). From March up to mid-April `value_adj = NA` as no actual data was recorded. Sampling started on week 17 and the trap was collected 2 weeks later (week 19) with no eggs collected (value=0). Thus `value_adj = 0` for the three considered weeks. The first observation different from 0 occurred on week 28 when 53 eggs were collected over two weeks. Thus the observation was spread on weeks 27 and 28 with `value_adj` equal to 24 and 29 respectively (24+29 = 53). 
+
+We remark that observations are reallocated randomly; the spreader function allows us to specify the seed in the arguments, so it is possible to recreate the same new dataset using the same seed.
+
+Finally, the monitoring activity ended on week 46 (mid-November), so we averaged those samplings and spread them over the month. As no data was recorded in December, `value_adj` is set equal to zero. 
+
+## 3.2 Automatic detection of the sampling period
+
+In this section we apply the `spreader` function with no specification for the `counter.field` argument.
+
+```{r}
+# apply spreader function
+ex_noSampl <- spreader(mydf = tmp, 
+         date.field = "date", 
+         value.field = "value", 
+         counter.field = NULL,
+         seed=123)
+```
+
+The output is the same as the one obtained previously since we used the same seed value. This is even more clear from the following plot:
+
+```{r, warning=FALSE}
+plot(ex$value_adj, ex_noSampl$value_adj, 
+     xlab ="User-defined counter.field", 
+     ylab ="Automatic counter.field")
+abline(a=0,b=1,lty=2)
+```
+
+# 4. Usage notes
+In this example, the *week* was defined as the fundamental temporal unit. However, the function can be applied with the same rationale to other temporal units, i.e. *days*.  

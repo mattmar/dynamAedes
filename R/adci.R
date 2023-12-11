@@ -81,13 +81,13 @@ adci <- function(input_sim = NULL, stage = NULL, sub_stage = NULL,
         all.matrix <- data.frame(t(apply(all.matrix, 1, function(x) quantile(x, probs=breaks, na.rm=T))), day=eval_date, stage=stage)
 
         } else {
-          tabCoord <- which(apply(AedeslifeHistoryList$speciesheet, 1:2, function(x) grepl(sub_stage, x)), arr.ind = TRUE)
+          tabCoord <- which(apply(AedeslifeHistoryList$speciesheet, 1:2, function(x) grepl(sub_stage, x)), arr.ind = TRUE)[1,]
           message(paste("Computing sub-compartment", sub_stage, names(AedeslifeHistoryList$speciesheet)[tabCoord[2]], "abundance..." ))
 
           all.matrix <- do.call(cbind, mclapply(1:input_sim@n_iterations, mc.cores=n.clusters, function(y) {
             sapply(eval_date, function(x) sum(input_sim@simulation[[y]][x][[1]][tabCoord[2],,tabCoord[1]]))
             }))
-          all.matrix <- data.frame(t(apply(all.matrix, 1, function(x) quantile(x, probs=breaks, na.rm=TRUE))), day=eval_date, stage=stage)
+          all.matrix <- data.frame(t(apply(all.matrix, 1, function(x) quantile(x, probs=breaks, na.rm=TRUE))), day=eval_date, stage=stage, sub_stage = sub_stage)
         }
       }
 
@@ -159,17 +159,17 @@ adci <- function(input_sim = NULL, stage = NULL, sub_stage = NULL,
               names(all.matrix) <- paste("q",breaks,sep="_")
             } else {
               if (nrow(coords) <= 1 || is.null(coords) || type == "O") {
-                tabCoord <- which(sapply(AedeslifeHistoryList$speciesheet, grepl, pattern=sub_stage), arr.ind=TRUE)
+                tabCoord <- which(sapply(AedeslifeHistoryList$speciesheet, grepl, pattern=sub_stage), arr.ind=TRUE)[1,]
                 message(paste("Computing non-spatial sub-compartment", sub_stage, names(AedeslifeHistoryList$speciesheet)[tabCoord[2]], "abundance..."))
 
                 all.matrix <- do.call(cbind, mclapply(1:input_sim@n_iterations, mc.cores=n.clusters, function(y) {
                   sapply(eval_date, function(x) sum(input_sim@simulation[[y]][x][[1]][tabCoord[2],,tabCoord[1]]))
                   }))
-                all.matrix <- data.frame(t(apply(all.matrix, 1, function(x) quantile(x, probs=breaks, na.rm=TRUE))), day=eval_date, stage=stage)
+                all.matrix <- data.frame(t(apply(all.matrix, 1, function(x) quantile(x, probs=breaks, na.rm=TRUE))), day=eval_date, stage=stage, sub_stage = sub_stage)
               } 
               else {
                 message("Computing spatio-temporal abundance estimate at substage level.")
-                tabCoord <- which(sapply(AedeslifeHistoryList$speciesheet, grepl, pattern=sub_stage), arr.ind=TRUE)
+                tabCoord <- which(sapply(AedeslifeHistoryList$speciesheet, grepl, pattern=sub_stage), arr.ind=TRUE)[1,]
                 message(paste("Computing sub-compartment", sub_stage, names(AedeslifeHistoryList$speciesheet)[tabCoord[2]], "abundance..."))
 
                 # Compute all matrix based on the specific sub-stage
@@ -193,4 +193,4 @@ adci <- function(input_sim = NULL, stage = NULL, sub_stage = NULL,
           }
         }
         return(all.matrix)
-      }
+}

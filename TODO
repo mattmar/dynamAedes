@@ -1,10 +1,12 @@
 ## 2.1.*
-# Remove gdal from DESCRIPTION and thus vignettes
-# Multiple introductions for punctual scale: Emma?
-# Implement evaporation function and precipitation input
-# dynamAedes object to store attributes of the scenario
-# Add new function for adci made by Daniele
-# Check if dplyr can be just in suggested
+# merge psi and psi_sp in a unique function: @Matteo
+# check summary print for punctual and local scale @Matteo
+# Remove gdal from DESCRIPTION and thus vignettes: done
+# Multiple introductions for punctual scale: @Emma
+# Implement evaporation function and precipitation input @Emma
+# dynamAedes object to store attributes of the scenario: done
+# Add new function for adci made by Daniele: done
+# Check if dplyr can be just in suggested: done
 
 # dynamAedes.m 1.0.0
 ## package: Add vignettes
