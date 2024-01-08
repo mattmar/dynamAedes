@@ -1,12 +1,12 @@
 ---
-title: "05. Temporal downscaling of entomological surveillance observations"
+title: "05. Temporal downscaling of entomological observations"
 author: "Daniele Da Re, Giovanni Marini"
 output: 
   rmarkdown::html_vignette:
     toc: true
     toc_depth: 3
 vignette: |
-  %\VignetteIndexEntry{05. Temporal downscaling of entomological surveillance observations}
+  %\VignetteIndexEntry{05. Temporal downscaling of entomological observations}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 date: "`r Sys.Date()`"
@@ -94,7 +94,7 @@ mySeq <- tibble("date"=seq.Date(as.Date('2014-01-01'), as.Date('2014-12-31'), by
   
 #add temporal ID to the observational dataset and merge the missing dates
 tmp <- templatedf %>%
-  mutate(temporalID=paste0(year,  "_",    stringr::str_pad(week(sampling_date), 2, pad="0"))) %>% 
+  mutate(temporalID=paste0(year,  "_",  stringr::str_pad(week(sampling_date), 2, pad="0"))) %>% 
   select(temporalID, value, delta_week) %>% 
   full_join(mySeq, by="temporalID" ) %>% 
   arrange(date)
@@ -122,7 +122,7 @@ To visualize the effect of the temporal downscaling:
 ```{r, warning=FALSE}
 cols <- c("Observed" = "#E1BE6A", "Post-processed" = "#40B0A6" )
 
-bind_rows(templatedf %>% 
+dplyr::bind_rows(templatedf %>% 
   mutate(week = lubridate::week(sampling_date), 
          field = "Observed") %>% 
   select(week, value, field), 

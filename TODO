@@ -1,18 +1,39 @@
+<<<<<<< HEAD
 ## 2.1.*
 # merge psi and psi_sp in a unique function: @Matteo
-# check summary print for punctual and local scale @Matteo
+# check summary print for punctual and local scale: done
 # Remove gdal from DESCRIPTION and thus vignettes: done
 # Multiple introductions for punctual scale: @Emma
 # Implement evaporation function and precipitation input @Emma
 # dynamAedes object to store attributes of the scenario: done
 # Add new function for adci made by Daniele: done
 # Check if dplyr can be just in suggested: done
+=======
+## 2.2.8
+# merge psi and psi_sp in a unique function: @Matteo
+# check summary print for punctual and local scale @Matteo
+# Multiple introductions for punctual scale: @Emma
+# Implement evaporation function and precipitation input @Emma
+
+# 2.2.*
+## package: Add vignettes for new adci subcompartments
+## package: Merge psi & psi_sp in a single function
+## model: Name iterations and days in dynamAedes object ($sim*$d*)
+## model: Change scale name in summary
+
+# 2.1.*
+## package: Remove gdal from DESCRIPTION and thus vignettes (v)
+## package: Multiple introductions for punctual scale: Emma?
+## package: Implement evaporation function and precipitation input 
+## package: dynamAedes object to store attributes of the scenario (v)
+## package: Add new function for adci made by Daniele (v)
+## package: Check if dplyr can be just in suggested (v)
+>>>>>>> ed5ae1f58091a1ae3a0ab17725493225f8f8a6a8
 
 # dynamAedes.m 1.0.0
 ## package: Add vignettes
 ## package: Add plotting functions
 ## package: Add manuals
-
 ## physiological functions: see Monteiro 2007 used in https://doi.org/10.1016/j.actatropica.2019.105228
 
 ## model check: add stop() at the beginning of the computation, if temperature matrix has NAs, then stop the iteration
