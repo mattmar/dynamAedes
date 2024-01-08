@@ -104,7 +104,7 @@ Function to simulate population dynamics of \emph{Aedes} mosquitoes
 # Make a toy temperature time series
 w <- matrix(seq(20,25,length.out=5),ncol=5)*1000
 # Run the model
-	dynamAedes.m(
+	simout <- dynamAedes.m(
 	species="koreicus", 
 	scale="ws",
 	intro.eggs=10, 
@@ -116,7 +116,8 @@ w <- matrix(seq(20,25,length.out=5),ncol=5)*1000
 	long=8,
 	n.clusters=1, 
 	iter=1,
-	compressed.output=TRUE)
+	compressed.output=TRUE,
+	verbose=FALSE)
 }
 }
 \seealso{

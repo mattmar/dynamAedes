@@ -1,3 +1,9 @@
+# dynamAedes 2.2.8
+* Adds reference file for life history traits `AedeslifeHistoryList`.
+* Adds function `spread`.
+* Adds vignettes 4 (Uncompressed output) and 5 (spread).
+* Fixes minor issues in `adci`.
+
 # dynamAedes 2.2.7
 * Adapts all auxiliary functions to the `dynamAedesClass` output.
 * Adds `adci` function that allows for substages statistics and merges space/non-space outputs.

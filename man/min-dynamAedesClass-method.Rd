@@ -24,7 +24,7 @@ propagule in the system (any stage) along iterations.
 }
 \examples{
 \dontrun{
-summary(sim)
+min(sim)
 }
 
 }

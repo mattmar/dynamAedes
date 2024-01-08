@@ -264,13 +264,13 @@ endr <- "2000-09-01"
 ## Define the number of adult females to be introduced
 ia <- 10000
 ## Define the number of model iterations
-it <- 5 # The higher the number of simulations the better
+it <- 1 # The higher the number of simulations the better
 ## Define the number of liters for the larval density-dependent mortality
 habitat_liters <- 100
 ##Define average trip distance
 mypDist <- 1000
 ## Define the number of parallel processes (for sequential iterations set nc=1)
-cl <- 5
+cl <- 1
 ## Define proj4 string
 utm32N <- "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs" 
 ```
