@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">dynamAedes</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.8</span>
       </span>
     </div>
 
@@ -39,6 +39,12 @@
     </li>
     <li>
       <a href="../articles/dynamAedes_03_regional.html">03. The Regional Scale Model</a>
+    </li>
+    <li>
+      <a href="../articles/dynamAedes_04_uncompModel.html">04. The uncompressed model output (sub-stage level)</a>
+    </li>
+    <li>
+      <a href="../articles/dynamAedes_05_spreader.html">05. Temporal downscaling of entomological observations</a>
     </li>
   </ul></li>
 <li>
@@ -238,7 +244,7 @@
 <span class="r-in"><span><span class="co"># Make a toy temperature time series</span></span></span>
 <span class="r-in"><span><span class="va">w</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">20</span>,<span class="fl">25</span>,length.out<span class="op">=</span><span class="fl">5</span><span class="op">)</span>,ncol<span class="op">=</span><span class="fl">5</span><span class="op">)</span><span class="op">*</span><span class="fl">1000</span></span></span>
 <span class="r-in"><span><span class="co"># Run the model</span></span></span>
-<span class="r-in"><span>  <span class="fu">dynamAedes.m</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">simout</span> <span class="op">&lt;-</span> <span class="fu">dynamAedes.m</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  species<span class="op">=</span><span class="st">"koreicus"</span>, </span></span>
 <span class="r-in"><span>  scale<span class="op">=</span><span class="st">"ws"</span>,</span></span>
 <span class="r-in"><span>  intro.eggs<span class="op">=</span><span class="fl">10</span>, </span></span>
@@ -250,7 +256,8 @@
 <span class="r-in"><span>  long<span class="op">=</span><span class="fl">8</span>,</span></span>
 <span class="r-in"><span>  n.clusters<span class="op">=</span><span class="fl">1</span>, </span></span>
 <span class="r-in"><span>  iter<span class="op">=</span><span class="fl">1</span>,</span></span>
-<span class="r-in"><span>  compressed.output<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  compressed.output<span class="op">=</span><span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>  verbose<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  ### Model without dispersal ### </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ##########################################</span>
@@ -265,70 +272,6 @@
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ########################################</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> An object of class "dynamAedesClass"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Slot "species":</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "koreicus"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Slot "scale":</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Weaether Station"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Slot "start_date":</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "2021-06-21"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Slot "end_date":</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "2021-06-25"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Slot "n_iterations":</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Slot "stage_intro":</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "egg"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Slot "n_intro":</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Slot "coordinates":</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      [,1] [,2]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]    8   42</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Slot "compressed_output":</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Slot "jhwv":</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Slot "dispersal":</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Simulations without dispersal"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Slot "simulation":</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]][[1]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              [,1]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> egg             4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> juvenile        6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> adult           0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> diapause_egg    0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]][[2]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              [,1]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> egg             1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> juvenile        9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> adult           0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> diapause_egg    0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]][[3]]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              [,1]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> egg             0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> juvenile       10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> adult           0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> diapause_egg    0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"compressed")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

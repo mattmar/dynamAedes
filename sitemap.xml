@@ -13,6 +13,12 @@
     <loc>/articles/dynamAedes_03_regional.html</loc>
   </url>
   <url>
+    <loc>/articles/dynamAedes_04_uncompModel.html</loc>
+  </url>
+  <url>
+    <loc>/articles/dynamAedes_05_spreader.html</loc>
+  </url>
+  <url>
     <loc>/articles/index.html</loc>
   </url>
   <url>
@@ -107,6 +113,9 @@
   </url>
   <url>
     <loc>/reference/psi_sp.html</loc>
+  </url>
+  <url>
+    <loc>/reference/spreader.html</loc>
   </url>
   <url>
     <loc>/reference/summary-dynamAedesClass-method.html</loc>

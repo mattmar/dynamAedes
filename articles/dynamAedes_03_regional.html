@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">dynamAedes</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.8</span>
       </span>
     </div>
 
@@ -64,6 +64,12 @@
     </li>
     <li>
       <a href="../articles/dynamAedes_03_regional.html">03. The Regional Scale Model</a>
+    </li>
+    <li>
+      <a href="../articles/dynamAedes_04_uncompModel.html">04. The uncompressed model output (sub-stage level)</a>
+    </li>
+    <li>
+      <a href="../articles/dynamAedes_05_spreader.html">05. Temporal downscaling of entomological observations</a>
     </li>
   </ul>
 </li>
@@ -95,7 +101,7 @@
                         <h4 data-toc-skip class="author">Daniele Da Re,
 Sophie O. Vanwambeke, Matteo Marcantonio</h4>
             
-            <h4 data-toc-skip class="date">2023-10-31</h4>
+            <h4 data-toc-skip class="date">2024-01-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mattmar/dynamAedes/blob/HEAD/vignettes/dynamAedes_03_regional.Rmd" class="external-link"><code>vignettes/dynamAedes_03_regional.Rmd</code></a></small>
       <div class="hidden name"><code>dynamAedes_03_regional.Rmd</code></div>
@@ -252,7 +258,7 @@ series and autocorrelated temperature surface</p>
 <h4 id="format-temperature-data">1.2.1 Format temperature data<a class="anchor" aria-label="anchor" href="#format-temperature-data"></a>
 </h4>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">mat</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"d_"</span>, <span class="fl">1</span><span class="op">:</span><span class="va">ndays</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">mat</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"d_"</span>, <span class="fl">1</span><span class="op">:</span><span class="va">ndays</span><span class="op">)</span></span>
 <span><span class="va">df_temp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">df</span>, <span class="va">mat</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
