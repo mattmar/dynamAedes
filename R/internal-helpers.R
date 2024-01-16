@@ -396,3 +396,14 @@ return( i.dmort.pred )
   }
   return(outd)
 }
+
+#Safer version of sample
+.resample <- function(x, ...) x[sample.int(length(x), ...)]
+
+# Check dayspan as well as date format function
+check_date_format <- function(date) {
+  if (!grepl("^\\d{4}-\\d{2}-\\d{2}$", date)) {
+    stop("Dates in the wrong format: change them to '%Y-%m-%d'.")
+  }
+}
+

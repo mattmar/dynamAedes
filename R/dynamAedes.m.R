@@ -53,26 +53,16 @@ if(length(matches) == 1) {
   stop("Mosquito species not supported, exiting...")
 }
 
-#Safer version of sample
-.resample <- function(x, ...) x[sample.int(length(x), ...)]
-
-# Check dayspan as well as date format function
-check_date_format <- function(date) {
-  if (!grepl("^\\d{4}-\\d{2}-\\d{2}$", date)) {
-    stop("Dates in the wrong format: change them to '%Y-%m-%d'.")
-  }
-}
-
 # Check start date format
 check_date_format(as.character(startd))
 
 # Determine dayspan
 if (is.na(endd)) {
-  dayspan <- ncol(temps.matrix) - 1
+  dayspan <- ncol(temps.matrix)
 } else {
   # Check end date format
   check_date_format(as.character(endd))
-  dayspan <- as.integer(as.Date(endd) - as.Date(startd))
+  dayspan <- length(as.Date(startd):as.Date(endd))
 }
 
 # Set dayspan length
@@ -120,7 +110,7 @@ if( is.na(avgpdisp) ) {
 								} else (stop("avgpdisp not supported yet..."))
 ## Derive daylength for laying of diapausing eggs in albopictus/koreicus/japonicus
 if( species!="aegypti" ){
-	doy <- as.numeric(format(seq(as.POSIXct(startd), as.POSIXct(as.Date(startd)+dayspan), by='day'), "%j"))
+  doy <- as.numeric(format(seq(as.POSIXct(startd), as.POSIXct(as.Date(endd)), length.out=dayspan), "%j"))
 	if( scale=="rg" ) {
 		photo.matrix <- lapply(doy, function(x){geosphere::daylength(lat=cells.coords.photo[,2], doy=x)})
 		photo.matrix <- do.call(cbind,photo.matrix)
