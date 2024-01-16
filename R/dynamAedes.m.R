@@ -221,7 +221,7 @@ if( exists("counter") ) {
 	rm(counter)
 }
 setTxtProgressBar(pb, legind)
-foreach(day = 2:dayspan, .combine=c, .export = ls(globalenv())) %do% {
+foreach(day = 1:dayspan, .combine=c, .export = ls(globalenv())) %do% {
 	while( !stopit ) {
 		if( !exists("counter") ) {
 # Index for dynamic array eggs
@@ -250,13 +250,19 @@ i.emer.p <- .i.emer_rate.f(temps.matrix[,day]/1000, species)
 ## Derive daily immature survival rate
 i.mort_rate.v <- -log(.i.surv_rate.f(temps.matrix[,day]/1000, species))
 # Set allocation of diapause/non-diapause eggs
-if(scale=="rg" & species!="aegypti") {
-	e.diap.p <- if( any(photo.matrix[,day-1]>photo.matrix[,day]) ) .e.dia_rate.f(photo.matrix[,day], species) else rep(0, ncol(photo.matrix))
-	} else { 
-		e.diap.p <- if( dl[day-1]>dl[day] ) {
-			.e.dia_rate.f(dl[day], species)
-			} else{0} 
-		}
+e.diap.p <- if(length(counter)!=1){ # counter on the first day: no diapause
+  if(scale=="rg" & species!="aegypti") { # diapause incidence at regional scale 
+    if( any(photo.matrix[,day-1] > photo.matrix[,day])){ # diapause incidence during summer
+      .e.dia_rate.f(photo.matrix[,day], species) 
+    } else {rep(0, ncol(photo.matrix))}
+  } else { if( dl[day-1]>dl[day] ) { # diapause incidence at punctual scale 
+    .e.dia_rate.f(dl[day], species)
+  } else{0} 
+  }
+} else{ if(scale=="rg"){ # diapause incidence at regional scale during winter
+  rep(0, ncol(photo.matrix))
+} else{0}
+}
 ## Derive daily egg hatching rate
 e.hatc.p <- .e.hatch_rate.f(temps.matrix[,day]/1000, species)
 ## Derive daily egg survival rate
@@ -272,9 +278,9 @@ if( dispersal ) {f.pdis.p <- dgamma(seq(1,max(road.dist.matrix,na.rm=T),1000),sh
 p.life.a[1,,2:(4*de)] <- apply(t(p.life.a[1,,1:(4*de-1)]),MARGIN=mrg,function(x) rbinom(size=x,n=space,prob=e.surv.p))
 if(species!="aegypti") {p.life.a[4,,2:(4*de)] <- apply(t(p.life.a[4,,1:(4*de-1)]),MARGIN=mrg,function(x) rbinom(size=x,n=space,prob=d.surv.p))} else {p.life.a[4,,2:(4*de)] <- 0}
 ## Introduce eggs if day==1; introduction happens in E sub-compartment 8 as it can be assumed that eggs are most likely to be introduced in an advanced stage of development 
-p.life.a[1,,(4*de)] <- if( length(counter)==1 ) {
-	e.intro.n
-	} else p.life.a[1,,(4*de)]
+p.life.a[1,,(4*de)] <- if(length(counter)==1) {
+	e.intro.n 
+} else {p.life.a[1,,(4*de)]}
 # Diapause eggs
 p.life.a[4,,(4*de)] <- if( length(counter)==1 ) {
 	d.intro.n
@@ -287,19 +293,23 @@ p.life.a[1,,c(4*de)] <- p.life.a[1,,c(4*de)] + e.temp.v
 if(species!="aegypti") {p.life.a[4,,c(4*de)] <- p.life.a[4,,c(4*de)] + d.temp.v}
 # Binomial draw to find numbers of eggs 8-d+ old that hatch today (per cell)
 e.hatc.n <- rbinom(length(1:space), p.life.a[1,,c(4*de)], prob=e.hatc.p)
-if( species=="albopictus" ) {
-	if( any(photo.matrix[,day]>photo.matrix[,day-1]) & any(photo.matrix[,day]>11.44) ) {
-		d.hatc.n <- rep(0,space)
-		ddays <- which(photo.matrix[,day]>11.44)
-		d.hatc.n[ddays] <- rbinom(length(ddays), p.life.a[4,ddays,c(4*de)], prob=e.hatc.p)
-		} else {d.hatc.n <- 0}
-		}else if( species=="koreicus"|species=="japonicus" ) {
-			if( photo.matrix[,day]>photo.matrix[,day-1] & any(photo.matrix[,day]>10.71) ) {
-				d.hatc.n <- rep(0,space)
-				ddays <- which(photo.matrix[,day]>10.71)
-				d.hatc.n[ddays] <- rbinom(length(ddays), p.life.a[4,ddays,c(4*de)], prob=e.hatc.p)
-				} else {d.hatc.n <- 0}
-				} else {d.hatc.n <- 0}
+if(length(counter)!=1){
+  if( species=="albopictus" ) {
+    if( any(photo.matrix[,day]>photo.matrix[,day-1]) & any(photo.matrix[,day]>11.44) ) {
+      d.hatc.n <- rep(0,space)
+      ddays <- which(photo.matrix[,day]>11.44)
+      d.hatc.n[ddays] <- rbinom(length(ddays), p.life.a[4,ddays,c(4*de)], prob=e.hatc.p)
+    } else {d.hatc.n <- 0}
+  }else if( species=="koreicus"|species=="japonicus" ) {
+    if( photo.matrix[,day]>photo.matrix[,day-1] & any(photo.matrix[,day]>10.71) ) {
+      d.hatc.n <- rep(0,space)
+      ddays <- which(photo.matrix[,day]>10.71)
+      d.hatc.n[ddays] <- rbinom(length(ddays), p.life.a[4,ddays,c(4*de)], prob=e.hatc.p)
+    } else {d.hatc.n <- 0}
+  } else {d.hatc.n <- 0}
+} else {
+  d.hatc.n <- 0
+}
 # Remove hatched eggs from eggs 8d+ old
 e.temp.v <- p.life.a[1,,(4*de)] - e.hatc.n
 if( species!="aegypti" ) {d.temp.v <- p.life.a[4,,c(4*de)] - if(species!="aegypti") {d.hatc.n} else {0}}
