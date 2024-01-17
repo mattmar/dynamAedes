@@ -367,7 +367,7 @@ dim(simout@simulation[[1]][[1]])
 
 We can now use the auxiliary functions of the package to Analyse the results.
 
-# 3. Analyse the results
+
 ## 3.1 Derive probability of a successfull introduction at the end of the simulated period
 First, we can retrieve the probability of successful introduction, computed as the proportion of model
 iterations that resulted in a viable mosquito population at a given date.

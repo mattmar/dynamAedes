@@ -5,7 +5,7 @@
 #' @slot end_date Character. The end date of the simulation.
 #' @slot n_iterations Numeric. The number of iterations.
 #' @slot stage_intro Character. The introduced mosquito stage.
-#' @slot n_intro Numeric. The number of propagules introduced.
+#' @slot n_intro numeric. The number of propagules introduced.
 #' @slot coordinates Matrix. The coordinates of each cell.
 #' @slot compressed_output Logical. If output is at stage or substage level.
 #' @slot jhwv Numeric. The volume of water in the system.

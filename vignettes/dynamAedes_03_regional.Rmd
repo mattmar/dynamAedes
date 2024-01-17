@@ -199,7 +199,9 @@ simout <- dynamAedes.m(species="albopictus",
             seeding=TRUE,
             verbose=FALSE)
 ```
+
 #3. Analyse the results
+
 A first summary of simulations can be obtained with:
 ```{r, warning=FALSE}
 summary(simout)
@@ -232,7 +234,6 @@ dim(simout@simulation[[1]][[1]])
 
 We can now use the auxiliary functions of the package to Analyse the results. 
 
-# 3. Analyse the results
 ## 3.1 Derive probability of a successfull introduction at the end of the simulated period
 
 First, we can retrieve the "probability of a successful introduction", computed as the proportion of model iterations that resulted in a viable mosquito population (in any cells of the grid) at a given date.
@@ -252,8 +253,8 @@ We can now compute the interquantile range abundance of the simulated population
 dd <- max(simout) #retrieve the maximum number of simulated days
 
 # Compute the inter-quartile of abundances along the iterations
-breaks=c(0.25,0.50,0.75)
-ed=1:dd
+breaks <- c(0.25,0.50,0.75)
+ed <- 1:dd
 
 # type "O" derives a non-spatial time series
 outdf <- rbind(

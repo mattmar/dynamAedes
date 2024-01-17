@@ -397,13 +397,20 @@ return( i.dmort.pred )
   return(outd)
 }
 
-#Safer version of sample
+#' Safer version of sample
+#' @description sample
+#' @keywords internal
+#' @return  a vector of length n with elements drawn from either x or from the integers 1:x
 .resample <- function(x, ...) x[sample.int(length(x), ...)]
 
+#' Date format check
+#' @description Check the proper format of a date object
+#' @keywords internal
+#' @return Logical
+#' 
 # Check dayspan as well as date format function
 check_date_format <- function(date) {
   if (!grepl("^\\d{4}-\\d{2}-\\d{2}$", date)) {
     stop("Dates in the wrong format: change them to '%Y-%m-%d'.")
   }
 }
-

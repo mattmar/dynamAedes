@@ -162,13 +162,12 @@ psi(input_sim = simout, eval_date = 30)
 ## 3.2 Derive abundance 95% CI for each life stage and in each day
 We now compute the interquantile range abundance for all the stages of the simulated population using the function *adci*.
 ```{r, message=FALSE, warning=FALSE}
-
 # Retrieve the maximum number of simulated days
 dd <- max(simout)
 
 # Compute the inter-quartile of abundances along the iterations
-breaks=c(0.25,0.50,0.75)
-ed=1:dd
+breaks <- c(0.25,0.50,0.75)
+ed <- 1:dd
 
 outdf <- rbind(
   adci(simout, eval_date=ed, breaks=breaks, stage="Eggs"),

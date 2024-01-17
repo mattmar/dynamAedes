@@ -55,7 +55,8 @@ if(length(matches) == 1) {
 
 # Check start date format
 check_date_format(as.character(startd))
-
+# Compute vector of dates for eggs introductions
+myDates <- seq.Date(from = as.Date(startd), to = as.Date(endd), by="day")
 # Determine dayspan
 if (is.na(endd)) {
   dayspan <- ncol(temps.matrix)
@@ -196,13 +197,29 @@ if( intro.adults!=0 ) {
 			if( nrow(temps.matrix)>1 ) {
 				stop( "if scale='lc' then nrow(temps.matrix) must be 1" )
 				} else {
-					e.intro.n <- intro.eggs; d.intro.n <- intro.deggs; i.intro.n <- intro.juveniles; a.intro.n <- intro.adults; road.dist.matrix <- as.data.frame(c(0,0)); names(road.dist.matrix) <- 1
+				  	if(is.list(intro.eggs)){ # multiple introductions
+					  e.intro.n <- rep(0, length = length(myDates))
+					  count.mIntro <- which(myDates %in% as.Date(names(intro.eggs[[iteration]])))
+					  e.intro.n[count.mIntro]<- as.numeric(intro.eggs[[iteration]])
+					} else { # # single introduction on the first day
+					  e.intro.n <- c(intro.eggs, rep(0, length = length(myDates)-1))
+					  e.intro.n <- rep(list(e.intro.n), iter)
+					}
+					d.intro.n <- intro.deggs; i.intro.n <- intro.juveniles; a.intro.n <- intro.adults; road.dist.matrix <- as.data.frame(c(0,0)); names(road.dist.matrix) <- 1
 				}
 				} else if( scale=="rg" ) {
 					if( nrow(temps.matrix)<1 ) {
 						stop( "if scale='rg' then nrow(temps.matrix) must be > 1" )
 						} else {
-							e.intro.n <- intro.eggs; d.intro.n <- intro.deggs; i.intro.n <- intro.juveniles; a.intro.n <- intro.adults; road.dist.matrix <- as.data.frame(c(0,0)); names(road.dist.matrix) <- 1
+						  if(is.list(intro.eggs)){ # multiple introductions
+						    e.intro.n <- rep(0, length = length(myDates))
+						    count.mIntro <- which(myDates %in% as.Date(names(intro.eggs[[iteration]])))
+						    e.intro.n[count.mIntro]<- as.numeric(intro.eggs[[iteration]])
+						  } else { # # single introduction on the first day
+						    e.intro.n <- c(intro.eggs, rep(0, length = length(myDates)-1))
+						    e.intro.n <- rep(list(e.intro.n), iter)
+						  }
+							d.intro.n <- intro.deggs; i.intro.n <- intro.juveniles; a.intro.n <- intro.adults; road.dist.matrix <- as.data.frame(c(0,0)); names(road.dist.matrix) <- 1
 						}
 						} else stop("Wrong scale.")
 ### Day cycle: Start sequential "day" life cycle into the "iteration" loop ###
@@ -269,8 +286,10 @@ p.life.a[1,,2:(4*de)] <- apply(t(p.life.a[1,,1:(4*de-1)]),MARGIN=mrg,function(x)
 if(species!="aegypti") {p.life.a[4,,2:(4*de)] <- apply(t(p.life.a[4,,1:(4*de-1)]),MARGIN=mrg,function(x) rbinom(size=x,n=space,prob=d.surv.p))} else {p.life.a[4,,2:(4*de)] <- 0}
 ## Introduce eggs if day==1; introduction happens in E sub-compartment 8 as it can be assumed that eggs are most likely to be introduced in an advanced stage of development 
 p.life.a[1,,(4*de)] <- if(length(counter)==1) {
-	e.intro.n 
-} else {p.life.a[1,,(4*de)]}
+  e.intro.n[day]
+} else {
+  p.life.a[1,,(4*de)] + e.intro.n[day]
+} 
 # Diapause eggs
 p.life.a[4,,(4*de)] <- if( length(counter)==1 ) {
 	d.intro.n
@@ -486,8 +505,8 @@ return(
 		scale=ifelse(scale=="ws","Weather Station", ifelse(scale=="lc","Local","Regional")), 
 		start_date=startd, end_date=ifelse(is.na(endd), "1990-01-01", endd), 
 		n_iterations=iter, 
-		stage_intro=ifelse(intro.eggs!=0, "egg", ifelse(intro.juveniles!=0, "juvnile", ifelse(intro.adults!=0, "adult", "Diapause egg"))),
-		n_intro=ifelse(intro.eggs!=0, intro.eggs, ifelse(intro.juveniles!=0, intro.juveniles, ifelse(intro.adults!=0,intro.adults, intro.deggs))),
+		stage_intro=ifelse(any(sapply(intro.eggs, function(x){x!=0})), "egg", ifelse(intro.juveniles!=0, "juvenile", ifelse(intro.adults!=0, "adult", "Diapause egg"))),
+		n_intro=ifelse(any(sapply(intro.eggs, function(x){x!=0})), intro.eggs[[1]], ifelse(intro.juveniles!=0, intro.juveniles, ifelse(intro.adults!=0,intro.adults, intro.deggs))),
 		coordinates=if(!scale=="ws") {matrix(cells.coords, ncol=2)} else{matrix(c(long, lat), byrow=TRUE, nrow=1)},
 		compressed_output=compressed.output,
 		jhwv=jhwv, 

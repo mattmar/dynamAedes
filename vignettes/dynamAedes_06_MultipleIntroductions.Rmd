@@ -1,12 +1,12 @@
 ---
-title: "04. The uncompressed model output (sub-stage level)"
-author: "Daniele Da Re, Matteo Marcantonio"
+title: "06. Multiple introductions of Aedes propagules"
+author: "Emmanuelle Kern, Ilaria Dorigatti, Daniele Da Re, Matteo Marcantonio"
 output: 
   rmarkdown::html_vignette:
     toc: true
     toc_depth: 3
 vignette: |
-  %\VignetteIndexEntry{04. The uncompressed model output (sub-stage level)}
+  %\VignetteIndexEntry{06. Multiple introductions of Aedes propagules}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
   %\number_sections: yes
@@ -22,62 +22,11 @@ This tutorial explains step-by-step the main features of **dynamAedes** package,
 
 The model is driven by temperature, photoperiod and intra-specific larval competition and can be applied to three different spatial scales: punctual, local and regional. These spatial scales consider different degrees of spatial complexity and data availability, by accounting for both active and passive dispersal of the modelled mosquito species as well as for the heterogeneity of input temperature data.
 
-We will describe the *uncompressed* model application for *Ae. albopictus* at the punctual and regional scales by using a simulated temperature dataset. The *uncompressed* model return the number of simulated individuals not only for the three main compartments, i.e. life stages (eggs, juveniles and adults), but also the number of simulated individuals within each sub-compartments, such as 2-days old eggs or host-seeking adult females. 
+We will describe the multiple introduction of mosquito propagules for *Ae. albopictus* at the punctual and regional scales by using a simulated temperature dataset. 
 
-# 1. Sub-compartment structure
+# 1. Multiple introductions
 
-The general structure of the compartments and sub-compartments for the four species can be inspected from the `AedeslifeHistoryList` object available in the package.
-```{r,  message=FALSE, warning=FALSE, echo=FALSE}
-library(dynamAedes)
-data(AedeslifeHistoryList)
-knitr::kable(AedeslifeHistoryList$speciesheet, align = "ccccc")
-```
-
-For each species, the sub-compartments are arranges as follows.
-
-## 1.1 *Aedes aegypti*
-```{r,  message=FALSE, warning=FALSE, echo=FALSE}
-species_data <- data.frame(
-  Species = rep("*Ae. aegypti*", 6),
-  `Sub-compartments` = paste("Sub-compartment", 1:6),
-  Eggs = c("New layed egg", "2 day egg", "3 day egg", ">= 4 day egg", NA, NA),
-  Juveniles = c("1 day juv", "2 day juv", "3 day juv", "4 day juv", "5 day juv", ">= 6 day juv"),
-  Adults = c("blood fed", "ovipositing d1", "ovipositing d2", "Host-seeking", "new emerged", NA)
-)
-
-knitr::kable(species_data, format = "markdown", align = c('c', 'c', 'c', 'c', 'c'))
-```
-## 1.2 *Aedes albopictus*
-```{r,  message=FALSE, warning=FALSE, echo=FALSE}
-species_data <- data.frame(
-  Species = rep("*Ae. albopictus*", 6),
-  `Sub-compartments` = paste("Sub-compartment", 1:6),
-  Eggs = c("New layed egg", "2 day egg", "3 day egg", ">= 4 day egg", NA, NA),
-  Juveniles = c("1 day juv", "2 day juv", "3 day juv", "4 day juv", "5 day juv", ">= 6 day juv"),
-  Adults = c("blood fed", "ovipositing d1", "ovipositing d2", "Host-seeking", "new emerged", NA),
-  `Diapausing Eggs` = c("New layed degg", "2 day degg", "3 day degg", ">= 4 day degg", NA, NA)
-)
-knitr::kable(species_data, format = "markdown", align = c('c', 'c', 'c', 'c', 'c', 'c'))
-```
-
-## 1.3 *Aedes japonicus* and *Ae. koreicus*
-```{r,  message=FALSE, warning=FALSE, echo=FALSE}
-species_data <- data.frame(
-  Species = rep("*Ae. japonicus* or *Ae. koreicus*", 12),
-  `Sub-compartments` = paste("Sub-compartment", 1:12),
-  Eggs = c("New layed egg", "2 day egg", "3 day egg", "4 day egg", "5 day egg", 
-           "6 day egg", "7 day egg", ">=8 day egg", NA, NA, NA, NA),
-  Juveniles = c("1 day juv", "2 day juv", "3 day juv", "4 day juv", "5 day juv", 
-                "6 day juv", "7 day juv", "8 day juv", "9 day juv", "10 day juv", 
-                "11 day juv", ">=12 day juv"),
-  Adults = c("blood fed", "ovipositing d1", "ovipositing d2", "Host-seeking", 
-             "new emerged", NA, NA, NA, NA, NA, NA, NA),
-  `Diapausing Eggs` = c("New layed degg", "2 day degg", "3 day degg", "4 day degg", 
-                        "5 day degg", "6 day degg", "7 day degg", ">=8 day degg", 
-                        NA, NA, NA, NA)
-)
-knitr::kable(species_data, format = "markdown", align = c('c', 'c', 'c', 'c', 'c', 'c'))
-```
+**Add a description of what the function does here.**
 
 # 2. Punctual scale model 
 
@@ -107,16 +56,18 @@ sim_temp <- create_sims(n_reps = 1,
   outcome_trend = "cos1",
   outcome_amp = 0.8, 
   rr = 1.0055)
+```
 
+Define model parameters
+
+```{r, warning=FALSE}
 # Model settings
 ## Define the day of introduction (July 1st is day 1)
 str <- "2000-07-01"
 ## Define the end-day of life cycle (August 1st is the last day)
 endr <- "2000-08-01"
-## Define the number of eggs to be introduced
-ie <- 1000
 ## Define the number of model iterations
-it <- 1 # The higher the number of simulations the better
+it <- 2 # The higher the number of simulations the better
 ## Define the number of liters for the larval density-dependent mortality
 habitat_liters <- 1
 ## Define latitude and longitude for the diapause process
@@ -129,8 +80,20 @@ df_temp <- data.frame("Date" = sim_temp[[1]]$date, "temp" = sim_temp[[1]]$x)
 w <- t(as.integer(df_temp$temp*1000)[format(as.Date(str)+1,"%j"):format(as.Date(endr)+1,"%j")])
 ```
 
+
+Multiple introductions: define the number of eggs to be introduced, when, and how many times
+```{r, warning=FALSE}
+ie <- multipleIntro(startd = str,
+              endd =  "2000-07-28",
+              n.intro = 4,
+              intro.eggs = 1000,
+              sd_eggs = 15,
+              scenario = "ff",
+              iter = it)
+ie
+```
+
 ## 2.2 Run the model
-It is crucial to run the model the model specifying the argument `compressed.output = FALSE`. This will return the number of simulated individuals for each sub-compartments.
 
 ```{r,  message=FALSE, warning=FALSE, results='hide'}
 simout <- dynamAedes.m(species="albopictus", 
@@ -142,7 +105,7 @@ simout <- dynamAedes.m(species="albopictus",
  n.clusters=cl, 
  iter=it,  
  intro.eggs=ie,  
- compressed.output=FALSE, 
+ compressed.output=TRUE, 
  lat=myLat, 
  long=myLon,
  verbose=FALSE,
@@ -159,56 +122,52 @@ The *simout* object is a S4 object where the outputs of the model and related de
 ```{r, warning=FALSE, message=FALSE}
 simout@n_iterations
 ```
-
-The model output, i.e. the number of simulated individuals, is stored in `simout@simulation`.
-For the *uncompressed* model, `simout@simulation` is a list where the **first** level stores the simulation of different iteration, while the **second** corresponds to the simulated days in the corresponding iteration.
-If we inspect the first iteration, we observe that the model has computed `length(simout[[1]])` days, since we have started the simulation on the 1st of July and ended on the 1st of August.
-
-```{r, warning=FALSE}
-length(simout@simulation[[1]])
-```
-
-The **third** level corresponds to an array reporting, for a given iteration and a given day, the number of individuals belonging to each compartment (rows) for each sub-compartment (the third dimension of the array, noted as *sc1*-...-*scN* in the print). As example, if we inspect the 1st and the 15th day within the first iteration, we obtain a matrix having:
-```{r, warning=FALSE}
-class(simout@simulation[[1]][[1]])
-simout@simulation[[1]][[1]]
-simout@simulation[[1]][[15]]
-```
-
+**should implement S4 object here for the multiple introductions**
 
 ## 2.4 Derive abundance 95% CI for a specific sub-compartment 
 We can use the auxiliary functions of the package to analyse the results. We now compute the interquantile range abundance for the host-seeking sub-compartment of the simulated population using the function *adci*.
 ```{r, message=FALSE, warning=FALSE}
 # Retrieve the maximum number of simulated days
 dd <- max(simout)
+
 # Compute the inter-quartile of abundances along the iterations
 breaks <- c(0.25,0.50,0.75)
 ed <- 1:dd
-hs <- adci(simout, eval_date=ed, breaks=breaks, 
-           stage="Adults",
-           sub_stage = "Host-seeking" ) 
-head(hs)
-tail(hs)
+
+outdf <- rbind(
+  adci(simout, eval_date=ed, breaks=breaks, stage="Eggs"),
+  adci(simout, eval_date=ed, breaks=breaks, stage="Juvenile"),
+  adci(simout, eval_date=ed, breaks=breaks, stage="Adults"),
+  adci(simout, eval_date=ed, breaks=breaks, stage="Dia"))
+outdf$stage <- factor(outdf$stage, levels= c('Egg', 'DiapauseEgg', 'Juvenile', 'Adult'))
+outdf$Date <- rep(seq.Date(as.Date(str), as.Date(endr), by="day"), 4)
 ```
 
-We can now simply plot it.
+Then we can look at the time series of the population dynamics stage by stage.
 ```{r, message=FALSE, warning=FALSE}
-ggplot(hs, aes(x=day, y=X50., group=factor(stage), col=factor(stage))) +
-ggtitle("Host-seeking Ae. albopictus Interquantile range abundance") +
-geom_ribbon(aes(ymin=X25., ymax=X75., fill=factor(stage)), 
-  col="white", 
-  alpha=0.2, 
-  outline.type="full") +
-geom_line(linewidth=0.8) +
-ylim(0,10)+
-labs(x="Date", y="Interquantile range abundance", col="Stage", fill="Stage") +
-theme_classic() +
-theme(legend.pos="bottom",  
-  text = element_text(size=16), 
-  strip.text = element_text(face = "italic"))
+intro.dates <- data.frame(Date = as.Date(c(sapply(ie, names))), 
+                                         stage = "Egg", 
+                                          n.intro = unlist(ie))
+intro.dates$X50. <- subset(outdf, stage=="Egg")[which(subset(outdf, stage=="Egg")$"Date" %in% intro.dates$Date), "X50."]
+
+ggplot(outdf, aes(x=Date, y=X50., group=factor(stage), col=factor(stage))) +
+  ggtitle("Ae. albopictus Interquantile range abundance") +
+  geom_ribbon(aes(ymin=X25., ymax=X75., fill=factor(stage)), 
+    col="white", 
+    alpha=0.2, 
+    outline.type="full") +
+  geom_line(linewidth=0.8) +
+  geom_segment(data=intro.dates, aes(x=Date, xend=Date,  y = rep(0,4), yend=X50., group=factor(stage)), col="black")+
+  geom_point(data=intro.dates, aes(x=Date, yend=X50.), col="black")+
+  geom_text(data=intro.dates, aes(x=Date, yend=X50., label = paste("+", n.intro )), vjust =-1)+
+  labs(x="Date", y="Interquantile range abundance", col="Stage", fill="Stage") +
+  facet_wrap(~stage, scales = "free_y") +
+  theme_light() +
+  theme(legend.pos="bottom",  
+    text = element_text(size=16), 
+    strip.text = element_text(face = "italic"))
 
 ```
-
 # 3. Regional scale model 
 
 We can now repeat the exercise for a regional scale model.
@@ -255,7 +214,7 @@ w <- sapply(df_temp[,-c(1:3)], function(x) as.integer(x*1000))
 cc <- df_temp[,c("x","y")]
 ```
 
-We run now the regional model keeping the same settings defined for the punctual scale model.
+
 ```{r,  message=FALSE, warning=FALSE, results='hide'}
 simout <- dynamAedes.m(species="albopictus", 
             scale="rg",  
@@ -268,7 +227,7 @@ simout <- dynamAedes.m(species="albopictus",
             n.clusters=cl,
             iter=it,
             intro.eggs=ie,
-            compressed.output=FALSE,
+            compressed.output=TRUE,
             seeding=TRUE,
             verbose=FALSE)
 ```
@@ -276,24 +235,81 @@ simout <- dynamAedes.m(species="albopictus",
 ```{r, warning=FALSE}
 summary(simout)
 ```
+## 3.1 Derive abundance 95% CI for each life stage and in each day
 
-## 3.1 Abundance raster
-Compute raster displaying the abundance of host-seeking females.
+We can now compute the interquantile range abundance of the simulated population using the function *adci* over the whole landscape. 
+```{r message=FALSE, warning=FALSE, evaluate=FALSE}
+dd <- max(simout) #retrieve the maximum number of simulated days
+
+# Compute the inter-quartile of abundances along the iterations
+breaks <- c(0.25,0.50,0.75)
+ed <- 1:dd
+
+# type "O" derives a non-spatial time series
+outdf <- rbind(
+  adci(simout, eval_date=ed, breaks=breaks, stage="Eggs", type="O"),
+  adci(simout, eval_date=ed, breaks=breaks, stage="Juvenile", type="O"),
+  adci(simout, eval_date=ed, breaks=breaks, stage="Adults", type="O"),
+  adci(simout, eval_date=ed, breaks=breaks, stage="Dia", type="O")
+  )
+outdf$stage <- factor(outdf$stage, levels= c('Egg', 'DiapauseEgg', 'Juvenile', 'Adult'))
+outdf$Date <- rep(seq.Date(as.Date(str), as.Date(endr), by="day"), 4)
+```
+
+Then we can look at the time series of the population dynamics stage by stage at the whole landscape level.
+```{r, message=FALSE, warning=FALSE}
+intro.dates <- data.frame(Date = as.Date(c(sapply(ie, names))), 
+                                         stage = "Egg", 
+                                          n.intro = unlist(ie))
+intro.dates$X50. <- subset(outdf, stage=="Egg")[which(subset(outdf, stage=="Egg")$"Date" %in% intro.dates$Date), "X50."]
+
+ggplot(outdf, aes(x=Date, y=X50., group=factor(stage), col=factor(stage))) +
+  ggtitle("Ae. albopictus Interquantile range abundance") +
+  geom_ribbon(aes(ymin=X25., ymax=X75., fill=factor(stage)), 
+    col="white", 
+    alpha=0.2, 
+    outline.type="full") +
+  geom_line(linewidth=0.8) +
+  geom_segment(data=intro.dates, aes(x=Date, xend=Date,  y = rep(0,4), yend=X50., group=factor(stage)), col="black")+
+  geom_point(data=intro.dates, aes(x=Date, yend=X50.), col="black")+
+  geom_text(data=intro.dates, aes(x=Date, yend=X50., label = paste("+", n.intro )), vjust =-1)+
+  labs(x="Date", y="Interquantile range abundance", col="Stage", fill="Stage") +
+  facet_wrap(~stage, scales = "free_y") +
+  theme_light() +
+  theme(legend.pos="bottom",  
+    text = element_text(size=16), 
+    strip.text = element_text(face = "italic"))
+```
+
+## 3.2 Abundance raster
+
+Compute the egg abundance raster before and after the second introduction event.
 ```{r,  message=FALSE, warning=FALSE, echo=FALSE}
 # Retrieve the maximum number of simulated days
 dd <- max(simout)
 
+#retrieve in which day of the simulation the multiple introductions happened
+intro.dates <- data.frame(Date = seq.Date(from = as.Date(str), to= as.Date(endr), length.out = dd))
+intro.dates$IntroDay<-1:nrow(intro.dates)
+intro.dates <- intro.dates[which(intro.dates$Date %in% as.Date(c(sapply(ie, names)))),]
+intro.dates
+```
+
+In our case, we will produce two rasters, one on the day before the second introduction (day 9), and one on the day of the second introduction (day 10).
+
+```{r,  message=FALSE, warning=FALSE, echo=FALSE}
 # Compute a raster with the  median of the iterations
 breaks <- c(0.50)
-ed <- 1:dd
-hs.r <- adci(simout, eval_date=ed, breaks=breaks, 
-     stage="Adults",
-     sub_stage = "Host-seeking", type="N")
-```
-```{r, warning=FALSE}
+eggs.r <- adci(simout, eval_date=9:10, breaks=breaks, 
+     stage="Eggs",
+      type="N")
 # inspect the raster
-hs.r$`Host-seeking_q_0.5`
-
-# plot the raster with the median host-seeking abundace
-plot(hs.r$`Host-seeking_q_0.5`$day30)
+eggs.r$q_0.5
+# plot the raster with the median egg abundace
+plot(eggs.r$q_0.5,  
+     legend ="bottom",
+     range = c(0, 3000))
 ```
+
+
+
