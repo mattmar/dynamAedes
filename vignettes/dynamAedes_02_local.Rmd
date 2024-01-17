@@ -426,7 +426,7 @@ geom_line(linewidth=0.8) +
 labs(x="Date", y="Interquantile range abundance", col="Stage", fill="Stage") +
 facet_wrap(~stage, scales = "free_y") +
 theme_light() +
-theme(legend.pos="bottom",  
+theme(legend.position="bottom",  
   text = element_text(size=16), 
   strip.text = element_text(face = "italic"))
 ```
