@@ -22,7 +22,7 @@ S4 class representing the output of dynamAedes.m
 
 \item{\code{stage_intro}}{Character. The introduced mosquito stage.}
 
-\item{\code{n_intro}}{Numeric. The number of propagules introduced.}
+\item{\code{n_intro}}{numeric. The number of propagules introduced.}
 
 \item{\code{coordinates}}{Matrix. The coordinates of each cell.}
 

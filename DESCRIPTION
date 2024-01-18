@@ -2,7 +2,7 @@ Package: dynamAedes
 Version: 2.2.8
 Date: 2024-01-08
 Title: A Unified Mechanistic Model for the Population Dynamics of Invasive Aedes Mosquitoes
-Authors@R: c(person("Matteo", "Marcantonio", role = c("aut", "cre"), email = "marcantoniomatteo@gmail.com"),person("Daniele", "Da Re", role = c("aut"), email = "dare.daniele@gmail.com")) 
+Authors@R: c(person("Matteo", "Marcantonio", role = c("aut", "cre"), email = "marcantoniomatteo@gmail.com"), person("Daniele", "Da Re", role = c("aut"), email = "dare.daniele@gmail.com"), person("Giovanni", "Marini", role = c("ctb"), email = "giovanni.marini@fmach.it"), person("Emmanuelle", "Kern", role = c("ctb"), email = "emmanuelle.kern22@imperial.ac.uk"), person("Ilaria", "Dorigatti", role = c("ctb"), email = "i.dorigatti@imperial.ac.uk")) 
 Depends: R (>= 4.0.0)
 Imports: abind, doParallel, drc, foreach, geosphere, methods, parallel, terra
 BugReports: https://github.com/mattmar/dynamAedes

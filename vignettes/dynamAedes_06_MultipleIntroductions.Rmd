@@ -67,7 +67,7 @@ str <- "2000-07-01"
 ## Define the end-day of life cycle (August 1st is the last day)
 endr <- "2000-08-01"
 ## Define the number of model iterations
-it <- 2 # The higher the number of simulations the better
+it <- 1 # The higher the number of simulations the better
 ## Define the number of liters for the larval density-dependent mortality
 habitat_liters <- 1
 ## Define latitude and longitude for the diapause process

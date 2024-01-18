@@ -97,7 +97,7 @@ Float numbers in the temperature matrix would slow the computational speed, they
 
 ```{r, warning=FALSE}
 df_temp <- data.frame("Date" = sim_temp[[1]]$date, "temp" = sim_temp[[1]]$x)
-w <- t(as.integer(df_temp$temp*1000)[format(as.Date(str)+1,"%j"):format(as.Date(endr)+1,"%j")])
+w <- t(as.integer(df_temp$temp*1000)[format(as.Date(str),"%j"):format(as.Date(endr),"%j")])
 ```
 
 ## 2.2 Run the model
@@ -174,25 +174,26 @@ outdf <- rbind(
   adci(simout, eval_date=ed, breaks=breaks, stage="Juvenile"),
   adci(simout, eval_date=ed, breaks=breaks, stage="Adults"),
   adci(simout, eval_date=ed, breaks=breaks, stage="Dia"))
+outdf$stage <- factor(outdf$stage, levels= c('Egg', 'DiapauseEgg', 'Juvenile', 'Adult'))
+```
+```{r, message=FALSE, warning=FALSE}
+outdf$Date <- rep(seq.Date(as.Date(str), as.Date(endr), by="day"), 4)
 ```
 
 Then we can look at the time series of the population dynamics stage by stage.
 ```{r, message=FALSE, warning=FALSE}
-outdf$stage <- factor(outdf$stage, levels= c('Egg', 'DiapauseEgg', 'Juvenile', 'Adult'))
-outdf$Date <- rep(seq.Date(as.Date(str), as.Date(endr) - 2, by="day"), 4)
-
 ggplot(outdf, aes(x=Date, y=X50., group=factor(stage), col=factor(stage))) +
-ggtitle("Ae. albopictus Interquantile range abundance") +
-geom_ribbon(aes(ymin=X25., ymax=X75., fill=factor(stage)), 
-  col="white", 
-  alpha=0.2, 
-  outline.type="full") +
-geom_line(linewidth=0.8) +
-labs(x="Date", y="Interquantile range abundance", col="Stage", fill="Stage") +
-facet_wrap(~stage, scales = "free_y") +
-theme_light() +
-theme(legend.pos="bottom",  
-  text = element_text(size=16), 
-  strip.text = element_text(face = "italic"))
+  ggtitle("Ae. albopictus Interquantile range abundance") +
+  geom_ribbon(aes(ymin=X25., ymax=X75., fill=factor(stage)), 
+    col="white", 
+    alpha=0.2, 
+    outline.type="full") +
+  geom_line(linewidth=0.8) +
+  labs(x="Date", y="Interquantile range abundance", col="Stage", fill="Stage") +
+  facet_wrap(~stage, scales = "free_y") +
+  theme_light() +
+  theme(legend.pos="bottom",  
+    text = element_text(size=16), 
+    strip.text = element_text(face = "italic"))
 
 ```

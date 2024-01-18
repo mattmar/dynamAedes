@@ -161,9 +161,9 @@ if( scale=="lc" ) {
 if( intro.eggs!=0 ) {
 	e.intro.n <- rep(0,space)
 	if( !is.na(intro.cell) ) {
-		e.intro.n[intro.cell] <- intro.eggs
+		e.intro.n[intro.cell] <- c(intro.eggs, rep(0, length = length(myDates)-1))
 		} else {
-			e.intro.n[sample(as.integer(colnames(road.dist.matrix)),1)] <- intro.eggs
+			e.intro.n[sample(as.integer(colnames(road.dist.matrix)),1)] <- c(intro.eggs, rep(0, length = length(myDates)-1))
 		}
 		} else e.intro.n <- intro.eggs
 		if( intro.deggs!=0 ) {
@@ -203,8 +203,7 @@ if( intro.adults!=0 ) {
 					  e.intro.n[count.mIntro]<- as.numeric(intro.eggs[[iteration]])
 					} else { # # single introduction on the first day
 					  e.intro.n <- c(intro.eggs, rep(0, length = length(myDates)-1))
-					  e.intro.n <- rep(list(e.intro.n), iter)
-					}
+					  }
 					d.intro.n <- intro.deggs; i.intro.n <- intro.juveniles; a.intro.n <- intro.adults; road.dist.matrix <- as.data.frame(c(0,0)); names(road.dist.matrix) <- 1
 				}
 				} else if( scale=="rg" ) {
@@ -217,8 +216,7 @@ if( intro.adults!=0 ) {
 						    e.intro.n[count.mIntro]<- as.numeric(intro.eggs[[iteration]])
 						  } else { # # single introduction on the first day
 						    e.intro.n <- c(intro.eggs, rep(0, length = length(myDates)-1))
-						    e.intro.n <- rep(list(e.intro.n), iter)
-						  }
+						    }
 							d.intro.n <- intro.deggs; i.intro.n <- intro.juveniles; a.intro.n <- intro.adults; road.dist.matrix <- as.data.frame(c(0,0)); names(road.dist.matrix) <- 1
 						}
 						} else stop("Wrong scale.")

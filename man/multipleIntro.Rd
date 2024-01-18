@@ -49,7 +49,7 @@ The function allows to introduce mosquito eggs multiple times for each model ite
 }
 
 The function allows introducing two different mosquito life history stages: egg and female adult. By introducing adults, the number of eggs produced by a single female is sampled from a normal distribution
-with \eqn{\mu = 77} and \eqn{\sigma = 15}, being based on the findings presented in Aida et al. (2011)\link{https://doi.org/10.1016/S2221-1691(11)60103-2}
+with \eqn{\mu = 77} and \eqn{\sigma = 15}, being based on the findings presented in Aida et al. (2011)\url{https://doi.org/10.1016/S2221-1691(11)60103-2}
 The \code{"fr"} and \code{"rr"} scenarios currently support only the species Aedes albopictus (Aida et al.,2011).
 }
 \examples{
