@@ -203,7 +203,7 @@ geom_line(linewidth=0.8) +
 ylim(0,10)+
 labs(x="Date", y="Interquantile range abundance", col="Stage", fill="Stage") +
 theme_classic() +
-theme(legend.pos="bottom",  
+theme(legend.position="bottom",  
   text = element_text(size=16), 
   strip.text = element_text(face = "italic"))
 
