@@ -41,26 +41,26 @@ dynamAedes.m <- function(species=NULL, intro.eggs=0, intro.deggs=0, intro.adults
 ### Initial checks
 # Check species names (abbreviation allowed: at least two characters)
 if(nchar(species) < 2) {
-  stop("Please provide an abbreviation that is at least two characters long.")
+	stop("Please provide an abbreviation that is at least two characters long.")
 }
 full_species <- c("aegypti", "albopictus", "koreicus", "japonicus")
 matches <- grep(paste0("^", species), full_species)
 if(length(matches) == 1) {
-  species <- full_species[matches]
-} else if(length(matches) > 1) {
-  stop("Ambiguous abbreviation provided, please be more specific, exiting...")
-} else {
-  stop("Mosquito species not supported, exiting...")
-}
+	species <- full_species[matches]
+	} else if(length(matches) > 1) {
+		stop("Ambiguous abbreviation provided, please be more specific, exiting...")
+		} else {
+			stop("Mosquito species not supported, exiting...")
+		}
 
 #Safer version of sample
 .resample <- function(x, ...) x[sample.int(length(x), ...)]
 
 # Check dayspan as well as date format function
 check_date_format <- function(date) {
-  if (!grepl("^\\d{4}-\\d{2}-\\d{2}$", date)) {
-    stop("Dates in the wrong format: change them to '%Y-%m-%d'.")
-  }
+	if (!grepl("^\\d{4}-\\d{2}-\\d{2}$", date)) {
+		stop("Dates in the wrong format: change them to '%Y-%m-%d'.")
+	}
 }
 
 # Check start date format
@@ -68,8 +68,8 @@ check_date_format(as.character(startd))
 
 # Determine dayspan
 if (is.na(endd)) {
-  dayspan <- ncol(temps.matrix) - 1
-} else {
+	dayspan <- ncol(temps.matrix) - 1
+	} else {
   # Check end date format
   check_date_format(as.character(endd))
   dayspan <- as.integer(as.Date(endd) - as.Date(startd))
@@ -250,13 +250,25 @@ i.emer.p <- .i.emer_rate.f(temps.matrix[,day]/1000, species)
 ## Derive daily immature survival rate
 i.mort_rate.v <- -log(.i.surv_rate.f(temps.matrix[,day]/1000, species))
 # Set allocation of diapause/non-diapause eggs
-if(scale=="rg" & species!="aegypti") {
-	e.diap.p <- if( any(photo.matrix[,day-1]>photo.matrix[,day]) ) .e.dia_rate.f(photo.matrix[,day], species) else rep(0, ncol(photo.matrix))
-	} else { 
-		e.diap.p <- if( dl[day-1]>dl[day] ) {
-			.e.dia_rate.f(dl[day], species)
-			} else{0} 
-		}
+
+if(length(counter) != 1) {
+    if(scale == "rg" && species != "aegypti") {
+        if(any(photo.matrix[, day - 1] > photo.matrix[, day])) {
+            e.diap.p <- .e.dia_rate.f(photo.matrix[, day], species)
+        } else {
+            e.diap.p <- rep(0, ncol(photo.matrix))
+        }
+    } else {
+        e.diap.p <- if(dl[day - 1] > dl[day]) {
+            .e.dia_rate.f(dl[day], species)
+        } else {
+            0
+        } 
+    }
+} else {
+    e.diap.p <- ifelse(scale == "rg", rep(0, ncol(photo.matrix)), 0)
+}
+
 ## Derive daily egg hatching rate
 e.hatc.p <- .e.hatch_rate.f(temps.matrix[,day]/1000, species)
 ## Derive daily egg survival rate
@@ -353,7 +365,7 @@ a.tegg.n <- sapply(1:space, function(x) sum(rpois(sum(p.life.a[3,x,2:3]), a.batc
 if(scale=="rg") {
 	a.degg.n <- sapply(1:space, function(x){rbinom(1,a.tegg.n[x],prob=(e.diap.p[x]))})
 	} else {
-		a.degg.n <- sapply(1:space, function(x){rbinom(1,a.tegg.n[x],prob=(e.diap.p))})
+	a.degg.n <- sapply(1:space, function(x){rbinom(1,a.tegg.n[x],prob=(e.diap.p))})
 	}
 	a.egg.n <- a.tegg.n-a.degg.n
 	} else {

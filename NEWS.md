@@ -1,9 +1,12 @@
+# dynamAedes 2.2.9
+* Substitutes `legend.pos` with `legend.position` in vignettes.
+
 # dynamAedes 2.2.8
 * Adds reference file for life history traits `AedeslifeHistoryList`.
 * Adds function `spreader`.
 * Adds vignettes 4 (Uncompressed output) and 5 (spreader).
 * Fixes minor issues in `adci`.
-* check summary print for punctual and local scale: done
+* Fixes summary print for punctual and local scale.
 
 # dynamAedes 2.2.7
 * Adapts all auxiliary functions to the `dynamAedesClass` output.
