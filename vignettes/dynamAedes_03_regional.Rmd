@@ -199,9 +199,7 @@ simout <- dynamAedes.m(species="albopictus",
             seeding=TRUE,
             verbose=FALSE)
 ```
-
 #3. Analyse the results
-
 A first summary of simulations can be obtained with:
 ```{r, warning=FALSE}
 summary(simout)
@@ -234,6 +232,7 @@ dim(simout@simulation[[1]][[1]])
 
 We can now use the auxiliary functions of the package to Analyse the results. 
 
+# 3. Analyse the results
 ## 3.1 Derive probability of a successfull introduction at the end of the simulated period
 
 First, we can retrieve the "probability of a successful introduction", computed as the proportion of model iterations that resulted in a viable mosquito population (in any cells of the grid) at a given date.
@@ -253,8 +252,8 @@ We can now compute the interquantile range abundance of the simulated population
 dd <- max(simout) #retrieve the maximum number of simulated days
 
 # Compute the inter-quartile of abundances along the iterations
-breaks <- c(0.25,0.50,0.75)
-ed <- 1:dd
+breaks=c(0.25,0.50,0.75)
+ed=1:dd
 
 # type "O" derives a non-spatial time series
 outdf <- rbind(
@@ -263,23 +262,24 @@ outdf <- rbind(
   adci(simout, eval_date=ed, breaks=breaks, stage="Adults", type="O"),
   adci(simout, eval_date=ed, breaks=breaks, stage="Dia", type="O")
   )
-outdf$stage <- factor(outdf$stage, levels= c('Egg', 'DiapauseEgg', 'Juvenile', 'Adult'))
-outdf$Date <- rep(seq.Date(as.Date(str), as.Date(endr), by="day"), 4)
 ```
 
 Then we can look at the time series of the population dynamics stage by stage at the whole landscape level.
 ```{r, message=FALSE, warning=FALSE}
+outdf$stage <- factor(outdf$stage, levels= c('Egg', 'DiapauseEgg', 'Juvenile', 'Adult'))
+outdf$Date <- rep(seq.Date(as.Date(str), as.Date(endr) - 2, by="day"), 4)
+
 ggplot(outdf, aes(x=Date, y=X50., group=factor(stage), col=factor(stage))) +
-  ggtitle("Ae. albopictus Interquantile range abundance") +
-  geom_ribbon(aes(ymin=X25., ymax=X75., fill=factor(stage)), 
-    col="white", 
-    alpha=0.2, 
-    outline.type="full") +
-  geom_line(linewidth=0.8) +
-  labs(x="Date", y="Interquantile range abundance", col="Stage", fill="Stage") +
-  facet_wrap(~stage, scales = "free_y") +
-  theme_light() +
-  theme(legend.position="bottom",  
-    text = element_text(size=16), 
-    strip.text = element_text(face = "italic"))
+ggtitle("Ae. albopictus Interquantile range abundance") +
+geom_ribbon(aes(ymin=X25., ymax=X75., fill=factor(stage)), 
+  col="white", 
+  alpha=0.2, 
+  outline.type="full") +
+geom_line(linewidth=0.8) +
+labs(x="Date", y="Interquantile range abundance", col="Stage", fill="Stage") +
+facet_wrap(~stage, scales = "free_y") +
+theme_light() +
+theme(legend.position="bottom",  
+  text = element_text(size=16), 
+  strip.text = element_text(face = "italic"))
 ```

@@ -276,9 +276,6 @@ simout <- dynamAedes.m(species="albopictus",
 ```{r, warning=FALSE}
 summary(simout)
 ```
-
-## 3.1 Abundance raster
-Compute raster displaying the abundance of host-seeking females.
 ```{r,  message=FALSE, warning=FALSE, echo=FALSE}
 # Retrieve the maximum number of simulated days
 dd <- max(simout)
