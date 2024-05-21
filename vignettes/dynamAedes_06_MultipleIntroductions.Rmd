@@ -77,7 +77,8 @@ myLon <- 7
 cl <- 1
 ## convert float temperatures to integer
 df_temp <- data.frame("Date" = sim_temp[[1]]$date, "temp" = sim_temp[[1]]$x)
-w <- t(as.integer(df_temp$temp*1000)[format(as.Date(str)+1,"%j"):format(as.Date(endr)+1,"%j")])
+df_temp <- df_temp[df_temp$Date %in% seq.Date(as.Date(str), as.Date(endr), by="day") , ]
+w <- t(as.integer(df_temp$temp*1000))
 ```
 
 
@@ -201,8 +202,12 @@ bbox <- terra::as.polygons(terra::ext(r), crs=utm32N)
 autocorr_factor <- terra::values(r)
 
 # "expand onto space" the temperature time series by multiplying it with the autocorrelated surface simulated above. 
+df_temp <- data.frame("Date" = sim_temp[[1]]$date, "temp" = sim_temp[[1]]$x)
+df_temp <- df_temp[df_temp$Date %in% seq.Date(as.Date(str), as.Date(endr), by="day") , ]
+
+
 mat <- do.call(rbind, lapply(1:ncell(r), function(x) {
-	d_t <- sim_temp[[1]]$x*autocorr_factor[[x]]
+	d_t <- df_temp$temp*autocorr_factor[[x]]
 	return(d_t)
 }))
 
@@ -219,7 +224,7 @@ cc <- df_temp[,c("x","y")]
 simout <- dynamAedes.m(species="albopictus", 
             scale="rg",  
             jhwv=habitat_liters,  
-            temps.matrix=w[,as.numeric(format(as.Date(str),"%j")):as.numeric(format(as.Date(endr),"%j"))],
+            temps.matrix=w,
             coords.proj4=utm32N,
             cells.coords=as.matrix(cc),
             startd=str,
