@@ -36,6 +36,7 @@ At the punctual scale, the model only requires a temperature time series, record
 
 ```{r,  message=FALSE, warning=FALSE, echo=FALSE}
 #Load packages
+library(dynamAedes)
 # simulate temperatures
 library(eesim)
 # plotting
@@ -84,7 +85,7 @@ w <- t(as.integer(df_temp$temp*1000))
 
 Multiple introductions: define the number of eggs to be introduced, when, and how many times
 ```{r, warning=FALSE}
-ie <- multipleIntro(startd = str,
+ie <- dynamAedes::multipleIntro(startd = str,
               endd =  "2000-07-28",
               n.intro = 4,
               intro.eggs = 1000,
@@ -97,7 +98,7 @@ ie
 ## 2.2 Run the model
 
 ```{r,  message=FALSE, warning=FALSE, results='hide'}
-simout <- dynamAedes.m(species="albopictus", 
+simout <- dynamAedes::dynamAedes.m(species="albopictus", 
  scale="ws",  
  jhwv=habitat_liters,  
  temps.matrix=w,  
