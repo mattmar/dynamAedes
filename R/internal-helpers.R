@@ -67,14 +67,23 @@ start
 #' @keywords internal
 #' @return vector of rates.
 #' @noRd
-sanitize_output <- function(x, is_prob = TRUE, min_val = 1e-6) {
-  x[!is.finite(x)] <- NA_real_
+sanitize_output <- function(x, is_prob = TRUE, min_val = 1e-6, max_val = 1) {
+  # Replace NA and NaN with min_val (safe default)
+  x[is.na(x)] <- min_val
+  
+  # Replace -Inf with min_val (very unsafe = no survival)
+  x[is.infinite(x) & x < 0] <- min_val
+  
+  # Replace +Inf with max_val (very safe = full survival)
+  x[is.infinite(x) & x > 0] <- max_val
+  
+  # Clamp only if outside expected bounds
   if (is_prob) {
-    x <- pmin(pmax(x, 0), 1)    # Clamp to [0,1]
+    x <- pmin(pmax(x, 0), 1)
   } else {
-    x <- pmax(x, 0)             # Clamp to [0, ∞)
+    x <- pmax(x, 0)
   }
-  x[is.na(x)] <- min_val        # Replace NAs with small safe value
+  
   return(x)
 }
 
@@ -115,25 +124,25 @@ sanitize_output <- function(x, is_prob = TRUE, min_val = 1e-6) {
   if(sp=="aegypti") {
     ovi_n <- c( 0, 2.5, 3.37, 4.6,  6.98, 7.6,  9.58, 7.28,11.22,7.27,0) * 10
     temp_n <- c(0, 10,20.05,21.79,25.64,27.64,31.33,31.65,32.55,33.41,34)
-    model=lm(ovi_n~poly(temp_n,3))
-    a.ovi.pred <- sanitize_output(predict(model, newdata = data.frame(temp_n=temp.new), response=TRUE))
+    model <- lm(ovi_n~poly(temp_n,3))
+    a.ovi.pred <- predict(model, newdata = data.frame(temp_n=temp.new), response=TRUE)
     a.ovi.pred <- ifelse(a.ovi.pred<0, 0, a.ovi.pred)
     a.ovi.pred[which(temp.new<4|temp.new>45)] <- 0
     }else if(sp=="albopictus") {
       ovi_n <-  c(0, 50.8, 65.3, 74.2, 48.7, 0)
       temp_n <- c(5, 20,   25,   30,   35, 45)
       model <- drm(ovi_n ~ temp_n, fct = .DRC.beta())
-      a.ovi.pred <- sanitize_output(predict(model,data.frame(temp.v=temp.new)))
+      a.ovi.pred <- predict(model,data.frame(temp.v=temp.new))
       }else if(sp=="koreicus") {
         ovi_n <- c(0, 5, 20, 25, 30, 38, 40, 40, 38, 20, 10, 10, 0)
         temp_n <-c(8, 10,12, 15,17, 20, 23,  25, 27, 30, 33, 35,37)
         model <- drm(ovi_n ~ temp_n, fct = .DRC.beta())
-        a.ovi.pred <- sanitize_output(predict(model,data.frame(temp.v=temp.new)))
+        a.ovi.pred <- predict(model,data.frame(temp.v=temp.new))
         }else if(sp=="japonicus") {
           ovi_n <- c(0, 108.2, 111.6, 106.8, 112.2, 97.1, 99.1, 94.5, 80.6, 82.1, 71.6, 67.4, 68.4, 55.0, 47.4,0)
           temp_n <-c(5, 10, 12, 14, 15, 17, 19, 20, 23, 25, 26, 27, 28, 29, 31, 40)
           model <- drm(ovi_n ~ temp_n, fct = .DRC.beta())
-          a.ovi.pred <- sanitize_output(predict(model,data.frame(temp.v=temp.new)))
+          a.ovi.pred <- predict(model,data.frame(temp.v=temp.new))
           }else(stop("Species not supported."))
           return( a.ovi.pred )
         }

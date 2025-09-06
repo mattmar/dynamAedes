@@ -184,7 +184,6 @@ cl <- 1
 Running the model with the settings specified in this example takes about 3 minutes.
 
 ```{r results='hide', message=FALSE, warning=FALSE, evaluate=FALSE}
-# debugonce(dynamAedes.m)
 simout <- dynamAedes.m(species="albopictus", 
             scale="rg",  
             jhwv=habitat_liters,  
