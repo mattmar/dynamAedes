@@ -90,7 +90,7 @@ autocorr_factor <- terra::values(r)
 We  simulate a 1-year temperature time series with seasonal trend. For the time series we consider a mean value of 16°C and standard deviation of 2°C.
 
 ```{r}
-ndays = 365
+ndays <- 365
 set.seed(123)
 sim_temp <- eesim::create_sims(n_reps = 1, 
                         n = ndays, 
@@ -169,7 +169,7 @@ str <- "2000-06-01"
 ## Define the end-day of life cycle (July 2nd is the last day)
 endr <- "2000-07-02"
 ## Define the number of eggs to be introduced
-ie <- 100
+ie <- 1000
 ## Define the number of model iterations
 it <- 1 # The higher the number of simulations the better
 ## Define the number of liters for the larval density-dependent mortality
@@ -184,6 +184,7 @@ cl <- 1
 Running the model with the settings specified in this example takes about 3 minutes.
 
 ```{r results='hide', message=FALSE, warning=FALSE, evaluate=FALSE}
+# debugonce(dynamAedes.m)
 simout <- dynamAedes.m(species="albopictus", 
             scale="rg",  
             jhwv=habitat_liters,  
@@ -252,8 +253,8 @@ We can now compute the interquantile range abundance of the simulated population
 dd <- max(simout) #retrieve the maximum number of simulated days
 
 # Compute the inter-quartile of abundances along the iterations
-breaks=c(0.25,0.50,0.75)
-ed=1:dd
+breaks <- c(0.25,0.50,0.75)
+ed <- 1:dd
 
 # type "O" derives a non-spatial time series
 outdf <- rbind(
@@ -270,16 +271,16 @@ outdf$stage <- factor(outdf$stage, levels= c('Egg', 'DiapauseEgg', 'Juvenile', '
 outdf$Date <- rep(seq.Date(as.Date(str), as.Date(endr) - 2, by="day"), 4)
 
 ggplot(outdf, aes(x=Date, y=X50., group=factor(stage), col=factor(stage))) +
-ggtitle("Ae. albopictus Interquantile range abundance") +
-geom_ribbon(aes(ymin=X25., ymax=X75., fill=factor(stage)), 
-  col="white", 
-  alpha=0.2, 
-  outline.type="full") +
-geom_line(linewidth=0.8) +
-labs(x="Date", y="Interquantile range abundance", col="Stage", fill="Stage") +
-facet_wrap(~stage, scales = "free_y") +
-theme_light() +
-theme(legend.position="bottom",  
-  text = element_text(size=16), 
-  strip.text = element_text(face = "italic"))
+  ggtitle("Ae. albopictus Interquantile range abundance") +
+  geom_ribbon(aes(ymin=X25., ymax=X75., fill=factor(stage)), 
+    col="white", 
+    alpha=0.2, 
+    outline.type="full") +
+  geom_line(linewidth=0.8) +
+  labs(x="Date", y="Interquantile range abundance", col="Stage", fill="Stage") +
+  facet_wrap(~stage, scales = "free_y") +
+  theme_light() +
+  theme(legend.position="bottom",  
+    text = element_text(size=16), 
+    strip.text = element_text(face = "italic"))
 ```

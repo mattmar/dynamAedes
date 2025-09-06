@@ -41,29 +41,38 @@ dynamAedes.m <- function(species=NULL, intro.eggs=0, intro.deggs=0, intro.adults
 ### Initial checks
 # Check species names (abbreviation allowed: at least two characters)
 if(nchar(species) < 2) {
-  stop("Please provide an abbreviation that is at least two characters long.")
+	stop("Please provide an abbreviation that is at least two characters long.")
 }
 full_species <- c("aegypti", "albopictus", "koreicus", "japonicus")
 matches <- grep(paste0("^", species), full_species)
 if(length(matches) == 1) {
-  species <- full_species[matches]
-} else if(length(matches) > 1) {
-  stop("Ambiguous abbreviation provided, please be more specific, exiting...")
-} else {
-  stop("Mosquito species not supported, exiting...")
+	species <- full_species[matches]
+	} else if(length(matches) > 1) {
+		stop("Ambiguous abbreviation provided, please be more specific, exiting...")
+		} else {
+			stop("Mosquito species not supported, exiting...")
+		}
+
+#Safer version of sample
+.resample <- function(x, ...) x[sample.int(length(x), ...)]
+
+# Check dayspan as well as date format function
+check_date_format <- function(date) {
+	if (!grepl("^\\d{4}-\\d{2}-\\d{2}$", date)) {
+		stop("Dates in the wrong format: change them to '%Y-%m-%d'.")
+	}
 }
 
 # Check start date format
 check_date_format(as.character(startd))
-# Compute vector of dates for eggs introductions
-myDates <- seq.Date(from = as.Date(startd), to = as.Date(endd), by="day")
+
 # Determine dayspan
 if (is.na(endd)) {
-  dayspan <- ncol(temps.matrix)
-} else {
+	dayspan <- ncol(temps.matrix) - 1
+	} else {
   # Check end date format
   check_date_format(as.character(endd))
-  dayspan <- length(as.Date(startd):as.Date(endd))
+  dayspan <- as.integer(as.Date(endd) - as.Date(startd))
 }
 
 # Set dayspan length
@@ -111,7 +120,7 @@ if( is.na(avgpdisp) ) {
 								} else (stop("avgpdisp not supported yet..."))
 ## Derive daylength for laying of diapausing eggs in albopictus/koreicus/japonicus
 if( species!="aegypti" ){
-  doy <- as.numeric(format(seq(as.POSIXct(startd), as.POSIXct(as.Date(endd)), length.out=dayspan), "%j"))
+	doy <- as.numeric(format(seq(as.POSIXct(startd), as.POSIXct(as.Date(startd)+dayspan), by='day'), "%j"))
 	if( scale=="rg" ) {
 		photo.matrix <- lapply(doy, function(x){geosphere::daylength(lat=cells.coords.photo[,2], doy=x)})
 		photo.matrix <- do.call(cbind,photo.matrix)
@@ -122,6 +131,10 @@ if( species!="aegypti" ){
 			} else {
 				dl <- rep(24,(dayspan))
 			}
+if (species == "aegypti") {
+  photo.matrix <- matrix(0, nrow = nrow(temps.matrix), ncol = dayspan)
+  dl <- rep(24, dayspan)
+}
 ## Set dispersal according to scale
 dispersal <- if(scale=="lc"){TRUE}else if(scale=="rg"|scale=="ws"){FALSE}else{stop("Wrong scale. Exiting...")}
 ## Define the `margin` for apply
@@ -129,10 +142,12 @@ mrg <- if(scale=="ws"){2}else if(scale=="lc"|scale=="rg"){1}
 if( !dispersal ) message("\n ### Model without dispersal ### \n") 
 ## Define the type of cluster computing environment 
 if(cluster.type=="PSOCK") {
-	cl <- makeCluster(spec=n.clusters, type=cluster.type, nnodes=n.clusters, outfile="")
+	cl <- parallel::makeCluster(spec=n.clusters, type=cluster.type, nnodes=n.clusters, outfile="")
 	} else(message("The only supported `cluster.type` is SOCK"))
 ## Register the environment 
 doParallel::registerDoParallel(cl, cores=n.clusters)
+foreach::registerDoSEQ()
+options(warn = 2)  # Turn warnings into errors
 if(seeding) parallel::clusterEvalQ(cl, set.seed(2021))
 ## Define space dimensionality into which simulations occour
 space <- nrow(temps.matrix)
@@ -161,9 +176,9 @@ if( scale=="lc" ) {
 if( intro.eggs!=0 ) {
 	e.intro.n <- rep(0,space)
 	if( !is.na(intro.cell) ) {
-		e.intro.n[intro.cell] <- c(intro.eggs, rep(0, length = length(myDates)-1))
+		e.intro.n[intro.cell] <- intro.eggs
 		} else {
-			e.intro.n[sample(as.integer(colnames(road.dist.matrix)),1)] <- c(intro.eggs, rep(0, length = length(myDates)-1))
+			e.intro.n[sample(as.integer(colnames(road.dist.matrix)),1)] <- intro.eggs
 		}
 		} else e.intro.n <- intro.eggs
 		if( intro.deggs!=0 ) {
@@ -197,27 +212,13 @@ if( intro.adults!=0 ) {
 			if( nrow(temps.matrix)>1 ) {
 				stop( "if scale='lc' then nrow(temps.matrix) must be 1" )
 				} else {
-				  	if(is.list(intro.eggs)){ # multiple introductions
-					  e.intro.n <- rep(0, length = length(myDates))
-					  count.mIntro <- which(myDates %in% as.Date(names(intro.eggs[[iteration]])))
-					  e.intro.n[count.mIntro]<- as.numeric(intro.eggs[[iteration]])
-					} else { # # single introduction on the first day
-					  e.intro.n <- c(intro.eggs, rep(0, length = length(myDates)-1))
-					  }
-					d.intro.n <- intro.deggs; i.intro.n <- intro.juveniles; a.intro.n <- intro.adults; road.dist.matrix <- as.data.frame(c(0,0)); names(road.dist.matrix) <- 1
+					e.intro.n <- intro.eggs; d.intro.n <- intro.deggs; i.intro.n <- intro.juveniles; a.intro.n <- intro.adults; road.dist.matrix <- as.data.frame(c(0,0)); names(road.dist.matrix) <- 1
 				}
 				} else if( scale=="rg" ) {
 					if( nrow(temps.matrix)<1 ) {
 						stop( "if scale='rg' then nrow(temps.matrix) must be > 1" )
 						} else {
-						  if(is.list(intro.eggs)){ # multiple introductions
-						    e.intro.n <- rep(0, length = length(myDates))
-						    count.mIntro <- which(myDates %in% as.Date(names(intro.eggs[[iteration]])))
-						    e.intro.n[count.mIntro]<- as.numeric(intro.eggs[[iteration]])
-						  } else { # # single introduction on the first day
-						    e.intro.n <- c(intro.eggs, rep(0, length = length(myDates)-1))
-						    }
-							d.intro.n <- intro.deggs; i.intro.n <- intro.juveniles; a.intro.n <- intro.adults; road.dist.matrix <- as.data.frame(c(0,0)); names(road.dist.matrix) <- 1
+							e.intro.n <- intro.eggs; d.intro.n <- intro.deggs; i.intro.n <- intro.juveniles; a.intro.n <- intro.adults; road.dist.matrix <- as.data.frame(c(0,0)); names(road.dist.matrix) <- 1
 						}
 						} else stop("Wrong scale.")
 ### Day cycle: Start sequential "day" life cycle into the "iteration" loop ###
@@ -226,7 +227,7 @@ if( exists("counter") ) {
 	rm(counter)
 }
 setTxtProgressBar(pb, legind)
-foreach(day = 1:dayspan, .combine=c, .export = ls(globalenv())) %do% {
+foreach(day = 2:dayspan, .combine=c, .export = ls(globalenv())) %do% {
 	while( !stopit ) {
 		if( !exists("counter") ) {
 # Index for dynamic array eggs
@@ -235,8 +236,30 @@ de <- if(species=="koreicus"|species=="japonicus") 2 else 1
 dj <- if(species=="koreicus"|species=="japonicus") 2 else 1
 # Index for dynamic array adults
 da <- if(species=="koreicus"|species=="japonicus") 2.25 else 1
+
 # Define objects required to store data during a day
-counter <- 0; i.temp.v <- 0; d.temp.v <- 0; e.temp.v <- 0; a.egg.n <- 0; a.new.n <- 0; a.degg.n <- 0; p.life.a <- array(0,c(4,nrow(temps.matrix),6*de), dimnames = list(c("egg", "juvenile", "adult", "diapause_egg"), NULL, paste0("sc",1:(6*de)))); storage.mode(p.life.a) <- "integer"; outl <- list()
+counter <- 0; i.temp.v <- 0; d.temp.v <- 0; e.temp.v <- 0; a.egg.n <- 0; a.new.n <- 0; a.degg.n <- 0; 
+# p.life.a <- array(0,c(4,nrow(temps.matrix),6*de), dimnames = list(c("egg", "juvenile", "adult", "diapause_egg"), NULL, paste0("sc",1:(6*de)))); #DDR
+# Determine number of subcompartments per life stage
+n_egg_sub      <- 6 * de         # corrected from 4 to 6
+n_juv_sub      <- 6 * dj
+n_adult_sub    <- 5              # fixed
+n_diapause_sub <- 6 * de         # matching egg structure
+
+# Max dimension across all life stages
+n_total_sub <- max(n_egg_sub, n_juv_sub, n_adult_sub, n_diapause_sub)
+
+# Allocate p.life.a
+p.life.a <- array(
+  0L,
+  dim = c(4, nrow(temps.matrix), n_total_sub),
+  dimnames = list(
+    c("egg", "juvenile", "adult", "diapause_egg"),
+    NULL,
+    paste0("sc", seq_len(n_total_sub))
+  )
+)
+storage.mode(p.life.a) <- "integer"; outl <- list()
 } else counter <- append(counter,day)
 ### Header:
 ## Gonotrophic cycle
@@ -255,19 +278,24 @@ i.emer.p <- .i.emer_rate.f(temps.matrix[,day]/1000, species)
 ## Derive daily immature survival rate
 i.mort_rate.v <- -log(.i.surv_rate.f(temps.matrix[,day]/1000, species))
 # Set allocation of diapause/non-diapause eggs
-e.diap.p <- if(length(counter)!=1){ # counter on the first day: no diapause
-  if(scale=="rg" & species!="aegypti") { # diapause incidence at regional scale 
-    if( any(photo.matrix[,day-1] > photo.matrix[,day])){ # diapause incidence during summer
-      .e.dia_rate.f(photo.matrix[,day], species) 
-    } else {rep(0, ncol(photo.matrix))}
-  } else { if( dl[day-1]>dl[day] ) { # diapause incidence at punctual scale 
-    .e.dia_rate.f(dl[day], species)
-  } else{0} 
-  }
-} else{ if(scale=="rg"){ # diapause incidence at regional scale during winter
-  rep(0, ncol(photo.matrix))
-} else{0}
+if(length(counter) != 1) {
+    if(scale == "rg" && species != "aegypti") {
+        if(any(photo.matrix[, day - 1] > photo.matrix[, day])) {
+            e.diap.p <- .e.dia_rate.f(photo.matrix[, day], species)
+        } else {
+            e.diap.p <- rep(0, ncol(photo.matrix))
+        }
+    } else {
+        e.diap.p <- if(dl[day - 1] > dl[day]) {
+            .e.dia_rate.f(dl[day], species)
+        } else {
+            0
+        } 
+    }
+} else {
+    e.diap.p <- ifelse(scale == "rg", rep(0, ncol(photo.matrix)), 0)
 }
+
 ## Derive daily egg hatching rate
 e.hatc.p <- .e.hatch_rate.f(temps.matrix[,day]/1000, species)
 ## Derive daily egg survival rate
@@ -280,14 +308,12 @@ if( dispersal ) {f.pdis.p <- dgamma(seq(1,max(road.dist.matrix,na.rm=T),1000),sh
 ### Events in the (`E`) egg compartment
 ## `E` has eight sub-compartment: 1:7 for eggs 1-7 days old that can only die or survive, 8 for eggs older than 7 days that can die/survive/hatch
 ## Binomial draw to find numbers of eggs that die or survive
-p.life.a[1,,2:(4*de)] <- apply(t(p.life.a[1,,1:(4*de-1)]),MARGIN=mrg,function(x) rbinom(size=x,n=space,prob=e.surv.p))
+p.life.a[1,,2:(4*de)] <- apply(t(p.life.a[1,,1:(4*de-1)]),MARGIN=mrg,function(x) rbinom(n=space, size=x, prob=e.surv.p))
 if(species!="aegypti") {p.life.a[4,,2:(4*de)] <- apply(t(p.life.a[4,,1:(4*de-1)]),MARGIN=mrg,function(x) rbinom(size=x,n=space,prob=d.surv.p))} else {p.life.a[4,,2:(4*de)] <- 0}
 ## Introduce eggs if day==1; introduction happens in E sub-compartment 8 as it can be assumed that eggs are most likely to be introduced in an advanced stage of development 
-p.life.a[1,,(4*de)] <- if(length(counter)==1) {
-  e.intro.n[day]
-} else {
-  p.life.a[1,,(4*de)] + e.intro.n[day]
-} 
+p.life.a[1,,(4*de)] <- if( length(counter)==1 ) {
+	e.intro.n
+	} else p.life.a[1,,(4*de)]
 # Diapause eggs
 p.life.a[4,,(4*de)] <- if( length(counter)==1 ) {
 	d.intro.n
@@ -300,23 +326,19 @@ p.life.a[1,,c(4*de)] <- p.life.a[1,,c(4*de)] + e.temp.v
 if(species!="aegypti") {p.life.a[4,,c(4*de)] <- p.life.a[4,,c(4*de)] + d.temp.v}
 # Binomial draw to find numbers of eggs 8-d+ old that hatch today (per cell)
 e.hatc.n <- rbinom(length(1:space), p.life.a[1,,c(4*de)], prob=e.hatc.p)
-if(length(counter)!=1){
-  if( species=="albopictus" ) {
-    if( any(photo.matrix[,day]>photo.matrix[,day-1]) & any(photo.matrix[,day]>11.44) ) {
-      d.hatc.n <- rep(0,space)
-      ddays <- which(photo.matrix[,day]>11.44)
-      d.hatc.n[ddays] <- rbinom(length(ddays), p.life.a[4,ddays,c(4*de)], prob=e.hatc.p)
-    } else {d.hatc.n <- 0}
-  }else if( species=="koreicus"|species=="japonicus" ) {
-    if( photo.matrix[,day]>photo.matrix[,day-1] & any(photo.matrix[,day]>10.71) ) {
-      d.hatc.n <- rep(0,space)
-      ddays <- which(photo.matrix[,day]>10.71)
-      d.hatc.n[ddays] <- rbinom(length(ddays), p.life.a[4,ddays,c(4*de)], prob=e.hatc.p)
-    } else {d.hatc.n <- 0}
-  } else {d.hatc.n <- 0}
-} else {
-  d.hatc.n <- 0
-}
+if( species=="albopictus" ) {
+	if( any(photo.matrix[,day]>photo.matrix[,day-1]) & any(photo.matrix[,day]>11.44) ) {
+		d.hatc.n <- rep(0,space)
+		ddays <- which(photo.matrix[,day]>11.44)
+		d.hatc.n[ddays] <- rbinom(length(ddays), p.life.a[4,ddays,c(4*de)], prob=e.hatc.p)
+		} else {d.hatc.n <- 0}
+		}else if( species=="koreicus"|species=="japonicus" ) {
+			if( photo.matrix[,day]>photo.matrix[,day-1] & any(photo.matrix[,day]>10.71) ) {
+				d.hatc.n <- rep(0,space)
+				ddays <- which(photo.matrix[,day]>10.71)
+				d.hatc.n[ddays] <- rbinom(length(ddays), p.life.a[4,ddays,c(4*de)], prob=e.hatc.p)
+				} else {d.hatc.n <- 0}
+				} else {d.hatc.n <- 0}
 # Remove hatched eggs from eggs 8d+ old
 e.temp.v <- p.life.a[1,,(4*de)] - e.hatc.n
 if( species!="aegypti" ) {d.temp.v <- p.life.a[4,,c(4*de)] - if(species!="aegypti") {d.hatc.n} else {0}}
@@ -370,7 +392,7 @@ a.tegg.n <- sapply(1:space, function(x) sum(rpois(sum(p.life.a[3,x,2:3]), a.batc
 if(scale=="rg") {
 	a.degg.n <- sapply(1:space, function(x){rbinom(1,a.tegg.n[x],prob=(e.diap.p[x]))})
 	} else {
-		a.degg.n <- sapply(1:space, function(x){rbinom(1,a.tegg.n[x],prob=(e.diap.p))})
+	a.degg.n <- sapply(1:space, function(x){rbinom(1,a.tegg.n[x],prob=(e.diap.p))})
 	}
 	a.egg.n <- a.tegg.n-a.degg.n
 	} else {
@@ -503,8 +525,8 @@ return(
 		scale=ifelse(scale=="ws","Weather Station", ifelse(scale=="lc","Local","Regional")), 
 		start_date=startd, end_date=ifelse(is.na(endd), "1990-01-01", endd), 
 		n_iterations=iter, 
-		stage_intro=ifelse(any(sapply(intro.eggs, function(x){x!=0})), "egg", ifelse(intro.juveniles!=0, "juvenile", ifelse(intro.adults!=0, "adult", "Diapause egg"))),
-		n_intro=ifelse(any(sapply(intro.eggs, function(x){x!=0})), intro.eggs[[1]], ifelse(intro.juveniles!=0, intro.juveniles, ifelse(intro.adults!=0,intro.adults, intro.deggs))),
+		stage_intro=ifelse(intro.eggs!=0, "egg", ifelse(intro.juveniles!=0, "juvnile", ifelse(intro.adults!=0, "adult", "Diapause egg"))),
+		n_intro=ifelse(intro.eggs!=0, intro.eggs, ifelse(intro.juveniles!=0, intro.juveniles, ifelse(intro.adults!=0,intro.adults, intro.deggs))),
 		coordinates=if(!scale=="ws") {matrix(cells.coords, ncol=2)} else{matrix(c(long, lat), byrow=TRUE, nrow=1)},
 		compressed_output=compressed.output,
 		jhwv=jhwv, 
