@@ -1,3 +1,11 @@
+# dynamAedes 3.0.0
+* Fixes bug on dybamAedes.m at the regional scale when the species is Aedes aegypti.
+* Updates adci function
+* Implement Multiple introduction events through the multipleIntro function 
+
+# dynamAedes 2.2.9
+Substitutes legend.pos with legend.position in vignettes.
+
 # dynamAedes 2.2.8
 * Adds reference file for life history traits `AedeslifeHistoryList`.
 * Adds function `spreader`.

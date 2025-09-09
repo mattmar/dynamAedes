@@ -142,7 +142,7 @@ outdf <- rbind(
   adci(simout, eval_date=ed, breaks=breaks, stage="Adults"),
   adci(simout, eval_date=ed, breaks=breaks, stage="Dia"))
 outdf$stage <- factor(outdf$stage, levels= c('Egg', 'DiapauseEgg', 'Juvenile', 'Adult'))
-outdf$Date <- rep(seq.Date(as.Date(str), as.Date(endr), by="day"), 4)
+outdf$Date <- rep(seq.Date(as.Date(str), as.Date(endr) - 2, by="day"), 4)
 ```
 
 Then we can look at the time series of the population dynamics stage by stage.
@@ -206,7 +206,6 @@ autocorr_factor <- terra::values(r)
 df_temp <- data.frame("Date" = sim_temp[[1]]$date, "temp" = sim_temp[[1]]$x)
 df_temp <- df_temp[df_temp$Date %in% seq.Date(as.Date(str), as.Date(endr), by="day") , ]
 
-
 mat <- do.call(rbind, lapply(1:ncell(r), function(x) {
 	d_t <- df_temp$temp*autocorr_factor[[x]]
 	return(d_t)
@@ -235,7 +234,7 @@ simout <- dynamAedes.m(species="albopictus",
             intro.eggs=ie,
             compressed.output=TRUE,
             seeding=TRUE,
-            verbose=FALSE)
+            verbose=TRUE)
 ```
 
 ```{r, warning=FALSE}
@@ -259,7 +258,7 @@ outdf <- rbind(
   adci(simout, eval_date=ed, breaks=breaks, stage="Dia", type="O")
   )
 outdf$stage <- factor(outdf$stage, levels= c('Egg', 'DiapauseEgg', 'Juvenile', 'Adult'))
-outdf$Date <- rep(seq.Date(as.Date(str), as.Date(endr), by="day"), 4)
+outdf$Date <- rep(seq.Date(as.Date(str), as.Date(endr) - 2, by="day"), 4)
 ```
 
 Then we can look at the time series of the population dynamics stage by stage at the whole landscape level.
@@ -296,7 +295,7 @@ dd <- max(simout)
 
 #retrieve in which day of the simulation the multiple introductions happened
 intro.dates <- data.frame(Date = seq.Date(from = as.Date(str), to= as.Date(endr), length.out = dd))
-intro.dates$IntroDay<-1:nrow(intro.dates)
+intro.dates$IntroDay <- 1:nrow(intro.dates)
 intro.dates <- intro.dates[which(intro.dates$Date %in% as.Date(c(sapply(ie, names)))),]
 intro.dates
 ```
@@ -313,7 +312,7 @@ eggs.r <- adci(simout, eval_date=9:10, breaks=breaks,
 eggs.r$q_0.5
 # plot the raster with the median egg abundace
 plot(eggs.r$q_0.5,  
-     legend ="bottom",
+     breaks = seq(0, 3000, 500),
      range = c(0, 3000))
 ```
 

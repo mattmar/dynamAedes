@@ -17,7 +17,7 @@ knitr::opts_chunk$set(fig.width=10, fig.height=10, fig.asp = 0.618, out.width = 
 options(rmarkdown.html_vignette.check_title = FALSE)
 ```
 
-This vignette provides a comprehensive guide to the `spreader` function available in the `dynamAedes` package ([Da Re et al., 2022](https://doi.org/10.1186/s13071-022-05414-4)). This function performs a temporal downscaling of observations captured by entomological traps (e.g. ovitraps, CDC-traps, BG-sentinel) *spreading* the observed counts over the period of activation of the traps.
+This vignette provides a comprehensive guide to the `spreader` function, originally developed for the systematization of the VectAbundance database ([Da Re et al., 2024](https://doi.org/10.1038/s41597-024-03482-y)). This function performs a temporal downscaling of observations captured by entomological traps (e.g. ovitraps, CDC-traps, BG-sentinel) *spreading* the observed counts over the period of activation of the traps.
 
 In fact, stakeholders in charge of mosquito surveillance activities, such as public health agencies or research centres, adopt different monitoring schemes (i.e., size of the traps, length of the monitoring period, length of the activation period of the trap, etc.), depending on their needs, budget, and personnel. As a result, the monitoring schemes are highly heterogeneous between (but also within) countries ([Jourdain et al., 2019](https://doi.org/10.1371/journal.pntd.0007314), [Miranda et al., 2022](https://doi.org/10.46471/gigabyte.57)), restricting the temporal and spatial extent of each monitoring effort and producing gaps in data collection.
 
