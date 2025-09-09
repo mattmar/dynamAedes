@@ -257,27 +257,27 @@ dj <- if(species=="koreicus"|species=="japonicus") 2 else 1
 da <- if(species=="koreicus"|species=="japonicus") 2.25 else 1
 
 # Define objects required to store data during a day
-counter <- 0; i.temp.v <- 0; d.temp.v <- 0; e.temp.v <- 0; a.egg.n <- 0; a.new.n <- 0; a.degg.n <- 0; 
-# p.life.a <- array(0,c(4,nrow(temps.matrix),6*de), dimnames = list(c("egg", "juvenile", "adult", "diapause_egg"), NULL, paste0("sc",1:(6*de)))); #DDR
-# Determine number of subcompartments per life stage
-n_egg_sub      <- 6 * de         # corrected from 4 to 6
-n_juv_sub      <- 6 * dj
-n_adult_sub    <- 5              # fixed
-n_diapause_sub <- 6 * de         # matching egg structure
-
-# Max dimension across all life stages
-n_total_sub <- max(n_egg_sub, n_juv_sub, n_adult_sub, n_diapause_sub)
-
-# Allocate p.life.a
-p.life.a <- array(
-  0L,
-  dim = c(4, nrow(temps.matrix), n_total_sub),
-  dimnames = list(
-    c("egg", "juvenile", "adult", "diapause_egg"),
-    NULL,
-    paste0("sc", seq_len(n_total_sub))
-  )
-)
+counter <- 0; i.temp.v <- 0; d.temp.v <- 0; e.temp.v <- 0; a.egg.n <- 0; a.new.n <- 0; a.degg.n <- 0 
+p.life.a <- array(0,c(4,nrow(temps.matrix),6*de), dimnames = list(c("egg", "juvenile", "adult", "diapause_egg"), NULL, paste0("sc",1:(6*de)))); #DDR
+# # Determine number of subcompartments per life stage
+# n_egg_sub      <- 6 * de         # corrected from 4 to 6
+# n_juv_sub      <- 6 * dj
+# n_adult_sub    <- 5              # fixed
+# n_diapause_sub <- 6 * de         # matching egg structure
+# 
+# # Max dimension across all life stages
+# n_total_sub <- max(n_egg_sub, n_juv_sub, n_adult_sub, n_diapause_sub)
+# 
+# # Allocate p.life.a
+# p.life.a <- array(
+#   0L,
+#   dim = c(4, nrow(temps.matrix), n_total_sub),
+#   dimnames = list(
+#     c("egg", "juvenile", "adult", "diapause_egg"),
+#     NULL,
+#     paste0("sc", seq_len(n_total_sub))
+#   )
+# )
 storage.mode(p.life.a) <- "integer"; outl <- list()
 } else counter <- append(counter,day)
 ### Header:
