@@ -11,11 +11,10 @@ importFrom("geosphere", "daylength")
 importFrom("terra", "distance","crds","project","vect","rast")
 importFrom("abind", "abind")
 importFrom("methods", "new")
-
+importFrom("terra", "app")
 #####################################
 ##               Export            ##
 #####################################
-
 export(adci)
 export(dici)
 export(dynamAedes.m)
@@ -24,3 +23,4 @@ export(psi)
 export(psi_sp)
 export(spreader)
 export(multipleIntro)
+export(get_rate)
